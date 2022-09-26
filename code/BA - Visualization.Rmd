@@ -1,0 +1,54 @@
+---
+title: "BA - Visualization"
+output: html_notebook
+---
+
+## load libraries
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+```
+
+## load data
+
+```{r}
+data <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/Data/Results/dea_results.csv", show_col_types = FALSE)
+```
+
+
+
+## years vs effiviency
+
+```{r}
+data %>%
+  filter(continent == "Europe") %>%
+  ggplot(aes(year, efficiencies))+
+  geom_point(aes(
+    color=country
+  ))
+```
+## Efficnienies per continent (all years)
+
+```{r}
+data %>%
+  # filter(continent == "Africa") %>%
+  ggplot(aes(continent, efficiencies))+
+  geom_boxplot()+
+  geom_jitter(width = 0.1,
+              alpha = 0.5,
+              aes(
+                color=year
+              ))
+```
+
+
+```{r}
+
+data %>%
+  filter(year==1992) %>%
+  filter(efficiencies==1) %>%
+  mean(income)
+
+```
+

@@ -1,0 +1,324 @@
+---
+title: "Bachelor's Thesis"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+  word_document: default
+---
+
+# Data Preparation
+
+## What data sets to use
+
+Input:
+
+* CO2 Emissions per person
+* women in parliament
+* democracy
+* mean years in school -> data on gapminder only until 2009
+
+Output:
+* life expactancy
+* income
+* murder rate
+* employment rate
+
+
+## install packages
+
+```{r}
+# install.packages("tidyverse")
+# install.packages("deaR")
+# tinytex::install_tinytex()
+# install.packages('countrycode')
+```
+
+
+## load libaries
+
+```{r}
+library(tidyverse)
+library(deaR)
+library(ggplot2)
+library(countrycode)
+```
+
+
+## load data
+
+```{r}
+
+# Input
+co2 <- read_csv("G:/My Drive/Bildung/Hochschule/BA/Data/gapminder/co2_emissions_tonnes_per_person.csv",show_col_types = FALSE)
+women_in_parliament <- read_csv("G:/My Drive/Bildung/Hochschule/BA/Data/gapminder/percentage_women_in_parliament.csv",show_col_types = FALSE)
+democracy <- read_csv("G:/My Drive/Bildung/Hochschule/BA/Data/gapminder/demox_eiu.csv",show_col_types = FALSE)
+# mean_years_in_school_men <- read_csv("G:/My Drive/Bildung/Hochschule/BA/Data/gapminder/mean_years_in_school_men_25_years_and_older.csv",show_col_types = FALSE)
+# mean_years_in_school_women <- read_csv("G:/My Drive/Bildung/Hochschule/BA/Data/gapminder/mean_years_in_school_women_25_years_and_older.csv",show_col_types = FALSE)
+
+# Output
+life_expactancy <- read_csv("G:/My Drive/Bildung/Hochschule/BA/Data/gapminder/life_expectancy_years.csv",show_col_types = FALSE)
+income <- read_csv("G:/My Drive/Bildung/Hochschule/BA/Data/gapminder/income_per_person_gdppercapita_ppp_inflation_adjusted.csv",show_col_types = FALSE)
+murder <- read_csv("G:/My Drive/Bildung/Hochschule/BA/Data/gapminder/murder_per_100000_people.csv",show_col_types = FALSE)
+employment_rate <- read_csv("G:/My Drive/Bildung/Hochschule/BA/Data/gapminder/aged_15plus_employment_rate_percent.csv",show_col_types = FALSE)
+
+```
+
+
+## Choose year with biggest overlap
+
+
+## Extract columns of chosen year
+
+```{r}
+
+# Input
+co2_2014 <- co2[c("country","2014")]
+wip_2014 <- women_in_parliament[c("country","2014")]
+democracy_2014 <- democracy[c("country","2014")]
+# school_men_2014 <- mean_years_in_school_men[c("country","2014")]
+# school_women_2014 <- mean_years_in_school_women[c("country","2014")]
+
+# Output
+life_expactancy_2014 <- life_expactancy[c("country","2014")]
+income_2014 <- income[c("country","2014")]
+murder_2014 <- murder[c("country","2014")]
+employment_2014 <- employment_rate[c("country","2014")]
+
+```
+
+## Remove Ks, Ms, etc... and make it numerical
+
+```{r}
+
+income_2014$`2014` <- as.numeric(gsub("k", "e3", income_2014$`2014`))/1000 # divided by 1000 to avoid different orders of magnitude within dataset
+
+```
+
+## Merge data frames and drop countries with NA
+
+```{r}
+
+# Create list of all data frames
+list_all_data <- list(
+  co2_2014, 
+  wip_2014, 
+  democracy_2014, 
+  # school_men_2014, 
+  # school_women_2014, 
+  life_expactancy_2014, 
+  income_2014, 
+  murder_2014, 
+  employment_2014)
+
+
+# Merge all data frame together by the country attribute
+final <- list_all_data %>% reduce(full_join, by="country")
+
+
+# Change column names to something meaningful
+colnames(final) <- c(
+  "country", 
+  "co2_2014", 
+  "wip_2014", 
+  "democracy_2014", 
+  # "school_men_2014", 
+  # "school_women_2014", 
+  "life_expactancy_2014", 
+  "income_2014", 
+  "murder_2014", 
+  "employment_2014")
+
+# convert tibble to data frame
+final <- as.data.frame(final)
+
+# Remove countries with NA values
+final <- drop_na(final)
+
+head(final)
+
+```
+
+## Save result as csv
+
+```{r}
+
+write_csv(final, "G:/My Drive/Bildung/Hochschule/BA/Data/Results/country_data.csv")
+
+```
+
+
+# DEA
+
+
+## DEA preparation
+
+```{r}
+
+# Documentation: https://cran.r-project.org/web/packages/deaR/deaR.pdf
+
+# Number of in- and outputs
+number_of_inputs <- 3
+number_of_outputs <- 4
+
+orientation <- "io" 
+# io: input oriented
+# oo: output oriented
+
+return_to_scale <- "vrs"
+# crs: constant return to scale
+# vrs: variable return to scale
+# nirs: non-increasing
+# ndrs: non-decreasing
+# grs: generalized
+
+
+model_data <- read_data(final, ni=number_of_inputs, no=number_of_outputs, dmus = 1)
+
+
+result <- model_basic(model_data, orientation = orientation, rts=return_to_scale)
+
+## Warning: There are data with very different orders of magnitude. Try to re-define the units of measure or some linear problems may be ill-posed.
+
+```
+
+
+## Results
+
+### Efficiencies
+
+```{r}
+
+eff <- efficiencies(result)
+
+```
+
+
+### Targets
+
+```{r}
+
+# Get targets
+targets <- as.data.frame(targets(result))
+
+```
+
+
+```{r}
+
+# Add efficiency to final data frame
+final$eff <- as.vector(eff)
+
+```
+
+
+```{r}
+
+# Combine final and targets
+final <- cbind(final, targets)
+
+# remove rownames
+rownames(final) <- NULL
+
+
+
+
+```
+
+
+```{r}
+
+# add continent
+final$continent <- countrycode(sourcevar = final$country,
+                               origin = "country.name",
+                               destination = "continent")
+
+head(final)
+
+```
+
+```{r}
+
+write_csv(final, "G:/My Drive/Bildung/Hochschule/BA/Data/Results/dea_results.csv")
+
+```
+
+
+
+### Visualization
+
+```{r}
+
+# Plot no. 1
+final %>%
+  ggplot(aes(country, co2_2014))+
+  geom_bar(stat="identity",
+           position = position_dodge(width = 0.1),
+           width=0.8,
+           aes(fill=wip_2014))+
+  theme(axis.text.x = element_text(angle = 90, hjust=0.95))+
+  coord_flip()
+
+
+```
+
+```{r}
+
+# Plot no. 2
+final %>%
+  ggplot(aes(eff, co2_2014))+
+  geom_point(alpha = 0.5,
+             size = 3,
+             aes(color = continent))+
+  geom_text(size = 2,
+            aes(label=country))
+
+
+```
+
+```{r}
+
+final %>%
+  ggplot(aes(co2_2014, income_2014))+
+  geom_point()+
+  geom_smooth(method="lm")
+
+```
+
+```{r}
+
+df1 <- data.frame(final$co2_2014, final$target_input.co2_2014, final$country)
+head(df1)
+
+```
+
+
+
+```{r}
+
+df1_long <- df1 %>%
+  gather("Stat", "Value", -final.country)
+head(df1_long)
+
+```
+
+```{r}
+
+df1_long %>%
+  ggplot(aes(x = final.country, y = Value, fill = Stat)) +
+  geom_col(position = "dodge")+
+  coord_flip()
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+
+

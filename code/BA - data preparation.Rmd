@@ -1,0 +1,424 @@
+---
+title: "Bachelor's Thesis - Data Preparation"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+  word_document: default
+---
+
+# Data Preparation
+
+## What data sets to use
+
+Input:
+
+* CO2 Emissions per person
+* women in parliament
+* democracy -> only very few years
+* mean years in school -> data on gapminder only until 2009
+
+Output:
+* life expactancy
+* income
+* murder rate
+* employment rate
+
+## load libaries
+
+```{r}
+library(tidyverse)
+library(deaR)
+library(ggplot2)
+library(countrycode)
+```
+
+
+## load data
+
+
+**Gapminder**:
+```{r}
+# Input
+# 5:
+women_in_parliament <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/Data/gapminder/percentage_women_in_parliament.csv",show_col_types = FALSE)
+# 6:
+basic_sanitation <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/Data/gapminder/at_least_basic_sanitation_overall_access_percent.csv",show_col_types = FALSE)
+basic_water_source <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/Data/gapminder/at_least_basic_water_source_overall_access_percent.csv",show_col_types = FALSE)
+# 7:
+electricity <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/Data/gapminder/access_to_electricity.csv",show_col_types = FALSE)
+# 8:
+employment_rate <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/Data/gapminder/aged_15plus_employment_rate_percent.csv",show_col_types = FALSE)
+# 12:
+material_footprint <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/Data/gapminder/matfootp_cap.csv",show_col_types = FALSE)
+# 15:
+forest_area <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/Data/gapminder/forest_area.csv",show_col_types = FALSE)
+
+# democracy <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/Data/gapminder/demox_eiu.csv",show_col_types = FALSE)
+
+# Output
+# 1:
+poverty <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/Data/gapminder/extreme_poverty_percent_people_below_190_a_day.csv",show_col_types = FALSE)
+# 3:
+life_expactancy <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/Data/gapminder/life_expectancy_years.csv",show_col_types = FALSE)
+# 8:
+income <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/Data/gapminder/income_per_person_gdppercapita_ppp_inflation_adjusted.csv",show_col_types = FALSE)
+# 10:
+income_share_20 <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/Data/gapminder/income_share_of_poorest_20percent.csv",show_col_types = FALSE)
+# 13:
+CO2 <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/Data/gapminder/co2_emissions_tonnes_per_person.csv",show_col_types = FALSE)
+# deaths_natural_disaster <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/Data/gapminder/number_of_natural_disaster_death_tot.csv",show_col_types = FALSE) # Total -> has to be calculated to /100k
+# 16:
+murder <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/Data/gapminder/murder_per_100000_people.csv",show_col_types = FALSE)
+
+```
+
+**OurWorldInData**:
+```{r}
+# 3:
+health_worker <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/Data/OurWorldInData/physicians-per-1000-people.csv",show_col_types = FALSE)
+# 4:
+mean_years_in_school <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/Data/OurWorldInData/mean-years-of-schooling.csv",show_col_types = FALSE)
+# 11:
+air_pollution <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/Data/OurWorldInData/PM25-air-pollution.csv",show_col_types = FALSE)
+# 15:
+red_list <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/Data/OurWorldInData/red-list-index.csv",show_col_types = FALSE)
+```
+
+## OurworldInData Adaption
+
+```{r}
+health_worker[,2] <- NULL
+mean_years_in_school[,2] <- NULL
+air_pollution[,2] <- NULL
+red_list[,2] <- NULL
+
+colnames(health_worker) <- c("country", "year", "value")
+colnames(mean_years_in_school) <- c("country", "year", "value")
+colnames(air_pollution) <- c("country", "year", "value")
+colnames(red_list) <- c("country", "year", "value")
+```
+
+## Remove years 1949 and earlier
+
+Not necessary, filtered out later anyways
+
+```{r}
+# drops <- as.character(c(1700:1949, 2021:2200))
+# 
+# CO2 <- CO2[ , !(names(CO2) %in% drops)]
+# women_in_parliament <- women_in_parliament[ , !(names(women_in_parliament) %in% drops)]
+# democracy <- democracy[ , !(names(democracy) %in% drops)]
+# 
+# life_expactancy <- life_expactancy[ , !(names(life_expactancy) %in% drops)]
+# income <- income[ , !(names(income) %in% drops)]
+# murder <- murder[ , !(names(murder) %in% drops)]
+# employment_rate <- employment_rate[ , !(names(employment_rate) %in% drops)]
+
+```
+
+## Change tables from wide to long (Gapminder)
+
+```{r}
+women_in_parliament <- women_in_parliament %>% gather("year", "value", -country)
+basic_sanitation <- basic_sanitation %>% gather("year", "value", -country)
+basic_water_source <- basic_water_source %>% gather("year", "value", -country)
+electricity <- electricity %>% gather("year", "value", -country)
+employment_rate <- employment_rate %>% gather("year", "value", -country)
+material_footprint <- material_footprint %>% gather("year", "value", -country)
+forest_area <- forest_area %>% gather("year", "value", -country)
+poverty <- poverty %>% gather("year", "value", -country)
+life_expactancy <- life_expactancy %>% gather("year", "value", -country)
+income <- income %>% gather("year", "value", -country)
+income_share_20 <- income_share_20 %>% gather("year", "value", -country)
+CO2 <- CO2 %>% gather("year", "value", -country)
+murder <- murder %>% gather("year", "value", -country)
+```
+
+## Range of years of datasets
+
+```{r}
+titles <- c(
+"women_in_parliament",
+"basic_sanitation",
+"basic_water_source",
+"electricity",
+"employment_rate",
+"material_footprint",
+"forest_area",
+"mean_years_in_school",
+"air_pollution",
+"health_worker",
+"red_list",
+"poverty",
+"life_expactancy",
+"income",
+"income_share_20",
+"CO2",
+"murder"
+)
+
+earliest <- c(
+min(women_in_parliament$year),
+min(basic_sanitation$year),
+min(basic_water_source$year),
+min(electricity$year),
+min(employment_rate$year),
+min(material_footprint$year),
+min(forest_area$year),
+min(mean_years_in_school$year),
+min(health_worker$year),
+min(air_pollution$year),
+min(red_list$year),
+min(poverty$year),
+min(life_expactancy$year),
+min(income$year),
+min(income_share_20$year),
+min(CO2$year),
+min(murder$year)
+)
+
+latest <- c(
+max(women_in_parliament$year),
+max(basic_sanitation$year),
+max(basic_water_source$year),
+max(electricity$year),
+max(employment_rate$year),
+max(material_footprint$year),
+max(forest_area$year),
+max(mean_years_in_school$year),
+max(health_worker$year),
+max(air_pollution$year),
+max(red_list$year),
+max(poverty$year),
+max(life_expactancy$year),
+max(income$year),
+max(income_share_20$year),
+max(CO2$year),
+max(murder$year)
+)
+
+overview <- data.frame(titles, earliest, latest)
+
+```
+
+## Merge data frames
+
+```{r}
+
+# Create list of all data frames
+# all_data <- list(
+#   women_in_parliament,
+#   basic_sanitation,
+#   basic_water_source,
+#   electricity,
+#   employment_rate,
+#   material_footprint,
+#   forest_area,
+#   mean_years_in_school,
+#   health_worker,
+#   air_pollution,
+#   red_list,
+#   poverty,
+#   life_expactancy,
+#   income,
+#   income_share_20,
+#   CO2,
+#   murder
+# )
+
+# make year columns numerical
+
+women_in_parliament <- women_in_parliament %>% mutate(year = as.numeric(year))
+basic_sanitation <- basic_sanitation %>% mutate(year = as.numeric(year))
+basic_water_source <- basic_water_source %>% mutate(year = as.numeric(year))
+electricity <- electricity %>% mutate(year = as.numeric(year))
+employment_rate <- employment_rate %>% mutate(year = as.numeric(year))
+material_footprint <- material_footprint %>% mutate(year = as.numeric(year))
+forest_area <- forest_area %>% mutate(year = as.numeric(year))
+mean_years_in_school <- mean_years_in_school %>% mutate(year = as.numeric(year))
+health_worker <- health_worker %>% mutate(year = as.numeric(year))
+air_pollution <- air_pollution %>% mutate(year = as.numeric(year))
+red_list <- red_list %>% mutate(year = as.numeric(year))
+poverty <- poverty %>% mutate(year = as.numeric(year))
+life_expactancy <- life_expactancy %>% mutate(year = as.numeric(year))
+income <- income %>% mutate(year = as.numeric(year))
+income_share_20 <- income_share_20 %>% mutate(year = as.numeric(year))
+CO2 <- CO2 %>% mutate(year = as.numeric(year))
+murder <- murder %>% mutate(year = as.numeric(year))
+```
+
+Test out, which datasets to use
+
+Excluding:
+- basic sanitation
+- basic water source
+- poverty
+- income share lowest 20%
+
+```{r}
+
+# Merge all data frame together by the country attribute
+
+# final <- 
+#   # # merge(
+#   # #   merge(
+#   # #     merge(
+#   # #       merge(
+#   #         merge(
+#   #           merge(
+#   #             merge(
+#   #               merge(
+#   #                 merge(
+#   #                   merge(
+#   #                     merge(
+#   #                       merge(
+#   #                         merge(
+#   #                           merge(
+#                               # merge(
+#                                 merge(
+#                                   # women_in_parliament, 
+#                                   # basic_sanitation, by = c("country", "year")), 
+#                                   # basic_water_source, by = c("country", "year")),
+#                                   # electricity,by = c("country", "year")),
+#                                   # employment_rate, by = c("country", "year")),
+#                                   # material_footprint, by = c("country", "year")),
+#                                   # forest_area, by = c("country", "year")),
+#                                   # mean_years_in_school, by = c("country", "year")),
+#                                   # health_worker, by = c("country", "year")),
+#                                   # air_pollution, by = c("country", "year")),
+#                                   # red_list, by = c("country", "year")),
+#                                   # poverty, by = c("country", "year")),
+#                                   # life_expactancy, by = c("country", "year")),
+#                                   income, by = c("country", "year")),
+#                                   # income_share_20, by = c("country", "year")),
+#                                   CO2, by = c("country", "year"))
+#                                   # murder, by = c("country", "year"))
+
+final <- merge(income, CO2 , by = c("country", "year"))
+
+# final <- all_data %>% reduce(full_join, by=c("country", "year"))
+```
+
+
+```{r}
+
+# Change column names to something meaningful
+colnames(final) <- c(
+  "country",
+  "year",
+  # "women_in_parliament",
+  # "basic_sanitation",
+  # "basic_water_source",
+  # "electricity",
+  # "employment_rate",
+  # "material_footprint",
+  # "forest_area",
+  # "mean_years_in_school",
+  # "air_pollution",
+  # "health_worker",
+  # "red_list",
+  # "poverty",
+  # "life_expactancy",
+  "income",
+  # "income_share_20",
+  "CO2"
+  # "murder"
+  )
+
+# convert tibble to data frame
+final <- as.data.frame(final)
+```
+
+# Are there any quirks in the resulting data frame?
+
+- Upper middle income
+- World
+- USSR
+
+-> OurWorldInData also shows regional data, Gapminder does not. When filtering out all country-year combinations with NA values, the regional data will be filtered out as well. We will check that later.
+
+## Adap data types
+```{r}
+str(final)
+```
+
+- Income not numeric
+- CO2 not numeric
+
+```{r}
+
+# adapt data types
+final$income <- as.numeric(gsub("k", "e3", final$income))/1000 # divided by 1000 to avoid different orders of magnitude within dataset
+final$CO2 <- as.numeric(final$CO2)
+str(final)
+```
+
+## Delete DMUs with NAs
+
+```{r}
+final <- drop_na(final)
+```
+
+## Find out year with most countries
+
+```{r}
+year <- table(final$year)
+year <- as.data.frame(year)
+year
+```
+
+## Check for negative or zero values
+
+```{r}
+min(final$women_in_parliament)
+min(final$basic_sanitation)
+min(final$basic_water_source)
+min(final$electricity)
+min(final$employment_rate)
+min(final$material_footprint)
+min(final$forest_area)
+min(final$mean_years_in_school)
+min(final$health_worker)
+min(final$air_pollution)
+min(final$red_list)
+min(final$poverty)
+min(final$life_expactancy)
+min(final$income)
+min(final$income_share_20)
+min(final$CO2)
+min(final$murder)
+
+```
+
+In the poverty column many 0 values can be found. For now, I will just delete this column
+
+```{r}
+final$poverty <- NULL
+```
+
+
+```{r}
+final_all <- final
+final_all$dmu <- str_c(final_all$country, "_", final_all$year)
+final_all$country <- NULL
+final_all$year <- NULL
+final_all <- final_all %>% relocate(dmu)
+```
+
+
+
+
+## Save result as csv
+
+```{r}
+
+write_csv(final_all, "D:/Daten/Bildung/HS Mannheim/BA/Data/Results/country_data_all_dmus.csv")
+write_csv(final, "D:/Daten/Bildung/HS Mannheim/BA/Data/Results/country_data_general.csv")
+
+
+```
+
+
+
+
