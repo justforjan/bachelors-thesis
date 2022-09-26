@@ -40,4 +40,4 @@ vignettes/*.pdf
 
 raw_data/
 
-.nb.html
+*.nb.html
