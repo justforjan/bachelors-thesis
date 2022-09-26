@@ -338,7 +338,7 @@ all_data <- list(
 
 final_8 <- all_data %>% reduce(full_join, by = c("country", "year"))
 
-colnames(final) <- c(
+colnames(final_8) <- c(
   "country",
   "year",
   "women_in_parliament",
@@ -351,9 +351,9 @@ colnames(final) <- c(
   "employment_rate"
 )
 
-final_8 <- as.data.frame(final)
+final_8 <- as.data.frame(final_8)
 
-final_8 <- drop_na(final)
+final_8 <- drop_na(final_8)
 
 nrow(final_8)
 ```
@@ -372,9 +372,9 @@ min(final_8$CO2)
 
 ```{r}
 print("0 women in parliament:")
-unique(final_8$country[final$women_in_parliament <= 0])
+unique(final_8$country[final_8$women_in_parliament <= 0])
 print("0 forest area:")
-unique(final_8$country[final$forest_area <= 0])
+unique(final_8$country[final_8$forest_area <= 0])
 ```
 
 Assign very low values where values are 0
@@ -389,6 +389,74 @@ min(final_8$forest_area)
 # min(final$mean_years_in_school)
 # min(final$poverty)
 min(final_8$CO2)
+```
+
+```{r}
+final_8$dmu <- str_c(final_8$country, "_", final_8$year)
+final_8$country <- NULL
+final_8$year <- NULL
+final_8 <- final_8 %>% relocate(dmu)
+```
+
+### DEA - Attempt 3
+
+```{r}
+
+# Documentation: https://cran.r-project.org/web/packages/deaR/deaR.pdf
+
+# Number of in- and outputs
+number_of_inputs <- 4
+number_of_outputs <- 4
+
+orientation <- "io"
+# io: input oriented
+# oo: output oriented
+
+return_to_scale <- "vrs"
+# crs: constant return to scale
+# vrs: variable return to scale
+# nirs: non-increasing
+# ndrs: non-decreasing
+# grs: generalized
+
+
+model_data <- read_data(final_8, ni=number_of_inputs, no=number_of_outputs, dmus = 1)
+
+
+result <- model_basic(model_data, orientation = orientation, rts=return_to_scale)
+
+```
+
+```{r}
+# Efficiencies
+eff <- as.data.frame(efficiencies(result))
+# add column for dmu names
+eff$dmu <- rownames(eff)
+# delete rownames
+rownames(eff) <- NULL
+# Rename efficiency column
+colnames(eff)[1] <- "efficiencies"
+
+# get targets
+targets <- as.data.frame(targets(result))
+# add column for dmu names
+targets$dmu <- rownames(targets)
+# delte rownames
+rownames(targets) <- NULL
+```
+
+```{r}
+data_and_results <- list(
+  final_8,
+  eff,
+  targets
+)
+
+data_dea <- data_and_results %>% reduce(full_join, by="dmu")
+```
+
+```{r}
+data_dea <- data_dea %>% relocate(efficiencies, .after = dmu)
 ```
 
 ## Attempt 2
