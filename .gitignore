@@ -39,3 +39,5 @@ vignettes/*.pdf
 .Renviron
 
 raw_data/
+
+.nb.html

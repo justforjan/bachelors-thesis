@@ -16,7 +16,7 @@ library(countrycode)
 ## load data
 
 ```{r}
-data = read_csv("D:/Daten/Bildung/HS Mannheim/BA/Data/Results/country_data_all_dmus.csv", show_col_types = FALSE)
+data = read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/country_data_all_dmus.csv", show_col_types = FALSE)
 str(data)
 ```
 
@@ -104,6 +104,6 @@ data_dea$continent <- countrycode(sourcevar = data_dea$country,
 ## export as csv
 
 ```{r}
-write_csv(data_dea, "D:/Daten/Bildung/HS Mannheim/BA/Data/Results/dea_results.csv")
+write_csv(data_dea, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/dea_results.csv")
 ```
 
