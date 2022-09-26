@@ -336,9 +336,11 @@ all_data <- list(
   employment_rate
 )
 
-final <- all_data %>% reduce(full_join, by = c("country", "year"))
+final_8 <- all_data %>% reduce(full_join, by = c("country", "year"))
 
 colnames(final) <- c(
+  "country",
+  "year",
   "women_in_parliament",
   "electricity",
   "CO2",
@@ -349,25 +351,44 @@ colnames(final) <- c(
   "employment_rate"
 )
 
-final <- as.data.frame(final)
+final_8 <- as.data.frame(final)
 
-final <- drop_na(final)
+final_8 <- drop_na(final)
 
-nrow(final)
+nrow(final_8)
 ```
+
+-\> 2201 DMUs
 
 ### Check for 0 values
 
 ```{r}
-# min(final$women_in_parliament)
-min(final$forest_area)
+min(final_8$women_in_parliament)
+min(final_8$forest_area)
 # min(final$mean_years_in_school)
 # min(final$poverty)
-min(final$CO2)
+min(final_8$CO2)
 ```
 
 ```{r}
-sum(final$CO2 <= 0)
+print("0 women in parliament:")
+unique(final_8$country[final$women_in_parliament <= 0])
+print("0 forest area:")
+unique(final_8$country[final$forest_area <= 0])
+```
+
+Assign very low values where values are 0
+
+```{r}
+final_8[final_8 == 0] <- 0.0001
+```
+
+```{r}
+min(final_8$women_in_parliament)
+min(final_8$forest_area)
+# min(final$mean_years_in_school)
+# min(final$poverty)
+min(final_8$CO2)
 ```
 
 ## Attempt 2
