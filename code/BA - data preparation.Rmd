@@ -271,8 +271,10 @@ zero_or_below <- c(
 (min(murder$value, na.rm = TRUE) <= 0)
 )
 
-overview <- data.frame(titles, earliest, latest, datapoints, zero_or_below)
-overview
+dp_per_year <- datapoints / (latest - earliest)
+
+overview <- data.frame(titles, earliest, latest, datapoints, dp_per_year, zero_or_below)
+overview[order(overview$dp_per_year, decreasing = TRUE),]
 ```
 
 Using data sets that have values of 0 or less might be an issue later on
@@ -313,7 +315,142 @@ Data sets that (as of now) look very promising:
 
 -   CO2
 
+## Attempt 3
+
+| Input               | Output          |
+|---------------------|-----------------|
+| electricity         | life_expectancy |
+| forest_area         | income          |
+| women_in_parliament | CO2             |
+| health_worker       | employment_rate |
+
+```{r}
+all_data <- list(
+  women_in_parliament,
+  electricity,
+  CO2,
+  forest_area,
+  life_expectancy,
+  income,
+  health_worker,
+  employment_rate
+)
+
+final <- all_data %>% reduce(full_join, by = c("country", "year"))
+
+colnames(final) <- c(
+  "women_in_parliament",
+  "electricity",
+  "CO2",
+  "forest_area",
+  "life_expectancy",
+  "income",
+  "health_worker",
+  "employment_rate"
+)
+
+final <- as.data.frame(final)
+
+final <- drop_na(final)
+
+nrow(final)
+```
+
+### Check for 0 values
+
+```{r}
+# min(final$women_in_parliament)
+min(final$forest_area)
+# min(final$mean_years_in_school)
+# min(final$poverty)
+min(final$CO2)
+```
+
+```{r}
+sum(final$CO2 <= 0)
+```
+
+## Attempt 2
+
+In this attempt we try to cover only 8 dimensions in total.
+
+**Input:**
+
+-   women_in_parliament
+
+-   electricity
+
+-   CO2
+
+-   mean_years_in_school
+
+**Output:**
+
+-   life_expectancy
+
+-   income
+
+-   income_share_20
+
+-   employment_rate
+
+```{r}
+all_data <- list(
+  women_in_parliament,
+  electricity,
+  CO2,
+  mean_years_in_school,
+  life_expectancy,
+  income,
+  income_share_20,
+  employment_rate
+)
+
+final <- all_data %>% reduce(full_join, by = c("country", "year"))
+
+colnames(final) <- c(
+  "women_in_parliament",
+  "electricity",
+  "CO2",
+  "mean_years_in_school",
+  "life_expectancy",
+  "income",
+  "income_share_20",
+  "employment_rate"
+)
+
+final <- as.data.frame(final)
+
+final <- drop_na(final)
+```
+
+### Check for 0 values
+
+```{r}
+min(final$women_in_parliament)
+min(final$mean_years_in_school)
+min(final$CO2)
+```
+
+Count how many 0 values in CO2
+
+```{r}
+sum(final$CO2 <= 0)
+```
+
+Only 2 values 0 or less. I will delete these two observations.
+
+```{r}
+final <- subset(final, CO2>0)
+```
+
+```{r}
+nrow(final)
+```
+
 ## Attempt 1 - All data sets
+
+17 in total
 
 ```{r}
 # Create list of all data frames
@@ -384,15 +521,6 @@ final <- as.data.frame(final)
 filtering out all country-year combinations with NA values, the regional
 data will be filtered out as well. We will check that later.
 
-### Adapt data types
-
-```{r}
-str(final)
-```
-
--   Income not numeric
--   CO2 not numeric
-
 ### Delete DMUs with NAs
 
 ```{r}
@@ -411,31 +539,74 @@ year
 
 ```{r}
 min(final$women_in_parliament)
-min(final$basic_sanitation)
-min(final$basic_water_source)
-min(final$electricity)
-min(final$employment_rate)
-min(final$material_footprint)
 min(final$forest_area)
 min(final$mean_years_in_school)
-min(final$health_worker)
-min(final$air_pollution)
-min(final$red_list)
 min(final$poverty)
-min(final$life_expectancy)
-min(final$income)
-min(final$income_share_20)
 min(final$CO2)
-min(final$murder)
-
 ```
 
-In the poverty column many 0 values can be found. For now, I will just
-delete this column
+In the poverty column many 0 values can be found. Instead of just
+deleting the columns, I will do the merger again but without poverty.
 
 ```{r}
-final$poverty <- NULL
+nrow(final)
+
+all_data <- list(
+  women_in_parliament,
+  basic_sanitation,
+  basic_water_source,
+  electricity,
+  employment_rate,
+  material_footprint,
+  forest_area,
+  mean_years_in_school,
+  health_worker,
+  air_pollution,
+  red_list,
+  # poverty,
+  life_expectancy,
+  income,
+  income_share_20,
+  CO2,
+  murder
+)
+
+final <- all_data %>% reduce(full_join, by=c("country", "year"))
+
+# Change column names to something meaningful
+colnames(final) <- c(
+  "country",
+  "year",
+  "women_in_parliament",
+  "basic_sanitation",
+  "basic_water_source",
+  "electricity",
+  "employment_rate",
+  "material_footprint",
+  "forest_area",
+  "mean_years_in_school",
+  "air_pollution",
+  "health_worker",
+  "red_list",
+  # "poverty",
+  "life_expectancy",
+  "income",
+  "income_share_20",
+  "CO2",
+  "murder"
+  )
+
+# convert tibble to data frame
+final <- as.data.frame(final)
+
+final <- drop_na(final)
+
+nrow(final)
 ```
+
+As we can see, we did not get any more DMUs by not including poverty.
+What a shame. 259 DMUs are way too less for 16 Dimensions. We need to
+have less dimensions.
 
 ```{r}
 final_all <- final
@@ -451,3 +622,5 @@ final_all <- final_all %>% relocate(dmu)
 write_csv(final_all, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/all_datasets_all_dmus.csv")
 # write_csv(final, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/country_data_general.csv")
 ```
+
+## 
