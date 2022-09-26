@@ -226,33 +226,16 @@ overview <- data.frame(titles, earliest, latest)
 
 ```
 
+```{r}
+
+```
+
+
+
 ## Merge data frames
 
 ```{r}
-
-# Create list of all data frames
-# all_data <- list(
-#   women_in_parliament,
-#   basic_sanitation,
-#   basic_water_source,
-#   electricity,
-#   employment_rate,
-#   material_footprint,
-#   forest_area,
-#   mean_years_in_school,
-#   health_worker,
-#   air_pollution,
-#   red_list,
-#   poverty,
-#   life_expactancy,
-#   income,
-#   income_share_20,
-#   CO2,
-#   murder
-# )
-
 # make year columns numerical
-
 women_in_parliament <- women_in_parliament %>% mutate(year = as.numeric(year))
 basic_sanitation <- basic_sanitation %>% mutate(year = as.numeric(year))
 basic_water_source <- basic_water_source %>% mutate(year = as.numeric(year))
@@ -270,58 +253,34 @@ income <- income %>% mutate(year = as.numeric(year))
 income_share_20 <- income_share_20 %>% mutate(year = as.numeric(year))
 CO2 <- CO2 %>% mutate(year = as.numeric(year))
 murder <- murder %>% mutate(year = as.numeric(year))
+
+# Create list of all data frames
+all_data <- list(
+  women_in_parliament,
+  basic_sanitation,
+  basic_water_source,
+  electricity,
+  employment_rate,
+  material_footprint,
+  forest_area,
+  mean_years_in_school,
+  health_worker,
+  air_pollution,
+  red_list,
+  poverty,
+  life_expactancy,
+  income,
+  income_share_20,
+  CO2,
+  murder
+)
 ```
-
-Test out, which datasets to use
-
-Excluding:
-- basic sanitation
-- basic water source
-- poverty
-- income share lowest 20%
 
 ```{r}
 
 # Merge all data frame together by the country attribute
 
-# final <- 
-#   # # merge(
-#   # #   merge(
-#   # #     merge(
-#   # #       merge(
-#   #         merge(
-#   #           merge(
-#   #             merge(
-#   #               merge(
-#   #                 merge(
-#   #                   merge(
-#   #                     merge(
-#   #                       merge(
-#   #                         merge(
-#   #                           merge(
-#                               # merge(
-#                                 merge(
-#                                   # women_in_parliament, 
-#                                   # basic_sanitation, by = c("country", "year")), 
-#                                   # basic_water_source, by = c("country", "year")),
-#                                   # electricity,by = c("country", "year")),
-#                                   # employment_rate, by = c("country", "year")),
-#                                   # material_footprint, by = c("country", "year")),
-#                                   # forest_area, by = c("country", "year")),
-#                                   # mean_years_in_school, by = c("country", "year")),
-#                                   # health_worker, by = c("country", "year")),
-#                                   # air_pollution, by = c("country", "year")),
-#                                   # red_list, by = c("country", "year")),
-#                                   # poverty, by = c("country", "year")),
-#                                   # life_expactancy, by = c("country", "year")),
-#                                   income, by = c("country", "year")),
-#                                   # income_share_20, by = c("country", "year")),
-#                                   CO2, by = c("country", "year"))
-#                                   # murder, by = c("country", "year"))
-
-final <- merge(income, CO2 , by = c("country", "year"))
-
-# final <- all_data %>% reduce(full_join, by=c("country", "year"))
+final <- all_data %>% reduce(full_join, by=c("country", "year"))
 ```
 
 
@@ -331,23 +290,23 @@ final <- merge(income, CO2 , by = c("country", "year"))
 colnames(final) <- c(
   "country",
   "year",
-  # "women_in_parliament",
-  # "basic_sanitation",
-  # "basic_water_source",
-  # "electricity",
-  # "employment_rate",
-  # "material_footprint",
-  # "forest_area",
-  # "mean_years_in_school",
-  # "air_pollution",
-  # "health_worker",
-  # "red_list",
-  # "poverty",
-  # "life_expactancy",
+  "women_in_parliament",
+  "basic_sanitation",
+  "basic_water_source",
+  "electricity",
+  "employment_rate",
+  "material_footprint",
+  "forest_area",
+  "mean_years_in_school",
+  "air_pollution",
+  "health_worker",
+  "red_list",
+  "poverty",
+  "life_expactancy",
   "income",
-  # "income_share_20",
-  "CO2"
-  # "murder"
+  "income_share_20",
+  "CO2",
+  "murder"
   )
 
 # convert tibble to data frame
@@ -374,7 +333,7 @@ str(final)
 
 # adapt data types
 final$income <- as.numeric(gsub("k", "e3", final$income))/1000 # divided by 1000 to avoid different orders of magnitude within dataset
-final$CO2 <- as.numeric(final$CO2)
+# final$CO2 <- as.numeric(final$CO2)
 str(final)
 ```
 
@@ -430,17 +389,11 @@ final_all$year <- NULL
 final_all <- final_all %>% relocate(dmu)
 ```
 
-
-
-
 ## Save result as csv
 
 ```{r}
-
-write_csv(final_all, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/country_data_all_dmus.csv")
-write_csv(final, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/country_data_general.csv")
-
-
+write_csv(final_all, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/all_datasets_all_dmus.csv")
+# write_csv(final, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/country_data_general.csv")
 ```
 
 
