@@ -317,11 +317,190 @@ Data sets that (as of now) look very promising:
 
 ## Attempt 4
 
-| Input | Output |
-|-------|--------|
-|       |        |
-|       |        |
-|       |        |
+| Input               | Output          |
+|---------------------|-----------------|
+| electricity         | life_expectancy |
+| women_in_parliament | income          |
+| health_worker       | CO2             |
+
+```{r}
+all_data <- list(
+  women_in_parliament,
+  electricity,
+  CO2,
+  # forest_area,
+  life_expectancy,
+  income,
+  health_worker
+  # employment_rate
+)
+
+final_4 <- all_data %>% reduce(full_join, by = c("country", "year"))
+
+colnames(final_4) <- c(
+  "country",
+  "year",
+  "women_in_parliament",
+  "electricity",
+  "CO2",
+  # "forest_area",
+  "life_expectancy",
+  "income",
+  "health_worker"
+  # "employment_rate"
+)
+
+final_4 <- as.data.frame(final_4)
+
+final_4 <- drop_na(final_4)
+
+nrow(final_4)
+```
+
+-\> 2332 DMUs
+
+### Check for 0 values
+
+```{r}
+min(final_4$women_in_parliament)
+# min(final_4$forest_area)
+# min(final$mean_years_in_school)
+# min(final$poverty)
+min(final_4$CO2)
+```
+
+```{r}
+print("0 women in parliament:")
+unique(final_4$country[final_4$women_in_parliament <= 0])
+```
+
+Assign very low values where values are 0
+
+```{r}
+final_4[final_4 == 0] <- 0.0001
+```
+
+```{r}
+min(final_4$women_in_parliament)
+# min(final_4$forest_area)
+# min(final$mean_years_in_school)
+# min(final$poverty)
+min(final_4$CO2)
+```
+
+```{r}
+final_4$dmu <- str_c(final_4$country, "_", final_4$year)
+final_4$country <- NULL
+final_4$year <- NULL
+final_4 <- final_4 %>% relocate(dmu)
+```
+
+### DEA - Attempt 3
+
+```{r}
+
+# Documentation: https://cran.r-project.org/web/packages/deaR/deaR.pdf
+
+# Number of in- and outputs
+number_of_inputs <- 3
+number_of_outputs <- 3
+
+orientation <- "io"
+# io: input oriented
+# oo: output oriented
+
+return_to_scale <- "vrs"
+# crs: constant return to scale
+# vrs: variable return to scale
+# nirs: non-increasing
+# ndrs: non-decreasing
+# grs: generalized
+
+
+model_data <- read_data(final_4, ni=number_of_inputs, no=number_of_outputs, dmus = 1)
+
+
+result_4 <- model_basic(model_data, orientation = orientation, rts=return_to_scale)
+
+```
+
+Calculate efficiencies and target values
+
+```{r}
+# Efficiencies
+eff <- as.data.frame(efficiencies(result_4))
+# add column for dmu names
+eff$dmu <- rownames(eff)
+# delete rownames
+rownames(eff) <- NULL
+# Rename efficiency column
+colnames(eff)[1] <- "efficiencies"
+
+# get targets
+targets <- as.data.frame(targets(result_4))
+# add column for dmu names
+targets$dmu <- rownames(targets)
+# delte rownames
+rownames(targets) <- NULL
+```
+
+Merge efficiencies, targets and the original data into one data fram
+
+```{r}
+data_and_results <- list(
+  final_4,
+  eff,
+  targets
+)
+
+data_dea_4 <- data_and_results %>% reduce(full_join, by="dmu")
+```
+
+Relocate the efficiencies column
+
+```{r}
+data_dea_4 <- data_dea_4 %>% relocate(efficiencies, .after = dmu)
+```
+
+Separate the DMU column into country and year but keep the dmu column
+
+```{r}
+data_dea_4 <- separate(data_dea_4, dmu, c("country", "year"), "_", remove=FALSE)
+```
+
+Add the continent to each DMU
+
+```{r}
+data_dea_4$continent <- countrycode(sourcevar = data_dea_4$country,
+                               origin = "country.name",
+                               destination = "continent")
+```
+
+### Visualization
+
+```{r}
+data_dea_4 %>%
+  filter(continent == "Africa") %>%
+  ggplot(aes(year, efficiencies))+
+  geom_point(aes(
+    # color=country
+  )
+  )+
+  theme(axis.text.x=element_text(angle = -90, hjust = 0))
+```
+
+```{r}
+data_dea_4 %>%
+  # filter(continent == "Africa") %>%
+  ggplot(aes(continent, efficiencies))+
+  geom_boxplot()+
+  geom_jitter(width = 0.1,
+              alpha = 0.5,
+              # aes(
+              #   color=year
+              #   )
+              )
+```
 
 ## Attempt 3
 
@@ -431,7 +610,7 @@ return_to_scale <- "vrs"
 model_data <- read_data(final_3, ni=number_of_inputs, no=number_of_outputs, dmus = 1)
 
 
-result_8 <- model_basic(model_data, orientation = orientation, rts=return_to_scale)
+result_3 <- model_basic(model_data, orientation = orientation, rts=return_to_scale)
 
 ```
 
@@ -439,7 +618,7 @@ Calculate efficiencies and target values
 
 ```{r}
 # Efficiencies
-eff <- as.data.frame(efficiencies(result_8))
+eff <- as.data.frame(efficiencies(result_3))
 # add column for dmu names
 eff$dmu <- rownames(eff)
 # delete rownames
@@ -448,7 +627,7 @@ rownames(eff) <- NULL
 colnames(eff)[1] <- "efficiencies"
 
 # get targets
-targets <- as.data.frame(targets(result_8))
+targets <- as.data.frame(targets(result_3))
 # add column for dmu names
 targets$dmu <- rownames(targets)
 # delte rownames
