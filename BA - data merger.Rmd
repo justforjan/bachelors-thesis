@@ -198,11 +198,11 @@ Data sets that (as of now) look very promising:
 
 -   CO2
 
-## Attempt 8 - 4 data sets
+## Attempt 9 - 5 data sets
 
 | Input                | Output          |
 |----------------------|-----------------|
-| electricity          | life_expectancy |
+| employment_rate      | life_expectancy |
 | mean_years_in_school | income          |
 |                      | CO2             |
 
@@ -210,7 +210,7 @@ Data sets that (as of now) look very promising:
 
 ```{r}
 all_data <- list(
-  electricity,
+  employment_rate,
   mean_years_in_school,
   CO2,
   life_expectancy,
@@ -218,23 +218,23 @@ all_data <- list(
 
 )
 
-final_7 <- all_data %>% reduce(full_join, by = c("country", "year"))
+final_9 <- all_data %>% reduce(full_join, by = c("country", "year"))
 
-colnames(final_7) <- c(
+colnames(final_9) <- c(
   "country",
   "year",
-  "electricity",
+  "employment_rate",
   "mean_years_in_school",
   "CO2",
   "life_expectancy",
   "income"
 )
 
-final_7 <- as.data.frame(final_7)
+final_9 <- as.data.frame(final_9)
 
-final_7 <- drop_na(final_7)
+final_9 <- drop_na(final_9)
 
-nrow(final_7)
+nrow(final_9)
 ```
 
 -\> 4037 DMUs
@@ -242,17 +242,89 @@ nrow(final_7)
 **Check for 0 values**
 
 ```{r}
-min(final_7$women_in_parliament)
-min(final_7$forest_area)
-min(final_7$mean_years_in_school)
-min(final_7$poverty)
-min(final_7$CO2)
+min(final_9$women_in_parliament)
+min(final_9$forest_area)
+min(final_9$mean_years_in_school)
+min(final_9$poverty)
+min(final_9$CO2)
 ```
 
 **Export to csv**
 
 ```{r}
-write_csv(final_7, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_7.csv")
+write_csv(final_9, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_9.csv")
+```
+
+## Attempt 8 - 4 data sets
+
+| Input                | Output          |
+|----------------------|-----------------|
+| CO2                  | life_expectancy |
+| mean_years_in_school | income          |
+
+**Merge data**
+
+```{r}
+all_data <- list(
+  mean_years_in_school,
+  CO2,
+  life_expectancy,
+  income
+
+)
+
+final_8 <- all_data %>% reduce(full_join, by = c("country", "year"))
+
+colnames(final_8) <- c(
+  "country",
+  "year",
+  "mean_years_in_school",
+  "CO2",
+  "life_expectancy",
+  "income"
+)
+
+final_8 <- as.data.frame(final_8)
+
+final_8 <- drop_na(final_8)
+
+nrow(final_8)
+```
+
+-\> 5533 DMUs
+
+**Check for 0 values**
+
+```{r}
+# min(final_8$women_in_parliament)
+# min(final_8$forest_area)
+min(final_8$mean_years_in_school)
+# min(final_8$poverty)
+min(final_8$CO2)
+```
+
+```{r}
+print("0 mean years in school:")
+unique(final_8$country[final_8$mean_years_in_school <= 0])
+table(final_8$country[final_8$mean_years_in_school <= 0])
+print("0 CO2:")
+unique(final_8$country[final_8$CO2 <= 0])
+table(final_8$country[final_8$CO2 <= 0])
+```
+
+One entry with 0 years of education (Yemen) and one entry with 0 CO2
+emissions (Iran)
+
+-\> I will delete them
+
+```{r}
+final_8 <- subset(final_8, (mean_years_in_school != 0 & CO2 != 0))
+```
+
+**Export to csv**
+
+```{r}
+write_csv(final_8, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_8.csv")
 ```
 
 ## Attempt 7 - 5 data sets
