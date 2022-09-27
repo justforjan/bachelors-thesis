@@ -6,6 +6,10 @@ editor_options:
     wrap: 72
 ---
 
+```{r}
+library(tidyverse)
+```
+
 # Load data
 
 ```{r}
@@ -198,6 +202,73 @@ Data sets that (as of now) look very promising:
 
 -   CO2
 
+## Attempt 10 - 3 data sets
+
+| Input                | Output          |
+|----------------------|-----------------|
+| mean_years_in_school | life_expectancy |
+|                      | income          |
+
+**Merge data**
+
+```{r}
+all_data <- list(
+  mean_years_in_school,
+  life_expectancy,
+  income
+
+)
+
+final_10 <- all_data %>% reduce(full_join, by = c("country", "year"))
+
+colnames(final_10) <- c(
+  "country",
+  "year",
+  "mean_years_in_school",
+  "life_expectancy",
+  "income"
+)
+
+final_10 <- as.data.frame(final_10)
+
+final_10 <- drop_na(final_10)
+
+nrow(final_10)
+```
+
+-\> 5605 DMUs
+
+**Check for 0 values**
+
+```{r}
+# min(final_10$women_in_parliament)
+# min(final_10$forest_area)
+min(final_10$mean_years_in_school)
+# min(final_10$poverty)
+# min(final_10$CO2)
+```
+
+Mean years in school has values of 0
+
+```{r}
+print("0 mean years in school:")
+unique(final_10$country[final_10$mean_years_in_school <= 0])
+table(final_10$country[final_10$mean_years_in_school <= 0])
+
+```
+
+Only one entry of Yemen -\> delete it
+
+```{r}
+final_10 <- subset(final_10, (mean_years_in_school != 0))
+```
+
+**Export to csv**
+
+```{r}
+write_csv(final_10, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_10.csv")
+```
+
 ## Attempt 9 - 5 data sets
 
 | Input                | Output          |
@@ -237,17 +308,19 @@ final_9 <- drop_na(final_9)
 nrow(final_9)
 ```
 
--\> 4037 DMUs
+-\> 4232 DMUs
 
 **Check for 0 values**
 
 ```{r}
-min(final_9$women_in_parliament)
-min(final_9$forest_area)
+# min(final_9$women_in_parliament)
+# min(final_9$forest_area)
 min(final_9$mean_years_in_school)
-min(final_9$poverty)
+# min(final_9$poverty)
 min(final_9$CO2)
 ```
+
+No values of 0 or below
 
 **Export to csv**
 
@@ -371,10 +444,10 @@ nrow(final_7)
 **Check for 0 values**
 
 ```{r}
-min(final_7$women_in_parliament)
-min(final_7$forest_area)
+# min(final_7$women_in_parliament)
+# min(final_7$forest_area)
 min(final_7$mean_years_in_school)
-min(final_7$poverty)
+# min(final_7$poverty)
 min(final_7$CO2)
 ```
 
@@ -885,7 +958,7 @@ final_all <- final_all %>% relocate(dmu)
 ### Save result as csv
 
 ```{r}
-write_csv(final_all, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/all_datasets_all_dmus.csv")
+write_csv(final_all, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_all.csv")
 # write_csv(final, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/country_data_general.csv")
 ```
 
