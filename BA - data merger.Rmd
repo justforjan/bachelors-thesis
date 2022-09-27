@@ -1,0 +1,706 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+## General information about data sets
+
+## Load data
+
+```{r}
+women_in_parliament <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/women_in_parliament.csv",show_col_types = FALSE)
+basic_sanitation <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/basic_sanitation.csv",show_col_types = FALSE)
+basic_water_source <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/basic_water_source.csv",show_col_types = FALSE)
+electricity <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/electricity.csv",show_col_types = FALSE)
+employment_rate <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/employment_rate.csv",show_col_types = FALSE)
+material_footprint <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/material_footprint.csv",show_col_types = FALSE)
+forest_area <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/forest_area.csv",show_col_types = FALSE)
+mean_years_in_school <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/mean_years_in_school.csv",show_col_types = FALSE)
+air_pollution <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/air_pollution.csv",show_col_types = FALSE)
+health_worker <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/health_worker.csv",show_col_types = FALSE)
+red_list <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/red_list.csv",show_col_types = FALSE)
+poverty <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/poverty.csv",show_col_types = FALSE)
+life_expectancy <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/life_expectancy.csv",show_col_types = FALSE)
+income <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/income.csv",show_col_types = FALSE)
+income_share_20 <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/income_share_20.csv",show_col_types = FALSE)
+CO2 <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/CO2.csv",show_col_types = FALSE)
+murder <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/murder.csv",show_col_types = FALSE)
+```
+
+## General information about data sets
+
+```{r}
+titles <- c(
+"women_in_parliament",
+"basic_sanitation",
+"basic_water_source",
+"electricity",
+"employment_rate",
+"material_footprint",
+"forest_area",
+"mean_years_in_school",
+"air_pollution",
+"health_worker",
+"red_list",
+"poverty",
+"life_expectancy",
+"income",
+"income_share_20",
+"CO2",
+"murder"
+)
+
+earliest <- c(
+min(women_in_parliament$year),
+min(basic_sanitation$year),
+min(basic_water_source$year),
+min(electricity$year),
+min(employment_rate$year),
+min(material_footprint$year),
+min(forest_area$year),
+min(mean_years_in_school$year),
+min(health_worker$year),
+min(air_pollution$year),
+min(red_list$year),
+min(poverty$year),
+min(life_expectancy$year),
+min(income$year),
+min(income_share_20$year),
+min(CO2$year),
+min(murder$year)
+)
+
+latest <- c(
+max(women_in_parliament$year),
+max(basic_sanitation$year),
+max(basic_water_source$year),
+max(electricity$year),
+max(employment_rate$year),
+max(material_footprint$year),
+max(forest_area$year),
+max(mean_years_in_school$year),
+max(health_worker$year),
+max(air_pollution$year),
+max(red_list$year),
+max(poverty$year),
+max(life_expectancy$year),
+max(income$year),
+max(income_share_20$year),
+max(CO2$year),
+max(murder$year)
+)
+
+datapoints <- c(
+nrow(women_in_parliament),
+nrow(basic_sanitation),
+nrow(basic_water_source),
+nrow(electricity),
+nrow(employment_rate),
+nrow(material_footprint),
+nrow(forest_area),
+nrow(mean_years_in_school),
+nrow(air_pollution),
+nrow(health_worker),
+nrow(red_list),
+nrow(poverty),
+nrow(life_expectancy),
+nrow(income),
+nrow(income_share_20),
+nrow(CO2),
+nrow(murder)
+)
+
+dps_1990_2020 <- c(
+nrow(subset(women_in_parliament, year %in% c(1990:2020))),
+nrow(subset(basic_sanitation, year %in% c(1990:2020))),
+nrow(subset(basic_water_source, year %in% c(1990:2020))),
+nrow(subset(electricity, year %in% c(1990:2020))),
+nrow(subset(employment_rate, year %in% c(1990:2020))),
+nrow(subset(material_footprint, year %in% c(1990:2020))),
+nrow(subset(forest_area, year %in% c(1990:2020))),
+nrow(subset(mean_years_in_school, year %in% c(1990:2020))),
+nrow(subset(air_pollution, year %in% c(1990:2020))),
+nrow(subset(health_worker, year %in% c(1990:2020))),
+nrow(subset(red_list, year %in% c(1990:2020))),
+nrow(subset(poverty, year %in% c(1990:2020))),
+nrow(subset(life_expectancy, year %in% c(1990:2020))),
+nrow(subset(income, year %in% c(1990:2020))),
+nrow(subset(income_share_20, year %in% c(1990:2020))),
+nrow(subset(CO2, year %in% c(1990:2020))),
+nrow(subset(murder, year %in% c(1990:2020)))
+)
+
+
+zero_or_below <- c(
+(min(women_in_parliament$value, na.rm = TRUE) <= 0),
+(min(basic_sanitation$value, na.rm = TRUE) <= 0),
+(min(basic_water_source$value, na.rm = TRUE) <= 0),
+(min(electricity$value, na.rm = TRUE) <= 0),
+(min(employment_rate$value, na.rm = TRUE) <= 0),
+(min(material_footprint$value, na.rm = TRUE) <= 0),
+(min(forest_area$value, na.rm = TRUE) <= 0),
+(min(mean_years_in_school$value, na.rm = TRUE) <= 0),
+(min(air_pollution$value, na.rm = TRUE) <= 0),
+(min(health_worker$value, na.rm = TRUE) <= 0),
+(min(red_list$value, na.rm = TRUE) <= 0),
+(min(poverty$value, na.rm = TRUE) <= 0),
+(min(life_expectancy$value, na.rm = TRUE) <= 0),
+(min(income$value, na.rm = TRUE) <= 0),
+(min(income_share_20$value, na.rm = TRUE) <= 0),
+(min(CO2$value, na.rm = TRUE) <= 0),
+(min(murder$value, na.rm = TRUE) <= 0)
+)
+
+dp_per_year <- datapoints / (latest - earliest)
+
+overview <- data.frame(titles, earliest, latest, dps_1990_2020, datapoints, dp_per_year, zero_or_below)
+overview[order(overview$dps_1990_2020, decreasing = TRUE),]
+```
+
+Using data sets that have values of 0 or less might be an issue later on
+when inputting the data into the DEA, unless the 0 values get filtered
+out anyways while merging.
+
+# Merge data frames
+
+We want to create multiple data sets all comprising a different set of
+data sets. Merging all data sets results in too less dmus and too many
+dimensions and this results in all DMUs having an efficiency of either 1
+or very close to 1. The plan is to check, which combination of around 4
+in and 4 outputs results in a high enough number of DMUs.
+
+We want as many DMUs as possible. Therefore, it makes sense to use data
+sets with large time periods (e.g. women_in_parliament) and many
+datapoints (e.g. life_expectency, CO2, income).
+
+The amount of data point of the data set with the most data points
+automatically represents the maximum number of potential DMUs.
+
+Data sets that we can ignore already because of too little time frames
+and too few data points:
+
+-   air_pollution
+
+-   basic_sanitation
+
+-   basic_water_source
+
+Data sets that (as of now) look very promising:
+
+-   women_in_parliament
+
+-   life_expectancy
+
+-   income
+
+-   CO2
+
+## Attempt 6 - 5 data sets
+
+| Input           | Output          |
+|-----------------|-----------------|
+| electricity     | life_expectancy |
+| employment_rate | income          |
+|                 | CO2             |
+
+**Merge data**
+
+```{r}
+all_data <- list(
+  electricity,
+  employment_rate,
+  CO2,
+  life_expectancy,
+  income
+
+)
+
+final_6 <- all_data %>% reduce(full_join, by = c("country", "year"))
+
+colnames(final_6) <- c(
+  "country",
+  "year",
+  "electricity",
+  "employment_rate",
+  "CO2",
+  "life_expectancy",
+  "income"
+)
+
+final_6 <- as.data.frame(final_6)
+
+final_6 <- drop_na(final_6)
+
+nrow(final_6)
+```
+
+-\> 2594 DMUs
+
+**Check for 0 values**
+
+```{r}
+min(final_6$CO2)
+```
+
+**Export to csv**
+
+```{r}
+write_csv(final_6, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_6.csv")
+```
+
+## Attempt 5 - 5 data sets
+
+| Input         | Output          |
+|---------------|-----------------|
+| electricity   | life_expectancy |
+| health_worker | income          |
+|               | CO2             |
+
+**Merge data**
+
+```{r}
+all_data <- list(
+  electricity,
+  health_worker,
+  CO2,
+  life_expectancy,
+  income
+
+)
+
+final_5 <- all_data %>% reduce(full_join, by = c("country", "year"))
+
+colnames(final_5) <- c(
+  "country",
+  "year",
+  "electricity",
+  "health_worker",
+  "CO2",
+  "life_expectancy",
+  "income"
+)
+
+final_5 <- as.data.frame(final_5)
+
+final_5 <- drop_na(final_5)
+
+nrow(final_5)
+```
+
+-\> 2594 DMUs
+
+**Check for 0 values**
+
+```{r}
+min(final_5$CO2)
+```
+
+**Export to csv**
+
+```{r}
+write_csv(final_5, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_5.csv")
+```
+
+## Attempt 4 - 6 data sets
+
+| Input               | Output          |
+|---------------------|-----------------|
+| electricity         | life_expectancy |
+| women_in_parliament | income          |
+| health_worker       | CO2             |
+
+**Merge data**
+
+```{r}
+all_data <- list(
+  women_in_parliament,
+  electricity,
+  CO2,
+  # forest_area,
+  life_expectancy,
+  income,
+  health_worker
+  # employment_rate
+)
+
+final_4 <- all_data %>% reduce(full_join, by = c("country", "year"))
+
+colnames(final_4) <- c(
+  "country",
+  "year",
+  "women_in_parliament",
+  "electricity",
+  "CO2",
+  # "forest_area",
+  "life_expectancy",
+  "income",
+  "health_worker"
+  # "employment_rate"
+)
+
+final_4 <- as.data.frame(final_4)
+
+final_4 <- drop_na(final_4)
+
+nrow(final_4)
+```
+
+-\> 2332 DMUs
+
+**Check for 0 values**
+
+```{r}
+min(final_4$women_in_parliament)
+# min(final_4$forest_area)
+# min(final$mean_years_in_school)
+# min(final$poverty)
+min(final_4$CO2)
+```
+
+```{r}
+print("0 women in parliament:")
+unique(final_4$country[final_4$women_in_parliament <= 0])
+```
+
+Assign very low values where values are 0
+
+```{r}
+final_4[final_4 == 0] <- 0.0001
+```
+
+```{r}
+min(final_4$women_in_parliament)
+# min(final_4$forest_area)
+# min(final$mean_years_in_school)
+# min(final$poverty)
+min(final_4$CO2)
+```
+
+Export to csv
+
+```{r}
+write_csv(final_4, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_4.csv")
+```
+
+## Attempt 3 - 8 data sets
+
+| Input               | Output          |
+|---------------------|-----------------|
+| electricity         | life_expectancy |
+| forest_area         | income          |
+| women_in_parliament | CO2             |
+| health_worker       | employment_rate |
+
+**Merge data**
+
+```{r}
+all_data <- list(
+  women_in_parliament,
+  electricity,
+  CO2,
+  forest_area,
+  life_expectancy,
+  income,
+  health_worker,
+  employment_rate
+)
+
+final_3 <- all_data %>% reduce(full_join, by = c("country", "year"))
+
+colnames(final_3) <- c(
+  "country",
+  "year",
+  "women_in_parliament",
+  "electricity",
+  "CO2",
+  "forest_area",
+  "life_expectancy",
+  "income",
+  "health_worker",
+  "employment_rate"
+)
+
+final_3 <- as.data.frame(final_3)
+
+final_3 <- drop_na(final_3)
+
+nrow(final_3)
+```
+
+-\> 2201 DMUs
+
+**Check for 0 values**
+
+```{r}
+min(final_3$women_in_parliament)
+min(final_3$forest_area)
+# min(final$mean_years_in_school)
+# min(final$poverty)
+min(final_3$CO2)
+```
+
+```{r}
+print("0 women in parliament:")
+unique(final_3$country[final_3$women_in_parliament <= 0])
+print("0 forest area:")
+unique(final_3$country[final_3$forest_area <= 0])
+```
+
+Assign very low values where values are 0
+
+```{r}
+final_3[final_3 == 0] <- 0.0001
+```
+
+**Export to csv**
+
+```{r}
+write_csv(final_3, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_3.csv")
+```
+
+## Attempt 2 - 8 data sets
+
+In this attempt we try to cover only 8 dimensions in total.
+
+| Input                | Output          |
+|----------------------|-----------------|
+| women_in_parliament  | life_expectancy |
+| electricity          | income          |
+| CO2                  | income_share_20 |
+| mean_years_in_school | employment_rate |
+
+```{r}
+all_data <- list(
+  women_in_parliament,
+  electricity,
+  CO2,
+  mean_years_in_school,
+  life_expectancy,
+  income,
+  income_share_20,
+  employment_rate
+)
+
+final <- all_data %>% reduce(full_join, by = c("country", "year"))
+
+colnames(final) <- c(
+  "women_in_parliament",
+  "electricity",
+  "CO2",
+  "mean_years_in_school",
+  "life_expectancy",
+  "income",
+  "income_share_20",
+  "employment_rate"
+)
+
+final <- as.data.frame(final)
+
+final <- drop_na(final)
+```
+
+Check for 0 values
+
+```{r}
+min(final$women_in_parliament)
+min(final$mean_years_in_school)
+min(final$CO2)
+```
+
+Count how many 0 values in CO2
+
+```{r}
+sum(final$CO2 <= 0)
+```
+
+Only 2 values 0 or less. I will delete these two observations.
+
+```{r}
+final <- subset(final, CO2>0)
+```
+
+```{r}
+nrow(final)
+```
+
+1271 DMUs -\> Very few
+
+## Attempt 1 - All data sets
+
+17 in total
+
+```{r}
+# Create list of all data frames
+all_data <- list(
+  women_in_parliament,
+  basic_sanitation,
+  basic_water_source,
+  electricity,
+  employment_rate,
+  material_footprint,
+  forest_area,
+  mean_years_in_school,
+  health_worker,
+  air_pollution,
+  red_list,
+  poverty,
+  life_expectancy,
+  income,
+  income_share_20,
+  CO2,
+  murder
+)
+```
+
+```{r}
+
+# Merge all data frame together by the country attribute
+
+final <- all_data %>% reduce(full_join, by=c("country", "year"))
+```
+
+```{r}
+
+# Change column names to something meaningful
+colnames(final) <- c(
+  "country",
+  "year",
+  "women_in_parliament",
+  "basic_sanitation",
+  "basic_water_source",
+  "electricity",
+  "employment_rate",
+  "material_footprint",
+  "forest_area",
+  "mean_years_in_school",
+  "air_pollution",
+  "health_worker",
+  "red_list",
+  "poverty",
+  "life_expectancy",
+  "income",
+  "income_share_20",
+  "CO2",
+  "murder"
+  )
+
+# convert tibble to data frame
+final <- as.data.frame(final)
+```
+
+### Are there any quirks in the resulting data frame?
+
+-   Upper middle income
+-   World
+-   USSR
+
+-\> OurWorldInData also shows regional data, Gapminder does not. When
+filtering out all country-year combinations with NA values, the regional
+data will be filtered out as well. We will check that later.
+
+### Delete DMUs with NAs
+
+```{r}
+final <- drop_na(final)
+```
+
+### Find out year with most countries
+
+```{r}
+year <- table(final$year)
+year <- as.data.frame(year)
+year
+```
+
+### Check for negative or zero values
+
+```{r}
+min(final$women_in_parliament)
+min(final$forest_area)
+min(final$mean_years_in_school)
+min(final$poverty)
+min(final$CO2)
+```
+
+In the poverty column many 0 values can be found. Instead of just
+deleting the columns, I will do the merger again but without poverty.
+
+```{r}
+nrow(final)
+
+all_data <- list(
+  women_in_parliament,
+  basic_sanitation,
+  basic_water_source,
+  electricity,
+  employment_rate,
+  material_footprint,
+  forest_area,
+  mean_years_in_school,
+  health_worker,
+  air_pollution,
+  red_list,
+  # poverty,
+  life_expectancy,
+  income,
+  income_share_20,
+  CO2,
+  murder
+)
+
+final <- all_data %>% reduce(full_join, by=c("country", "year"))
+
+# Change column names to something meaningful
+colnames(final) <- c(
+  "country",
+  "year",
+  "women_in_parliament",
+  "basic_sanitation",
+  "basic_water_source",
+  "electricity",
+  "employment_rate",
+  "material_footprint",
+  "forest_area",
+  "mean_years_in_school",
+  "air_pollution",
+  "health_worker",
+  "red_list",
+  # "poverty",
+  "life_expectancy",
+  "income",
+  "income_share_20",
+  "CO2",
+  "murder"
+  )
+
+# convert tibble to data frame
+final <- as.data.frame(final)
+
+final <- drop_na(final)
+
+nrow(final)
+```
+
+As we can see, we did not get any more DMUs by not including poverty.
+What a shame. 259 DMUs are way too less for 16 Dimensions. We need to
+have less dimensions.
+
+```{r}
+final_all <- final
+final_all$dmu <- str_c(final_all$country, "_", final_all$year)
+final_all$country <- NULL
+final_all$year <- NULL
+final_all <- final_all %>% relocate(dmu)
+```
+
+### Save result as csv
+
+```{r}
+write_csv(final_all, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/all_datasets_all_dmus.csv")
+# write_csv(final, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/country_data_general.csv")
+```
+
+## 
