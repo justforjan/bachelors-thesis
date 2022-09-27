@@ -3,7 +3,7 @@ title: "BA - DEA"
 output: html_notebook
 ---
 
-## load libraries
+# load libraries
 
 ```{r}
 library(tidyverse)
@@ -13,27 +13,17 @@ library(countrycode)
 
 ```
 
-## load data
+# Preparation
+
+## Select data to be used and set parameter
 
 ```{r}
-data = read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/country_data_all_dmus.csv", show_col_types = FALSE)
-str(data)
-```
+# Chose the attempt
+attempt = 10
 
-```{r}
-final_3$dmu <- str_c(final_3$country, "_", final_3$year)
-final_3$country <- NULL
-final_3$year <- NULL
-final_3 <- final_3 %>% relocate(dmu)
-```
-
-```{r}
-
-# Documentation: https://cran.r-project.org/web/packages/deaR/deaR.pdf
-
-# Number of in- and outputs
+# Number of in- and outputs -> checl struture of selected data set!
 number_of_inputs <- 1
-number_of_outputs <- 1
+number_of_outputs <- 2
 
 orientation <- "io"
 # io: input oriented
@@ -45,15 +35,33 @@ return_to_scale <- "vrs"
 # nirs: non-increasing
 # ndrs: non-decreasing
 # grs: generalized
+```
 
+## Load data
+
+```{r}
+data = read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_", as.character(attempt), ".csv", sep = ""), show_col_types = FALSE)
+str(data)
+```
+
+## Combine country and year to one string to use it as a name for the DMUs
+
+```{r}
+data$dmu <- str_c(data$country, "_", data$year)
+data$country <- NULL
+data$year <- NULL
+data <- data %>% relocate(dmu)
+```
+
+# DEA
+
+```{r}
+
+# Documentation: https://cran.r-project.org/web/packages/deaR/deaR.pdf
 
 model_data <- read_data(data, ni=number_of_inputs, no=number_of_outputs, dmus = 1)
 
-
 result <- model_basic(model_data, orientation = orientation, rts=return_to_scale)
-
-## Warning: There are data with very different orders of magnitude. Try to re-define the units of measure or some linear problems may be ill-posed.
-
 ```
 
 ## Efficiencies and Targets
@@ -109,5 +117,5 @@ data_dea$continent <- countrycode(sourcevar = data_dea$country,
 ## export as csv
 
 ```{r}
-write_csv(data_dea, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/dea_results.csv")
+write_csv(data_dea, paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/dea_results_", as.character(attempt), ".csv", sep = ""))
 ```
