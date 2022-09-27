@@ -20,6 +20,12 @@ data = read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data
 str(data)
 ```
 
+```{r}
+final_3$dmu <- str_c(final_3$country, "_", final_3$year)
+final_3$country <- NULL
+final_3$year <- NULL
+final_3 <- final_3 %>% relocate(dmu)
+```
 
 ```{r}
 
@@ -86,7 +92,6 @@ data_dea <- data_and_results %>% reduce(full_join, by="dmu")
 data_dea <- data_dea %>% relocate(efficiencies, .after = dmu)
 ```
 
-
 ## Split um dmu column to country and year but keep dmu column
 
 ```{r}
@@ -106,4 +111,3 @@ data_dea$continent <- countrycode(sourcevar = data_dea$country,
 ```{r}
 write_csv(data_dea, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/dea_results.csv")
 ```
-
