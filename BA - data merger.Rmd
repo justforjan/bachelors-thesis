@@ -947,14 +947,6 @@ As we can see, we did not get any more DMUs by not including poverty.
 What a shame. 259 DMUs are way too less for 16 Dimensions. We need to
 have less dimensions.
 
-```{r}
-final_all <- final
-final_all$dmu <- str_c(final_all$country, "_", final_all$year)
-final_all$country <- NULL
-final_all$year <- NULL
-final_all <- final_all %>% relocate(dmu)
-```
-
 ### Save result as csv
 
 ```{r}
