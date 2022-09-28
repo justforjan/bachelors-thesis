@@ -19,11 +19,20 @@ library(countrycode)
 
 ```{r}
 # Chose the attempt
-attempt = 10
+attempt = 11
 
 # Number of in- and outputs -> checl struture of selected data set!
-number_of_inputs <- 1
-number_of_outputs <- 2
+number_of_inputs <- 2
+number_of_outputs <- 3
+
+# only from 1990?
+from_1990 <- "no"
+
+# only one year?
+only_one_year <- 0 # 0 means no
+
+# only one country?
+only_one_country <- "" # empty string means no
 
 orientation <- "io"
 # io: input oriented
@@ -42,6 +51,27 @@ return_to_scale <- "vrs"
 ```{r}
 data = read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_", as.character(attempt), ".csv", sep = ""), show_col_types = FALSE)
 str(data)
+```
+
+### Apply chosen selection
+
+```{r}
+
+if (from_1990 != "no") {
+  data <- data %>%
+    filter(year >= 1990)
+}
+
+if (only_one_year != 0) {
+  data <- data %>%
+    filter(year == only_one_year)
+}
+
+if (only_one_country != "") {
+  data <- data %>%
+    filter(country == only_one_country)
+}
+  
 ```
 
 ## Combine country and year to one string to use it as a name for the DMUs
@@ -117,5 +147,5 @@ data_dea$continent <- countrycode(sourcevar = data_dea$country,
 ## export as csv
 
 ```{r}
-write_csv(data_dea, paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/dea_results_", as.character(attempt), ".csv", sep = ""))
+write_csv(data_dea, paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/dea_results_", as.character(attempt), "_", orientation, "_", return_to_scale, ".csv", sep = ""))
 ```

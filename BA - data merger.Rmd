@@ -202,6 +202,63 @@ Data sets that (as of now) look very promising:
 
 -   CO2
 
+## Attempt 11 - 5 data sets
+
+| Input                | Output          |
+|----------------------|-----------------|
+| employment_rate      | life_expectancy |
+| mean_years_in_school | income          |
+|                      | CO2             |
+
+**Merge data**
+
+```{r}
+all_data <- list(
+  employment_rate,
+  mean_years_in_school,
+  CO2,
+  life_expectancy,
+  income
+
+)
+
+final_11 <- all_data %>% reduce(full_join, by = c("country", "year"))
+
+colnames(final_11) <- c(
+  "country",
+  "year",
+  "employment_rate",
+  "mean_years_in_school",
+  "CO2",
+  "life_expectancy",
+  "income"
+)
+
+final_11 <- as.data.frame(final_11)
+
+final_11 <- drop_na(final_11)
+
+nrow(final_11)
+```
+
+-\> 4232 DMUs
+
+**Check for 0 values**
+
+```{r}
+# min(final_11$women_in_parliament)
+# min(final_11$forest_area)
+min(final_11$mean_years_in_school)
+# min(final_11$poverty)
+min(final_11$CO2)
+```
+
+**Export to csv**
+
+```{r}
+write_csv(final_11, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_11.csv")
+```
+
 ## Attempt 10 - 3 data sets
 
 | Input                | Output          |
@@ -950,7 +1007,7 @@ have less dimensions.
 ### Save result as csv
 
 ```{r}
-write_csv(final_all, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_all.csv")
+# write_csv(final_all, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_all.csv")
 # write_csv(final, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/country_data_general.csv")
 ```
 
