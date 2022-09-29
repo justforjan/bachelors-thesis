@@ -241,7 +241,7 @@ final_11 <- drop_na(final_11)
 nrow(final_11)
 ```
 
--\> 4232 DMUs
+-\> **4232** DMUs
 
 **Check for 0 values**
 
@@ -293,7 +293,7 @@ final_10 <- drop_na(final_10)
 nrow(final_10)
 ```
 
--\> 5605 DMUs
+-\> **5605** DMUs
 
 **Check for 0 values**
 
@@ -365,7 +365,7 @@ final_9 <- drop_na(final_9)
 nrow(final_9)
 ```
 
--\> 4232 DMUs
+-\> **4232** DMUs
 
 **Check for 0 values**
 
@@ -421,7 +421,7 @@ final_8 <- drop_na(final_8)
 nrow(final_8)
 ```
 
--\> 5533 DMUs
+-\> **5533** DMUs
 
 **Check for 0 values**
 
@@ -496,7 +496,7 @@ final_7 <- drop_na(final_7)
 nrow(final_7)
 ```
 
--\> 4037 DMUs
+-\> **4037** DMUs
 
 **Check for 0 values**
 
@@ -553,7 +553,7 @@ final_6 <- drop_na(final_6)
 nrow(final_6)
 ```
 
--\> 4421 DMUs
+-\> **4421** DMUs
 
 **Check for 0 values**
 
@@ -606,7 +606,7 @@ final_5 <- drop_na(final_5)
 nrow(final_5)
 ```
 
--\> 2594 DMUs
+-\> **2594** DMUs
 
 **Check for 0 values**
 
@@ -664,7 +664,7 @@ final_4 <- drop_na(final_4)
 nrow(final_4)
 ```
 
--\> 2332 DMUs
+-\> **2332** DMUs
 
 **Check for 0 values**
 
@@ -746,7 +746,7 @@ final_3 <- drop_na(final_3)
 nrow(final_3)
 ```
 
--\> 2201 DMUs
+-\> **2201** DMUs
 
 **Check for 0 values**
 
