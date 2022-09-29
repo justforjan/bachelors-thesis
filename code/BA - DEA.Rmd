@@ -17,22 +17,38 @@ library(countrycode)
 
 ## Select data to be used and set parameter
 
+| Attempt | DMUs  | No. of inputs | No. of outputs |
+|---------|-------|---------------|----------------|
+| 3       | 2201  | 4             | 4              |
+| 4       | 2332  | 3             | 3              |
+| 5       | 2594  | 2             | 3              |
+| 6       | 4421  | 2             | 3              |
+| 7       | 4037  | 2             | 3              |
+| 8       | 5533  | 2             | 2              |
+| 9       | 4232  | 2             | 3              |
+| 10      | 5605  | 1             | 2              |
+| 11      | 4232  | 2             | 3              |
+
 ```{r}
 # Chose the attempt
-attempt = 11
+attempt = 3
 
 # Number of in- and outputs -> checl struture of selected data set!
-number_of_inputs <- 2
-number_of_outputs <- 3
+number_of_inputs <- 4
+number_of_outputs <- 4
+
+# location of inputs and outputs
+input_cols <- c(2,3,5,8)
+output_cols <- c(4,6,7,9)
 
 # only from 1990?
-from_1990 <- "no"
+from_1990 <- "yes"
 
 # only one year?
-only_one_year <- 0 # 0 means no
+only_one_year <- 2010 # 0 means no
 
 # only one country?
-only_one_country <- "" # empty string means no
+only_one_country <- "Germany" # empty string means no
 
 orientation <- "io"
 # io: input oriented
@@ -89,7 +105,21 @@ data <- data %>% relocate(dmu)
 
 # Documentation: https://cran.r-project.org/web/packages/deaR/deaR.pdf
 
-model_data <- read_data(data, ni=number_of_inputs, no=number_of_outputs, dmus = 1)
+if (length(input_cols) == 0) {
+  model_data <- read_data(data, 
+                        ni=number_of_inputs, 
+                        no=number_of_outputs, 
+                        dmus = 1)
+  
+} else {
+  model_data <- read_data(data, 
+                        ni=number_of_inputs, 
+                        no=number_of_outputs, 
+                        inputs=input_cols,
+                        outputs=output_cols,
+                        dmus = 1)
+}
+
 
 result <- model_basic(model_data, orientation = orientation, rts=return_to_scale)
 ```
@@ -136,7 +166,7 @@ data_dea <- data_dea %>% relocate(efficiencies, .after = dmu)
 data_dea <- separate(data_dea, dmu, c("country", "year"), "_", remove=FALSE)
 ```
 
-## Add contintents
+## Add continents
 
 ```{r}
 data_dea$continent <- countrycode(sourcevar = data_dea$country,
@@ -146,6 +176,30 @@ data_dea$continent <- countrycode(sourcevar = data_dea$country,
 
 ## export as csv
 
+create name for the file
+
 ```{r}
-write_csv(data_dea, paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/dea_results_", as.character(attempt), "_", orientation, "_", return_to_scale, ".csv", sep = ""))
+filename <- paste(as.character(attempt), 
+      "_", 
+      orientation, 
+      "_", 
+      return_to_scale
+  )
+
+if (from_1990 != "no") {
+  filename <- paste(filename, "_", "from1990")
+}
+
+if (only_one_year != 0) {
+  filename <- paste(filename, "_", as.character(only_one_year))  
+}
+
+if (only_one_country != "") {
+  filename <- paste(filename, "_", only_one_country)    
+}
+
+```
+
+```{r}
+write_csv(data_dea, paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/dea_results_", filename, ".csv", sep = ""))
 ```
