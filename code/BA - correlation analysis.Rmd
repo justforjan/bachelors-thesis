@@ -3,16 +3,40 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
-
 ```{r}
-plot(cars)
+library(tidyverse)
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+```{r}
+women_in_parliament <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/women_in_parliament.csv",show_col_types = FALSE)
+basic_sanitation <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/basic_sanitation.csv",show_col_types = FALSE)
+basic_water_source <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/basic_water_source.csv",show_col_types = FALSE)
+electricity <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/electricity.csv",show_col_types = FALSE)
+employment_rate <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/employment_rate.csv",show_col_types = FALSE)
+material_footprint <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/material_footprint.csv",show_col_types = FALSE)
+forest_area <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/forest_area.csv",show_col_types = FALSE)
+mean_years_in_school <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/mean_years_in_school.csv",show_col_types = FALSE)
+air_pollution <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/air_pollution.csv",show_col_types = FALSE)
+health_worker <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/health_worker.csv",show_col_types = FALSE)
+red_list <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/red_list.csv",show_col_types = FALSE)
+poverty <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/poverty.csv",show_col_types = FALSE)
+life_expectancy <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/life_expectancy.csv",show_col_types = FALSE)
+income <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/income.csv",show_col_types = FALSE)
+income_share_20 <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/income_share_20.csv",show_col_types = FALSE)
+CO2 <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/CO2.csv",show_col_types = FALSE)
+murder <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/murder.csv",show_col_types = FALSE)
+```
+
+
+```{r}
+test1 <- merge(CO2, income, by =c("country","year"))
+```
+
+
+
+```{r}
+cor(test1)
+```
+
