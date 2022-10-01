@@ -1,13 +1,6 @@
----
-title: "R Notebook"
-output: html_notebook
----
 
-```{r}
 library(tidyverse)
-```
 
-```{r}
 women_in_parliament <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/women_in_parliament.csv",show_col_types = FALSE)
 basic_sanitation <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/basic_sanitation.csv",show_col_types = FALSE)
 basic_water_source <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/basic_water_source.csv",show_col_types = FALSE)
@@ -25,20 +18,17 @@ income <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/pr
 income_share_20 <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/income_share_20.csv",show_col_types = FALSE)
 CO2 <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/CO2.csv",show_col_types = FALSE)
 murder <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/murder.csv",show_col_types = FALSE)
-```
 
-```{r}
+
+# Test correlation
 test1 <- merge(CO2, income, by =c("country","year"))
 test1$country <- NULL
 test1$year <- NULL
 colnames(test1) <- c("CO2","income")
-```
 
-```{r}
 cor(test1$CO2, test1$income, use = "complete.obs")
-```
 
-```{r}
+
 # Create list of all data frames
 all_data <- list(
   women_in_parliament,
@@ -59,17 +49,12 @@ all_data <- list(
   CO2,
   murder
 )
-```
 
-```{r}
 # Merge all data frame together by the country attribute
-
 data <- all_data %>% reduce(full_join, by=c("country", "year"))
-```
 
-```{r}
+
 # Change column names to something meaningful
-
 colnames(data) <- c(
   "country",
   "year",
@@ -91,10 +76,9 @@ colnames(data) <- c(
   "CO2",
   "murder"
 )
-```
 
-Easy approach to calculate all correlations.
+# Calculate correlations
+correlations <- as.data.frame(cor(data[3:length(data)], use = "pairwise.complete.obs"))
 
-```{r}
-as.data.frame(cor(data[3:length(data)], use = "pairwise.complete.obs"))
-```
+# Export as csv
+write_csv(correlations, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/correlations")
