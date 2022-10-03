@@ -26,7 +26,7 @@ employment_rate
 material_footprint
 forest_area
 poverty
-life_expactancy
+life_expectancy
 income
 income_share_20
 CO2
@@ -56,4 +56,13 @@ China
 Thailand
 Turkey
 Saudi Arabia
+South Africa
+Brazil
+Argentina
+Colombia
+Indonesia
+Russia
+Spain
+United Kingdom
+
 
