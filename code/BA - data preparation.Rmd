@@ -264,6 +264,82 @@ for (country in 1:nrow(nc)) {
 }
 ```
 
+## Merge country and year to dmu
+
+```{r}
+women_in_parliament$dmu <- str_c(women_in_parliament$country, "_", women_in_parliament$year)
+basic_sanitation$dmu <- str_c(basic_sanitation$country, "_", basic_sanitation$year)
+basic_water_source$dmu <- str_c(basic_water_source$country, "_", basic_water_source$year)
+electricity$dmu <- str_c(electricity$country, "_", electricity$year)
+employment_rate$dmu <- str_c(employment_rate$country, "_", employment_rate$year)
+material_footprint$dmu <- str_c(material_footprint$country, "_", material_footprint$year)
+forest_area$dmu <- str_c(forest_area$country, "_", forest_area$year)
+mean_years_in_school$dmu <- str_c(mean_years_in_school$country, "_", mean_years_in_school$year)
+air_pollution$dmu <- str_c(air_pollution$country, "_", air_pollution$year)
+health_worker$dmu <- str_c(health_worker$country, "_", health_worker$year)
+red_list$dmu <- str_c(red_list$country, "_", red_list$year)
+poverty$dmu <- str_c(poverty$country, "_", poverty$year)
+life_expectancy$dmu <- str_c(life_expectancy$country, "_", life_expectancy$year)
+income$dmu <- str_c(income$country, "_", income$year)
+income_share_20$dmu <- str_c(income_share_20$country, "_", income_share_20$year)
+CO2$dmu <- str_c(CO2$country, "_", CO2$year)
+murder$dmu <- str_c(murder$country, "_", murder$year)
+
+women_in_parliament$country <- NULL
+basic_sanitation$country <- NULL
+basic_water_source$country <- NULL
+electricity$country <- NULL
+employment_rate$country <- NULL
+material_footprint$country <- NULL
+forest_area$country <- NULL
+mean_years_in_school$country <- NULL
+air_pollution$country <- NULL
+health_worker$country <- NULL
+red_list$country <- NULL
+poverty$country <- NULL
+life_expectancy$country <- NULL
+income$country <- NULL
+income_share_20$country <- NULL
+CO2$country <- NULL
+murder$country <- NULL
+
+women_in_parliament$year <- NULL
+basic_sanitation$year <- NULL
+basic_water_source$year <- NULL
+electricity$year <- NULL
+employment_rate$year <- NULL
+material_footprint$year <- NULL
+forest_area$year <- NULL
+mean_years_in_school$year <- NULL
+air_pollution$year <- NULL
+health_worker$year <- NULL
+red_list$year <- NULL
+poverty$year <- NULL
+life_expectancy$year <- NULL
+income$year <- NULL
+income_share_20$year <- NULL
+CO2$year <- NULL
+murder$year <- NULL
+
+women_in_parliament <- women_in_parliament %>% relocate(dmu)
+basic_sanitation <- basic_sanitation %>% relocate(dmu)
+basic_water_source <- basic_water_source %>% relocate(dmu)
+electricity <- electricity %>% relocate(dmu)
+employment_rate <- employment_rate %>% relocate(dmu)
+material_footprint <- material_footprint %>% relocate(dmu)
+forest_area <- forest_area %>% relocate(dmu)
+mean_years_in_school <- mean_years_in_school %>% relocate(dmu)
+air_pollution <- air_pollution %>% relocate(dmu)
+health_worker <- health_worker %>% relocate(dmu)
+red_list <- red_list %>% relocate(dmu)
+poverty <- poverty %>% relocate(dmu)
+life_expectancy <- life_expectancy %>% relocate(dmu)
+income <- income %>% relocate(dmu)
+income_share_20 <- income_share_20 %>% relocate(dmu)
+CO2 <- CO2 %>% relocate(dmu)
+murder <- murder %>% relocate(dmu)
+```
+
 ## Save individual data sets as csvs
 
 ```{r}
