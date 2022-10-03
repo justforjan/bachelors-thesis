@@ -47,8 +47,7 @@ data <- all_data %>% reduce(full_join, by="dmu")
 
 # Change column names to something meaningful
 colnames(data) <- c(
-  "country",
-  "year",
+  "dmu",
   "women_in_parliament",
   "basic_sanitation",
   "basic_water_source",
@@ -69,7 +68,7 @@ colnames(data) <- c(
 )
 
 # Calculate correlations
-correlations <- as.data.frame(cor(data[3:length(data)], use = "pairwise.complete.obs"))
+correlations <- as.data.frame(cor(data[2:length(data)], use = "pairwise.complete.obs"))
 
 # Export as csv
 write_csv(correlations, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/correlations.csv")
