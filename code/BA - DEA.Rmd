@@ -10,7 +10,19 @@ library(tidyverse)
 library(deaR)
 library(ggplot2)
 library(countrycode)
+```
 
+Country groups
+
+```{r}
+regions <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/regions.csv", show_col_types = FALSE)
+
+Africa <- regions$country[regions$continent == "Africa"]
+Europe <- regions$country[regions$continent == "Europe"]
+Americs <- regions$country[regions$continent == "Americs"]
+Asia <- regions$country[regions$continent == "Asia"]
+Oceania <- regions$country[regions$continent == "Oceania"]
+EU <- regions$country[regions$EU == TRUE] 
 ```
 
 # Preparation
@@ -31,11 +43,11 @@ library(countrycode)
 
 ```{r}
 # Chose the attempt
-attempt = 8
+attempt = 15
 
 # Number of in- and outputs -> checl struture of selected data set!
-number_of_inputs <- 2
-number_of_outputs <- 2
+number_of_inputs <- 1
+number_of_outputs <- 1
 
 # location of inputs and outputs
 input_cols <- c()
@@ -47,8 +59,8 @@ from_1990 <- "no"
 # only one year?
 only_one_year <- 0 # 0 means no
 
-# only one country?
-only_one_country <- "Germany" # empty string means no
+# onyl specified chosen_countries?
+chosen_countries <- Europe # enter a vector with strings; empty means all
 
 orientation <- "io"
 # io: input oriented
@@ -62,11 +74,17 @@ return_to_scale <- "vrs"
 # grs: generalized
 ```
 
-## Load data
+### Load data
 
 ```{r}
 data = read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_", as.character(attempt), ".csv", sep = ""), show_col_types = FALSE)
 str(data)
+```
+
+### Split dmu column into country and year (for filtering)
+
+```{r}
+data <- separate(data, dmu, c("country", "year"), "_", remove=FALSE)
 ```
 
 ### Apply chosen selection
@@ -83,9 +101,9 @@ if (only_one_year != 0) {
     filter(year == only_one_year)
 }
 
-if (only_one_country != "") {
+if (!is.null(chosen_countries)) {
   data <- data %>%
-    filter(country == only_one_country)
+    filter(country %in% chosen_countries)
 }
   
 ```
@@ -93,7 +111,6 @@ if (only_one_country != "") {
 ## Combine country and year to one string to use it as a name for the DMUs
 
 ```{r}
-data$dmu <- str_c(data$country, "_", data$year)
 data$country <- NULL
 data$year <- NULL
 data <- data %>% relocate(dmu)
@@ -102,7 +119,6 @@ data <- data %>% relocate(dmu)
 # DEA
 
 ```{r}
-
 # Documentation: https://cran.r-project.org/web/packages/deaR/deaR.pdf
 
 if (length(input_cols) == 0) {
@@ -189,8 +205,20 @@ if (only_one_year != 0) {
   filename <- paste(filename, "_", as.character(only_one_year), sep = "")  
 }
 
-if (only_one_country != "") {
-  filename <- paste(filename, "_", only_one_country, sep = "")    
+if (!is.null(chosen_countries)) {
+  if (is_empty(setdiff(chosen_countries, Europe))) {
+    filename <- paste(filename, "_", "Europe", sep = "")
+  } else if (is_empty(setdiff(chosen_countries, Americas))) {
+    filename <- paste(filename, "_", "Americas", sep = "")
+  } else if (is_empty(setdiff(chosen_countries, EU))) {
+    filename <- paste(filename, "_", "EU", sep = "")
+  } else if (is_empty(setdiff(chosen_countries, Africa))) {
+    filename <- paste(filename, "_", "Africa", sep = "")
+  } else if (is_empty(setdiff(chosen_countries, Asia))) {
+    filename <- paste(filename, "_", "Asia", sep = "")
+  } else {
+    filename <- paste(filename, "_", "notAllCountries", sep = "")
+  }
 }
 
 ```
