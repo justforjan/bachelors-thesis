@@ -172,13 +172,13 @@ out anyways while merging.
 
 ```{r}
 merger <- function(indicators) {
-  d <- general[c("country", "year", indicators)]
+  d <- general[c("dmu", indicators)]
   d <- drop_na(d)
   d
 }
 
 merger2 <- function(indicators) {
-  d <- reduce(indicators, full_join, by=c("country", "year"))
+  d <- reduce(indicators, full_join, by="dmu")
   drop_na(d)
 }
 
@@ -187,29 +187,32 @@ write_final <- function(final) {
   write_csv(final, paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/", deparse(substitute(final)), ".csv", sep = ""))
 }
 
-# check_for_0 <- function(data) {
-#   
-#   if (data$women_in_parliament) {
-#     a <- min(data$women_in_parliament)
-#   }
-#   
-#   if (data$forest_area) {
-#     b <- min(data$forest_area)
-#   }
-#   
-#   if (data$mean_years_in_school) {
-#     c <- min(data$mean_years_in_school)
-#   }
-#   
-#   if (data$poverty) {
-#     d <- min(data$poverty)
-#   }
-#   
-#   if (data$CO2) {
-#     e <- min(data$CO2)
-#   }
-#   
-# }
+
+check0 <- function(data) {
+  
+  sum(data <= 0)
+
+  # if (data$women_in_parliament) {
+  #   a <- min(data$women_in_parliament)
+  # }
+  # 
+  # if (data$forest_area) {
+  #   b <- min(data$forest_area)
+  # }
+  # 
+  # if (data$mean_years_in_school) {
+  #   c <- min(data$mean_years_in_school)
+  # }
+  # 
+  # if (data$poverty) {
+  #   d <- min(data$poverty)
+  # }
+  # 
+  # if (data$CO2) {
+  #   e <- min(data$CO2)
+  # }
+
+}
 
 
 
@@ -256,40 +259,81 @@ Data sets that (as of now) look very promising:
 
 ```{r}
 # Create list of all data frames
-all_data <- list(
-  women_in_parliament,
-  basic_sanitation,
-  basic_water_source,
-  electricity,
-  employment_rate,
-  material_footprint,
-  forest_area,
-  mean_years_in_school,
-  health_worker,
-  air_pollution,
-  red_list,
-  poverty,
-  life_expectancy,
-  income,
-  income_share_20,
-  CO2,
-  murder
-)
+# all_data <- list(
+#   women_in_parliament,
+#   basic_sanitation,
+#   basic_water_source,
+#   electricity,
+#   employment_rate,
+#   material_footprint,
+#   forest_area,
+#   mean_years_in_school,
+#   health_worker,
+#   air_pollution,
+#   red_list,
+#   poverty,
+#   life_expectancy,
+#   income,
+#   income_share_20,
+#   CO2,
+#   murder
+# )
 ```
 
 ```{r}
 
 # Merge all data frame together by the country attribute
 
-general <- all_data %>% reduce(full_join, by=c("country", "year"))
+# general <- all_data %>% reduce(full_join, by="dmu")
+```
+
+Merge with merge function
+
+```{r}
+general <- 
+  merge(
+  merge(
+  merge(
+  merge(
+  merge(
+  merge(
+  merge(
+  merge(
+  merge(
+  merge(
+  merge(
+  merge(
+  merge(
+  merge(
+  merge(
+  merge(
+    
+  women_in_parliament,
+  basic_sanitation, by = "dmu", all = TRUE),
+  basic_water_source, by = "dmu", all = TRUE),
+  electricity, by = "dmu", all = TRUE),
+  employment_rate, by = "dmu", all = TRUE),
+  material_footprint, by = "dmu", all = TRUE),
+  forest_area, by = "dmu", all = TRUE),
+  mean_years_in_school, by = "dmu", all = TRUE),
+  air_pollution, by = "dmu", all = TRUE),
+  health_worker, by = "dmu", all = TRUE),
+  red_list, by = "dmu", all = TRUE),
+  poverty, by = "dmu", all = TRUE),
+  life_expectancy, by = "dmu", all = TRUE),
+  income, by = "dmu", all = TRUE),
+  income_share_20, by = "dmu", all = TRUE),
+  CO2, by = "dmu", all = TRUE),
+  murder, by = "dmu", all = TRUE)
+                                  
+
 ```
 
 ```{r}
 
 # Change column names to something meaningful
 colnames(general) <- c(
-  "country",
-  "year",
+  "dmu",
   "women_in_parliament",
   "basic_sanitation",
   "basic_water_source",
@@ -324,26 +368,19 @@ write_csv(general, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_d
 | health_worker | income_share_20 |
 
 ```{r}
-final_17 <- merger(c(
+final_18 <- merger(c(
   "health_worker",
   "income_share_20"
 ))
 
-nrow(final_17)
+nrow(final_18)
 
-write_final(final_17)
+write_final(final_18)
 ```
 
--\> **1640** dmus
+-\> dmus
 
-```{r}
-final_17_test <- merger2(list(
-  health_worker,
-  income_share_20
-))
-
-nrow(final_17_test)
-write_final(final_17_test)
+```{write_final(final_18)}
 ```
 
 ## Attempt 17 - 2 datasets
@@ -364,13 +401,10 @@ nrow(final_17)
 -\> **1640** dmus
 
 ```{r}
-final_17_test <- merger2(list(
-  electricity,
-  income_share_20
-))
-
-nrow(final_17_test)
+check0(final_17)
 ```
+
+No 0 values
 
 ```{r}
 write_final(final_17)
@@ -393,15 +427,6 @@ nrow(final_16)
 
 -\> **1645** dmus
 
-```{r}
-final_16 <- merger2(list(
-  electricity,
-  poverty
-))
-
-nrow(final_16)
-```
-
 **Check for 0 values**
 
 ```{r}
@@ -413,9 +438,7 @@ min(final_16$poverty)
 ```
 
 ```{r}
-print("0 poverty:")
-unique(final_16$country[final_16$poverty <= 0])
-as.data.frame(table(final_16$country[final_16$poverty <= 0]))
+check0(final_16)
 ```
 
 Poverty has too many 0 values -\> next attempt with lower income
@@ -427,14 +450,10 @@ Poverty has too many 0 values -\> next attempt with lower income
 | mean_years_in_school | employment_rate |
 
 ```{r}
-final_15 <- general[c(
-  "country",
-  "year",
+final_15 <- merger(c(
   "mean_years_in_school",
   "employment_rate"
-)]
-
-final_15 <- drop_na(final_15)
+))
 
 nrow(final_15)
 ```
@@ -464,19 +483,15 @@ write_final(final_15)
 | CO2   | mean_years_in_school |
 
 ```{r}
-final_14 <- general[c(
-  "country",
-  "year",
+final_14 <- merger(c(
   "CO2",
   "mean_years_in_school"
-)]
-
-final_14 <- drop_na(final_14)
+))
 
 nrow(final_14)
 ```
 
--\> **5892** dmus
+-\> **5892** DMUs
 
 **Check for 0 values**
 
@@ -485,17 +500,16 @@ nrow(final_14)
 # min(final_14$forest_area)
 min(final_14$mean_years_in_school)
 # min(final_14$poverty)
-# min(final_14$CO2)
+min(final_14$CO2)
 ```
 
 0 values in mean_years_in_school
 
 ```{r}
-print("0 mean years in school:")
-table(final_14$country[final_14$mean_years_in_school <= 0])
+check0(final_14)
 ```
 
-1 entry with 0 mean years in school -\> delete
+2 entry with 0 mean years in school -\> delete
 
 ```{r}
 final_14 <- filter(final_14, mean_years_in_school != 0)
@@ -537,8 +551,7 @@ min(final_13$CO2)
 0 values in CO2
 
 ```{r}
-print("0 CO2:")
-table(final_13$country[final_13$CO2 <= 0])
+check0(final_13)
 ```
 
 6 entries with 0 CO2 -\> delete
@@ -573,24 +586,22 @@ nrow(final_12)
 **Check for 0 values**
 
 ```{r}
-# min(final_12$women_in_parliament)
+min(final_12$women_in_parliament)
 # min(final_12$forest_area)
 # min(final_12$mean_years_in_school)
 # min(final_12$poverty)
 min(final_12$CO2)
 ```
 
-0 values in CO2
-
 ```{r}
-print("0 CO2:")
-table(final_12$country[final_12$CO2 <= 0])
+check0(final_12)
 ```
 
-2 entries with 0 CO2 -\> delete
+600 values in CO2. 2 in CO2 column, 598 in women_in_parliament
 
 ```{r}
-final_12 <- filter(final_12, CO2 != 0)
+final_12 <- filter(final_12, CO2 > 0)
+final_12[final_12 == 0] <- 0.001
 ```
 
 **Export to csv**
@@ -622,18 +633,6 @@ nrow(final_11)
 ```
 
 -\> **4473** DMUs
-
-```{r}
-final_11 <- merger2(list(
-  employment_rate,
-  mean_years_in_school,
-  CO2,
-  life_expectancy,
-  income
-))
-
-nrow(final_11)
-```
 
 **Check for 0 values**
 
@@ -674,16 +673,6 @@ nrow(final_10)
 
 -\> **5942** DMUs
 
-```{r}
-final_10 <- merger2(list(
-  mean_years_in_school,
-  life_expectancy,
-  income
-))
-
-nrow(final_10)
-```
-
 **Check for 0 values**
 
 ```{r}
@@ -697,8 +686,7 @@ min(final_10$mean_years_in_school)
 Mean years in school has values of 0
 
 ```{r}
-print("0 mean years in school:")
-table(final_10$country[final_10$mean_years_in_school <= 0])
+check0(final_10)
 
 ```
 
@@ -737,18 +725,6 @@ nrow(final_9)
 ```
 
 -\> **4473** DMUs
-
-```{r}
-final_9 <- merger2(list(
-  employment_rate,
-  mean_years_in_school,
-  CO2,
-  life_expectancy,
-  income
-))
-
-nrow(final_9)
-```
 
 **Check for 0 values**
 
@@ -800,11 +776,13 @@ min(final_8$mean_years_in_school)
 min(final_8$CO2)
 ```
 
+0 values in mean years in school and CO2
+
 ```{r}
 print("0 mean years in school:")
-table(final_8$country[final_8$mean_years_in_school <= 0])
+check0(final_8$mean_years_in_school)
 print("0 CO2:")
-table(final_8$country[final_8$CO2 <= 0])
+check0(final_8$CO2)
 ```
 
 One entry with 0 years of education (Yemen) and one entry with 0 CO2
@@ -888,18 +866,6 @@ nrow(final_6)
 
 -\> **4421** DMUs
 
-```{r}
-final_6 <- merger2(list(
-  electricity,
-  employment_rate,
-  CO2,
-  life_expectancy,
-  income
-))
-
-nrow(final_6)
-```
-
 **Check for 0 values**
 
 ```{r}
@@ -938,18 +904,6 @@ nrow(final_5)
 
 -\> **2049** DMUs
 
-```{r}
-final_5 <- merger2(list(
-  electricity,
-  health_worker,
-  CO2,
-  life_expectancy,
-  income
-))
-
-nrow(final_5)
-```
-
 **Check for 0 values**
 
 ```{r}
@@ -987,20 +941,7 @@ final_4 <- merger(c(
 nrow(final_4)
 ```
 
--\> **2332 -\> 1809** DMUs
-
-```{r}
-final_4 <- merger2(list(
-  women_in_parliament,
-  electricity,
-  CO2,
-  life_expectancy,
-  income,
-  health_worker
-))
-
-nrow(final_4)
-```
+-\> **2465** DMUs
 
 **Check for 0 values**
 
@@ -1014,13 +955,13 @@ min(final_4$CO2)
 
 ```{r}
 print("0 women in parliament:")
-table(final_4$country[final_4$women_in_parliament <= 0])
+check0(final_4)
 ```
 
 Assign very low values where values are 0
 
 ```{r}
-final_4[final_4 == 0] <- 0.0001
+final_4[final_4 == 0] <- 0.001
 ```
 
 ```{r}
@@ -1049,23 +990,6 @@ write_final(final_4)
 **Merge data**
 
 ```{r}
-final_3 <- merger2(list(
-  women_in_parliament,
-  electricity,
-  CO2,
-  forest_area,
-  life_expectancy,
-  income,
-  health_worker,
-  employment_rate
-))
-
-final_3 <- drop_na(final_3)
-
-nrow(final_3)
-```
-
-```{r}
 final_3 <- merger(c(
   "women_in_parliament",
   "electricity",
@@ -1080,65 +1004,7 @@ final_3 <- merger(c(
 nrow(final_3)
 ```
 
--\> **2201 -\> 1671** DMUs
-
-```{r}
-# Create list of all data frames
-all_data <- list(
-  women_in_parliament,
-  electricity,
-  employment_rate,
-  forest_area,
-  health_worker,
-  life_expectancy,
-  income,
-  CO2
-)
-
-final_3_test <- all_data %>% reduce(full_join, by=c("country", "year"))
-
-# Change column names to something meaningful
-colnames(final_3_test) <- c(
-  "country",
-  "year",
-  "women_in_parliament",
-  "electricity",
-  "employment_rate",
-  "forest_area",
-  "health_worker",
-  "life_expectancy",
-  "income",
-  "CO2"
-  )
-
-# convert tibble to data frame
-final_3_test <- as.data.frame(final_3_test)
-
-final_3_test <- drop_na(final_3_test)
-
-nrow(final_3_test)
-```
-
--\> **2316** dmus
-
-```{r}
-final_3_test2 <- general[c(
-  "country",
-  "year",
-  "women_in_parliament",
-  "electricity",
-  "CO2",
-  "forest_area",
-  "life_expectancy",
-  "income",
-  "health_worker",
-  "employment_rate"
-)]
-
-final_3_test2 <- drop_na(final_3_test2)
-
-nrow(final_3_test2)
-```
+-\> **2316** DMUs
 
 **Check for 0 values**
 
@@ -1150,17 +1016,19 @@ min(final_3$forest_area)
 min(final_3$CO2)
 ```
 
+0 values in women in parliament and forest area
+
 ```{r}
 print("0 women in parliament:")
-unique(final_3$country[final_3$women_in_parliament <= 0])
+check0(final_3$women_in_parliament)
 print("0 forest area:")
-unique(final_3$country[final_3$forest_area <= 0])
+check0(final_3$forest_area)
 ```
 
 Assign very low values where values are 0
 
 ```{r}
-final_3[final_3 == 0] <- 0.0001
+final_3[final_3 == 0] <- 0.001
 ```
 
 **Export to csv**
@@ -1181,9 +1049,7 @@ In this attempt we try to cover only 8 dimensions in total.
 | mean_years_in_school | employment_rate |
 
 ```{r}
-final <- general[c(
-  "country",
-  "year",
+final_2 <- merger(c(
   "women_in_parliament",
   "electricity",
   "CO2",
@@ -1192,37 +1058,40 @@ final <- general[c(
   "income",
   "income_share_20",
   "employment_rate"
-)]
-final <- as.data.frame(final)
+))
 
-final <- drop_na(final)
+nrow(final_2)
 ```
 
 Check for 0 values
 
 ```{r}
-min(final$women_in_parliament)
-min(final$mean_years_in_school)
-min(final$CO2)
+min(final_2$women_in_parliament)
+min(final_2$mean_years_in_school)
+min(final_2$CO2)
 ```
 
-Count how many 0 values in CO2
+Count how many 0 values in women in parliament
 
 ```{r}
-sum(final$CO2 <= 0)
+sum(final_2$women_in_parliament <= 0)
 ```
 
-Only 2 values 0 or less. I will delete these two observations.
+Only 3 values 0 or less. I will delete these 3 observations.
 
 ```{r}
-final <- subset(final, CO2>0)
+final_2 <- subset(final_2, women_in_parliament>0)
 ```
 
 ```{r}
-nrow(final)
+nrow(final_2)
 ```
 
-1271 DMUs -\> Very few
+1331 DMUs -\> Very few
+
+```{r}
+write_final(final_3)
+```
 
 ## Attempt 1 - All data sets
 
@@ -1242,14 +1111,6 @@ data will be filtered out as well. We will check that later.
 final_1 <- drop_na(general)
 ```
 
-### Find out year with most countries
-
-```{r}
-year <- table(final_11$year)
-year <- as.data.frame(year)
-year
-```
-
 ### Check for negative or zero values
 
 ```{r}
@@ -1263,12 +1124,14 @@ min(final_1$CO2)
 In the poverty column many 0 values can be found. Instead of just
 deleting the columns, I will do the merger again but without poverty.
 
+0 values in women in parliament as well, but only one -\> delete this
+value
+
 ```{r}
 nrow(final_1)
 
-final_1 <- general[c(
-  "country",
-  "year",
+final_1 <- merger(c(
+  "dmu",
   "women_in_parliament",
   "basic_sanitation",
   "basic_water_source",
@@ -1286,16 +1149,22 @@ final_1 <- general[c(
   "income_share_20",
   "CO2",
   "murder"
-)]
-
-final_1 <- drop_na(final_1)
+))
 
 nrow(final_1)
 ```
 
 As we can see, we did not get any more DMUs by not including poverty.
-What a shame. 259 DMUs are way too less for 16 Dimensions. We need to
+What a shame. 279 DMUs are way too less for 16 Dimensions. We need to
 have less dimensions.
+
+```{r}
+check0(final_1)
+```
+
+```{r}
+final_1 <- filter(final_1, final_1$women_in_parliament > 0)
+```
 
 ### Save result as csv
 
