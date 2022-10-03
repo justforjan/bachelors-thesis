@@ -4,29 +4,30 @@ library(tidyverse)
 library(countrycode)
 
 # Chose the attempt
-attempt = 11
+attempt = 10
 
 # Read data
 data = read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_", as.character(attempt), ".csv", sep = ""), show_col_types = FALSE)
 str(data)
 
-# Add continent
-data$continent <- countrycode(sourcevar = data$country,
-                                  origin = "country.name",
-                                  destination = "continent")
 
-data <- data %>%
-  filter(year == 2000)
+# Add continent
+# data$continent <- countrycode(sourcevar = data$country,
+#                                   origin = "country.name",
+#                                   destination = "continent")
+
+# data <- data %>%
+#   filter(year == 2000)
 
 
 # data$abc <- str_c(data$continent, "_", data$country)
-data$abc <- str_c(data$country, "_", 1:dim(data))
-data$country <- NULL
-data$year <- NULL
-data$continent <- NULL
-data <- data %>% relocate(abc)
+# data$abc <- str_c(data$country, "_", 1:dim(data))
+# data$country <- NULL
+# data$year <- NULL
+# data$continent <- NULL
+# data <- data %>% relocate(abc)
 
-data.lables <- data$abc
+data.lables <- data$dmu
 
 data_scale <- scale(data[2:ncol(data)])
 
@@ -35,7 +36,7 @@ data_scale <- scale(data[2:ncol(data)])
 fviz_nbclust(data_scale, kmeans, method = "wss")
 
 
-km.out <- kmeans(data_scale, centers = 4, nstart = 100)
+km.out <- kmeans(data_scale, centers = 5, nstart = 100)
 print(km.out)
 
 # Visualize the clustering algorithm results
