@@ -19,7 +19,8 @@ data <- data %>%
   filter(year == 2000)
 
 
-data$abc <- str_c(data$continent, "_", data$country)
+# data$abc <- str_c(data$continent, "_", data$country)
+data$abc <- str_c(data$country, "_", 1:dim(data))
 data$country <- NULL
 data$year <- NULL
 data$continent <- NULL
@@ -34,7 +35,7 @@ data_scale <- scale(data[2:ncol(data)])
 fviz_nbclust(data_scale, kmeans, method = "wss")
 
 
-km.out <- kmeans(data_scale, centers = 7, nstart = 100)
+km.out <- kmeans(data_scale, centers = 4, nstart = 100)
 print(km.out)
 
 # Visualize the clustering algorithm results
