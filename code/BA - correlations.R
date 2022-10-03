@@ -81,4 +81,5 @@ colnames(data) <- c(
 correlations <- as.data.frame(cor(data[3:length(data)], use = "pairwise.complete.obs"))
 
 # Export as csv
-write_csv(correlations, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/correlations")
+write_csv(correlations, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/correlations.csv")
+
