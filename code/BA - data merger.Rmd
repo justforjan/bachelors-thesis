@@ -615,18 +615,7 @@ write_csv(final_10, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_
 **Merge data**
 
 ```{r}
-all_data <- list(
-  employment_rate,
-  mean_years_in_school,
-  CO2,
-  life_expectancy,
-  income
-
-)
-
-final_9 <- all_data %>% reduce(full_join, by = c("country", "year"))
-
-colnames(final_9) <- c(
+final_9 <- general[c(
   "country",
   "year",
   "employment_rate",
@@ -634,9 +623,7 @@ colnames(final_9) <- c(
   "CO2",
   "life_expectancy",
   "income"
-)
-
-final_9 <- as.data.frame(final_9)
+)]
 
 final_9 <- drop_na(final_9)
 
@@ -734,28 +721,15 @@ write_csv(final_8, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_d
 **Merge data**
 
 ```{r}
-all_data <- list(
-  electricity,
-  mean_years_in_school,
-  CO2,
-  life_expectancy,
-  income
-
-)
-
-final_7 <- all_data %>% reduce(full_join, by = c("country", "year"))
-
-colnames(final_7) <- c(
+final_7 <- general[c(
   "country",
   "year",
   "electricity",
   "mean_years_in_school",
   "CO2",
   "life_expectancy",
-  "income"
-)
-
-final_7 <- as.data.frame(final_7)
+  "income" 
+)]
 
 final_7 <- drop_na(final_7)
 
@@ -791,18 +765,7 @@ write_csv(final_7, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_d
 **Merge data**
 
 ```{r}
-all_data <- list(
-  electricity,
-  employment_rate,
-  CO2,
-  life_expectancy,
-  income
-
-)
-
-final_6 <- all_data %>% reduce(full_join, by = c("country", "year"))
-
-colnames(final_6) <- c(
+final_6 <- general[c(
   "country",
   "year",
   "electricity",
@@ -810,9 +773,7 @@ colnames(final_6) <- c(
   "CO2",
   "life_expectancy",
   "income"
-)
-
-final_6 <- as.data.frame(final_6)
+)]
 
 final_6 <- drop_na(final_6)
 
@@ -844,18 +805,7 @@ write_csv(final_6, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_d
 **Merge data**
 
 ```{r}
-all_data <- list(
-  electricity,
-  health_worker,
-  CO2,
-  life_expectancy,
-  income
-
-)
-
-final_5 <- all_data %>% reduce(full_join, by = c("country", "year"))
-
-colnames(final_5) <- c(
+final_5 <- general[c(
   "country",
   "year",
   "electricity",
@@ -863,9 +813,7 @@ colnames(final_5) <- c(
   "CO2",
   "life_expectancy",
   "income"
-)
-
-final_5 <- as.data.frame(final_5)
+)]
 
 final_5 <- drop_na(final_5)
 
@@ -897,33 +845,16 @@ write_csv(final_5, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_d
 **Merge data**
 
 ```{r}
-all_data <- list(
-  women_in_parliament,
-  electricity,
-  CO2,
-  # forest_area,
-  life_expectancy,
-  income,
-  health_worker
-  # employment_rate
-)
-
-final_4 <- all_data %>% reduce(full_join, by = c("country", "year"))
-
-colnames(final_4) <- c(
+final_4 <- general[c(
   "country",
   "year",
   "women_in_parliament",
   "electricity",
   "CO2",
-  # "forest_area",
   "life_expectancy",
   "income",
   "health_worker"
-  # "employment_rate"
-)
-
-final_4 <- as.data.frame(final_4)
+)]
 
 final_4 <- drop_na(final_4)
 
@@ -979,20 +910,7 @@ write_csv(final_4, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_d
 **Merge data**
 
 ```{r}
-all_data <- list(
-  women_in_parliament,
-  electricity,
-  CO2,
-  forest_area,
-  life_expectancy,
-  income,
-  health_worker,
-  employment_rate
-)
-
-final_3 <- all_data %>% reduce(full_join, by = c("country", "year"))
-
-colnames(final_3) <- c(
+final_3 <- general[c(
   "country",
   "year",
   "women_in_parliament",
@@ -1003,9 +921,7 @@ colnames(final_3) <- c(
   "income",
   "health_worker",
   "employment_rate"
-)
-
-final_3 <- as.data.frame(final_3)
+)]
 
 final_3 <- drop_na(final_3)
 
@@ -1055,20 +971,9 @@ In this attempt we try to cover only 8 dimensions in total.
 | mean_years_in_school | employment_rate |
 
 ```{r}
-all_data <- list(
-  women_in_parliament,
-  electricity,
-  CO2,
-  mean_years_in_school,
-  life_expectancy,
-  income,
-  income_share_20,
-  employment_rate
-)
-
-final <- all_data %>% reduce(full_join, by = c("country", "year"))
-
-colnames(final) <- c(
+final <- generak[c(
+  "country",
+  "year",
   "women_in_parliament",
   "electricity",
   "CO2",
@@ -1077,8 +982,7 @@ colnames(final) <- c(
   "income",
   "income_share_20",
   "employment_rate"
-)
-
+)]
 final <- as.data.frame(final)
 
 final <- drop_na(final)
