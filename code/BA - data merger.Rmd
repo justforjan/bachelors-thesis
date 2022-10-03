@@ -202,6 +202,306 @@ Data sets that (as of now) look very promising:
 
 -   CO2
 
+## General data frame
+
+17 in total
+
+```{r}
+# Create list of all data frames
+all_data <- list(
+  women_in_parliament,
+  basic_sanitation,
+  basic_water_source,
+  electricity,
+  employment_rate,
+  material_footprint,
+  forest_area,
+  mean_years_in_school,
+  health_worker,
+  air_pollution,
+  red_list,
+  poverty,
+  life_expectancy,
+  income,
+  income_share_20,
+  CO2,
+  murder
+)
+```
+
+```{r}
+
+# Merge all data frame together by the country attribute
+
+general <- all_data %>% reduce(full_join, by=c("country", "year"))
+```
+
+```{r}
+
+# Change column names to something meaningful
+colnames(general) <- c(
+  "country",
+  "year",
+  "women_in_parliament",
+  "basic_sanitation",
+  "basic_water_source",
+  "electricity",
+  "employment_rate",
+  "material_footprint",
+  "forest_area",
+  "mean_years_in_school",
+  "air_pollution",
+  "health_worker",
+  "red_list",
+  "poverty",
+  "life_expectancy",
+  "income",
+  "income_share_20",
+  "CO2",
+  "murder"
+  )
+
+# convert tibble to data frame
+general <- as.data.frame(general)
+```
+
+## Attempt 16 - 2 datasets
+
+| Input       | Output  |
+|-------------|---------|
+| electricity | poverty |
+
+```{r}
+final_16 <- general[c(
+  "country",
+  "year",
+  "electricity",
+  "poverty"
+)]
+
+final_16 <- drop_na(final_16)
+
+nrow(final_16)
+```
+
+-\> **1652** dmus
+
+**Check for 0 values**
+
+```{r}
+# min(final_16$women_in_parliament)
+# min(final_16$forest_area)
+# min(final_16$mean_years_in_school)
+min(final_16$poverty)
+# min(final_16$CO2)
+```
+
+```{r}
+print("0 poverty:")
+unique(final_16$country[final_16$poverty <= 0])
+as.data.frame(table(final_16$country[final_16$poverty <= 0]))
+```
+
+```{r}
+final_16[final_16 == 0] <- 0.0001
+```
+
+**Export to csv**
+
+```{r}
+write_csv(final_16, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_16.csv")
+```
+
+## Attempt 15 - 2 datasets
+
+| Input                | Output          |
+|----------------------|-----------------|
+| mean_years_in_school | employment_rate |
+
+```{r}
+final_15 <- general[c(
+  "country",
+  "year",
+  "mean_years_in_school",
+  "employment_rate"
+)]
+
+final_15 <- drop_na(final_15)
+
+nrow(final_15)
+```
+
+-\> **4242** dmus
+
+```{r}
+# min(final_15$women_in_parliament)
+# min(final_15$forest_area)
+min(final_15$mean_years_in_school)
+# min(final_15$poverty)
+# min(final_15$CO2)
+```
+
+no 0 values :)
+
+**Export to csv**
+
+```{r}
+write_csv(final_15, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_15.csv")
+```
+
+## Attempt 14 - 2 datasets
+
+| Input | Output               |
+|-------|----------------------|
+| CO2   | mean_years_in_school |
+
+```{r}
+final_14 <- general[c(
+  "country",
+  "year",
+  "CO2",
+  "mean_years_in_school"
+)]
+
+final_14 <- drop_na(final_14)
+
+nrow(final_14)
+```
+
+-\> dmus
+
+**Check for 0 values**
+
+```{r}
+# min(final_14$women_in_parliament)
+# min(final_14$forest_area)
+min(final_14$mean_years_in_school)
+# min(final_14$poverty)
+# min(final_14$CO2)
+```
+
+0 values in mean_years_in_school
+
+```{r}
+print("0 mean years in school:")
+unique(final_14$country[final_14$mean_years_in_school <= 0])
+as.data.frame(table(final_14$country[final_14$mean_years_in_school <= 0]))
+```
+
+1 entry with 0 mean years in school -\> delete
+
+```{r}
+final_14 <- filter(final_14, mean_years_in_school != 0)
+```
+
+**Export to csv**
+
+```{r}
+write_csv(final_14, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_14.csv")
+```
+
+## Attempt 13 - 2 datasets
+
+| Input | Output |
+|-------|--------|
+| CO2   | income |
+
+```{r}
+final_13 <- general[c(
+  "country",
+  "year",
+  "CO2",
+  "income"
+)]
+
+final_13 <- drop_na(final_13)
+
+nrow(final_13)
+```
+
+-\> **12446** dmus
+
+**Check for 0 values**
+
+```{r}
+# min(final_13$women_in_parliament)
+# min(final_13$forest_area)
+# min(final_13$mean_years_in_school)
+# min(final_13$poverty)
+min(final_13$CO2)
+```
+
+0 values in CO2
+
+```{r}
+print("0 CO2:")
+unique(final_13$country[final_13$CO2 <= 0])
+as.data.frame(table(final_13$country[final_13$CO2 <= 0]))
+```
+
+6 entries with 0 CO2 -\> delete
+
+```{r}
+final_13 <- filter(final_13, CO2 != 0)
+```
+
+**Export to csv**
+
+```{r}
+write_csv(final_13, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_13.csv")
+```
+
+## Attempt 12 - 2 datasets
+
+| Input | Output              |
+|-------|---------------------|
+| CO2   | women_in_parliament |
+
+```{r}
+final_12 <- general[c(
+  "country",
+  "year",
+  "CO2",
+  "women_in_parliament"
+)]
+
+final_12 <- drop_na(final_12)
+
+nrow(final_12)
+```
+
+-\> **8847** dmus
+
+**Check for 0 values**
+
+```{r}
+# min(final_12$women_in_parliament)
+# min(final_12$forest_area)
+# min(final_12$mean_years_in_school)
+# min(final_12$poverty)
+min(final_12$CO2)
+```
+
+0 values in CO2
+
+```{r}
+print("0 CO2:")
+unique(final_12$country[final_12$CO2 <= 0])
+as.data.frame(table(final_12$country[final_12$CO2 <= 0]))
+```
+
+2 entries with 0 CO2 -\> delete
+
+```{r}
+final_12 <- filter(final_12, CO2 != 0)
+```
+
+**Export to csv**
+
+```{r}
+write_csv(final_12, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_12.csv")
+```
+
 ## Attempt 11 - 5 data sets
 
 | Input                | Output          |
@@ -213,18 +513,7 @@ Data sets that (as of now) look very promising:
 **Merge data**
 
 ```{r}
-all_data <- list(
-  employment_rate,
-  mean_years_in_school,
-  CO2,
-  life_expectancy,
-  income
-
-)
-
-final_11 <- all_data %>% reduce(full_join, by = c("country", "year"))
-
-colnames(final_11) <- c(
+final_11 <- general[c(
   "country",
   "year",
   "employment_rate",
@@ -232,9 +521,7 @@ colnames(final_11) <- c(
   "CO2",
   "life_expectancy",
   "income"
-)
-
-final_11 <- as.data.frame(final_11)
+)]
 
 final_11 <- drop_na(final_11)
 
@@ -253,6 +540,8 @@ min(final_11$mean_years_in_school)
 min(final_11$CO2)
 ```
 
+No 0 values
+
 **Export to csv**
 
 ```{r}
@@ -269,24 +558,13 @@ write_csv(final_11, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_
 **Merge data**
 
 ```{r}
-all_data <- list(
-  mean_years_in_school,
-  life_expectancy,
-  income
-
-)
-
-final_10 <- all_data %>% reduce(full_join, by = c("country", "year"))
-
-colnames(final_10) <- c(
+final_10 <- general[c(
   "country",
   "year",
   "mean_years_in_school",
   "life_expectancy",
   "income"
-)
-
-final_10 <- as.data.frame(final_10)
+)]
 
 final_10 <- drop_na(final_10)
 
@@ -395,26 +673,14 @@ write_csv(final_9, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_d
 **Merge data**
 
 ```{r}
-all_data <- list(
-  mean_years_in_school,
-  CO2,
-  life_expectancy,
-  income
-
-)
-
-final_8 <- all_data %>% reduce(full_join, by = c("country", "year"))
-
-colnames(final_8) <- c(
+final_8 <- general[c(
   "country",
   "year",
   "mean_years_in_school",
   "CO2",
   "life_expectancy",
   "income"
-)
-
-final_8 <- as.data.frame(final_8)
+)]
 
 final_8 <- drop_na(final_8)
 
@@ -846,67 +1112,6 @@ nrow(final)
 
 ## Attempt 1 - All data sets
 
-17 in total
-
-```{r}
-# Create list of all data frames
-all_data <- list(
-  women_in_parliament,
-  basic_sanitation,
-  basic_water_source,
-  electricity,
-  employment_rate,
-  material_footprint,
-  forest_area,
-  mean_years_in_school,
-  health_worker,
-  air_pollution,
-  red_list,
-  poverty,
-  life_expectancy,
-  income,
-  income_share_20,
-  CO2,
-  murder
-)
-```
-
-```{r}
-
-# Merge all data frame together by the country attribute
-
-final <- all_data %>% reduce(full_join, by=c("country", "year"))
-```
-
-```{r}
-
-# Change column names to something meaningful
-colnames(final) <- c(
-  "country",
-  "year",
-  "women_in_parliament",
-  "basic_sanitation",
-  "basic_water_source",
-  "electricity",
-  "employment_rate",
-  "material_footprint",
-  "forest_area",
-  "mean_years_in_school",
-  "air_pollution",
-  "health_worker",
-  "red_list",
-  "poverty",
-  "life_expectancy",
-  "income",
-  "income_share_20",
-  "CO2",
-  "murder"
-  )
-
-# convert tibble to data frame
-final <- as.data.frame(final)
-```
-
 ### Are there any quirks in the resulting data frame?
 
 -   Upper middle income
@@ -920,13 +1125,13 @@ data will be filtered out as well. We will check that later.
 ### Delete DMUs with NAs
 
 ```{r}
-final <- drop_na(final)
+final_1 <- drop_na(general)
 ```
 
 ### Find out year with most countries
 
 ```{r}
-year <- table(final$year)
+year <- table(final_11$year)
 year <- as.data.frame(year)
 year
 ```
@@ -934,43 +1139,20 @@ year
 ### Check for negative or zero values
 
 ```{r}
-min(final$women_in_parliament)
-min(final$forest_area)
-min(final$mean_years_in_school)
-min(final$poverty)
-min(final$CO2)
+min(final_1$women_in_parliament)
+min(final_1$forest_area)
+min(final_1$mean_years_in_school)
+min(final_1$poverty)
+min(final_1$CO2)
 ```
 
 In the poverty column many 0 values can be found. Instead of just
 deleting the columns, I will do the merger again but without poverty.
 
 ```{r}
-nrow(final)
+nrow(final_1)
 
-all_data <- list(
-  women_in_parliament,
-  basic_sanitation,
-  basic_water_source,
-  electricity,
-  employment_rate,
-  material_footprint,
-  forest_area,
-  mean_years_in_school,
-  health_worker,
-  air_pollution,
-  red_list,
-  # poverty,
-  life_expectancy,
-  income,
-  income_share_20,
-  CO2,
-  murder
-)
-
-final <- all_data %>% reduce(full_join, by=c("country", "year"))
-
-# Change column names to something meaningful
-colnames(final) <- c(
+final_1 <- general[c(
   "country",
   "year",
   "women_in_parliament",
@@ -990,14 +1172,11 @@ colnames(final) <- c(
   "income_share_20",
   "CO2",
   "murder"
-  )
+)]
 
-# convert tibble to data frame
-final <- as.data.frame(final)
+final_1 <- drop_na(final_1)
 
-final <- drop_na(final)
-
-nrow(final)
+nrow(final_1)
 ```
 
 As we can see, we did not get any more DMUs by not including poverty.
@@ -1007,7 +1186,7 @@ have less dimensions.
 ### Save result as csv
 
 ```{r}
-# write_csv(final_all, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_all.csv")
+write_csv(final_1, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_1.csv")
 # write_csv(final, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/country_data_general.csv")
 ```
 
