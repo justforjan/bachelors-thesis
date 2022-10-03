@@ -142,7 +142,7 @@ CO2 <- CO2 %>% gather("year", "value", -country)
 murder <- murder %>% gather("year", "value", -country)
 ```
 
-##  Change data types of columns
+## Change data types of columns
 
 ```{r}
 # Values
@@ -168,25 +168,120 @@ CO2 <- CO2 %>% mutate(year = as.numeric(year))
 murder <- murder %>% mutate(year = as.numeric(year))
 ```
 
+## Handle differences in naming conventions
+
+Vectors of country names of both Gapminder and OurWorldInData
+
+```{r}
+gapminder <- unique(c(
+  women_in_parliament$country,
+  basic_sanitation$country,
+  basic_water_source$country,
+  electricity$country,
+  employment_rate$country,
+  material_footprint$country,
+  forest_area$country,
+  poverty$country,
+  life_expectancy$country,
+  income$country,
+  income_share_20$country,
+  CO2$country,
+  murder$country
+))
+
+ourworldindata <- unique(c(
+  mean_years_in_school$country,
+  air_pollution$country,
+  health_worker$country,
+  red_list$country
+))
+```
+
+In gapminder, but not in ourworldindata
+
+```{r}
+ingm <- as.data.frame(sort(setdiff(gapminder, ourworldindata)))
+```
+
+In ourworldindata but not in gapminder
+
+```{r}
+inowid <- as.data.frame(sort(setdiff(ourworldindata, gapminder)))
+```
+
+Manual creation of csv to map country names
+
+```{r}
+write_csv(ingm, "in_gp.csv")
+write_csv(inowid, "in_owid.csv")
+```
+
+Read manually created naming conventions file
+
+```{r}
+nc <- read_csv("naming_conventions.csv", show_col_types = FALSE)
+```
+
+Change country names according to naming convention
+
+```{r}
+for (country in 1:nrow(nc)) {
+  women_in_parliament[women_in_parliament == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  basic_sanitation[basic_sanitation == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  basic_water_source[basic_water_source == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  electricity[electricity == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  employment_rate[employment_rate == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  material_footprint[material_footprint == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  forest_area[forest_area == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  mean_years_in_school[mean_years_in_school == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  air_pollution[air_pollution == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  health_worker[health_worker == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  red_list[red_list == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  poverty[poverty == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  life_expectancy[life_expectancy == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  income[income == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  income_share_20[income_share_20 == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  CO2[CO2 == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  murder[murder == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+
+}
+```
+
 ## Save individual data sets as csvs
 
 ```{r}
-# write_csv(women_in_parliament, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/women_in_parliament.csv")
-# write_csv(basic_sanitation, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/basic_sanitation.csv")
-# write_csv(basic_water_source, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/basic_water_source.csv")
-# write_csv(electricity, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/electricity.csv")
-# write_csv(employment_rate, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/employment_rate.csv")
-# write_csv(material_footprint, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/material_footprint.csv")
-# write_csv(forest_area, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/forest_area.csv")
-# write_csv(mean_years_in_school, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/mean_years_in_school.csv")
-# write_csv(air_pollution, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/air_pollution.csv")
-# write_csv(health_worker, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/health_worker.csv")
-# write_csv(red_list, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/red_list.csv")
-# write_csv(poverty, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/poverty.csv")
-# write_csv(life_expectancy, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/life_expectancy.csv")
-# write_csv(income, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/income.csv")
-# write_csv(income_share_20, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/income_share_20.csv")
-# write_csv(CO2, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/CO2.csv")
-# write_csv(murder, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/murder.csv")
+write_csv(women_in_parliament, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/women_in_parliament.csv")
+write_csv(basic_sanitation, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/basic_sanitation.csv")
+write_csv(basic_water_source, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/basic_water_source.csv")
+write_csv(electricity, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/electricity.csv")
+write_csv(employment_rate, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/employment_rate.csv")
+write_csv(material_footprint, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/material_footprint.csv")
+write_csv(forest_area, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/forest_area.csv")
+write_csv(mean_years_in_school, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/mean_years_in_school.csv")
+write_csv(air_pollution, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/air_pollution.csv")
+write_csv(health_worker, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/health_worker.csv")
+write_csv(red_list, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/red_list.csv")
+write_csv(poverty, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/poverty.csv")
+write_csv(life_expectancy, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/life_expectancy.csv")
+write_csv(income, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/income.csv")
+write_csv(income_share_20, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/income_share_20.csv")
+write_csv(CO2, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/CO2.csv")
+write_csv(murder, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/murder.csv")
 ```
-
