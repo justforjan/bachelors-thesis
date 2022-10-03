@@ -19,7 +19,7 @@ regions <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/regions.cs
 
 Africa <- regions$country[regions$continent == "Africa"]
 Europe <- regions$country[regions$continent == "Europe"]
-Americs <- regions$country[regions$continent == "Americs"]
+Americas <- regions$country[regions$continent == "Americas"]
 Asia <- regions$country[regions$continent == "Asia"]
 Oceania <- regions$country[regions$continent == "Oceania"]
 EU <- regions$country[regions$EU == TRUE] 
@@ -60,7 +60,7 @@ from_1990 <- "no"
 only_one_year <- 0 # 0 means no
 
 # onyl specified chosen_countries?
-chosen_countries <- Europe # enter a vector with strings; empty means all
+chosen_countries <- c("Germany") # enter a vector with strings; empty means all
 
 orientation <- "io"
 # io: input oriented
@@ -206,16 +206,18 @@ if (only_one_year != 0) {
 }
 
 if (!is.null(chosen_countries)) {
-  if (is_empty(setdiff(chosen_countries, Europe))) {
+  if (is_empty(setdiff(Europe, chosen_countries))) {
     filename <- paste(filename, "_", "Europe", sep = "")
-  } else if (is_empty(setdiff(chosen_countries, Americas))) {
+  } else if (is_empty(setdiff(Americas, chosen_countries))) {
     filename <- paste(filename, "_", "Americas", sep = "")
-  } else if (is_empty(setdiff(chosen_countries, EU))) {
+  } else if (is_empty(setdiff(EU, chosen_countries))) {
     filename <- paste(filename, "_", "EU", sep = "")
-  } else if (is_empty(setdiff(chosen_countries, Africa))) {
+  } else if (is_empty(setdiff(Africa, chosen_countries))) {
     filename <- paste(filename, "_", "Africa", sep = "")
-  } else if (is_empty(setdiff(chosen_countries, Asia))) {
+  } else if (is_empty(setdiff(Asia, chosen_countries))) {
     filename <- paste(filename, "_", "Asia", sep = "")
+  } else if (length(chosen_countries) == 1) {
+    filename <- paste(filename, "_", as.character(chosen_countries[1]), sep = "")
   } else {
     filename <- paste(filename, "_", "notAllCountries", sep = "")
   }
