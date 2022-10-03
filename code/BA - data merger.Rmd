@@ -168,6 +168,54 @@ Using data sets that have values of 0 or less might be an issue later on
 when inputting the data into the DEA, unless the 0 values get filtered
 out anyways while merging.
 
+# Functions
+
+```{r}
+merger <- function(indicators) {
+  d <- general[c("country", "year", indicators)]
+  d <- drop_na(d)
+  d
+}
+
+merger2 <- function(indicators) {
+  d <- reduce(indicators, full_join, by=c("country", "year"))
+  drop_na(d)
+}
+
+
+write_final <- function(final) {
+  write_csv(final, paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/", deparse(substitute(final)), ".csv", sep = ""))
+}
+
+# check_for_0 <- function(data) {
+#   
+#   if (data$women_in_parliament) {
+#     a <- min(data$women_in_parliament)
+#   }
+#   
+#   if (data$forest_area) {
+#     b <- min(data$forest_area)
+#   }
+#   
+#   if (data$mean_years_in_school) {
+#     c <- min(data$mean_years_in_school)
+#   }
+#   
+#   if (data$poverty) {
+#     d <- min(data$poverty)
+#   }
+#   
+#   if (data$CO2) {
+#     e <- min(data$CO2)
+#   }
+#   
+# }
+
+
+
+
+```
+
 # Merge data frames
 
 We want to create multiple data sets all comprising a different set of
@@ -265,6 +313,69 @@ colnames(general) <- c(
 general <- as.data.frame(general)
 ```
 
+```{r}
+write_csv(general, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/general.csv")
+```
+
+## Attempt 18 - 2 datasets
+
+| Input         | Output          |
+|---------------|-----------------|
+| health_worker | income_share_20 |
+
+```{r}
+final_17 <- merger(c(
+  "health_worker",
+  "income_share_20"
+))
+
+nrow(final_17)
+
+write_final(final_17)
+```
+
+-\> **1640** dmus
+
+```{r}
+final_17_test <- merger2(list(
+  health_worker,
+  income_share_20
+))
+
+nrow(final_17_test)
+write_final(final_17_test)
+```
+
+## Attempt 17 - 2 datasets
+
+| Input       | Output          |
+|-------------|-----------------|
+| electricity | income_share_20 |
+
+```{r}
+final_17 <- merger(c(
+  "electricity",
+  "income_share_20"
+))
+
+nrow(final_17)
+```
+
+-\> **1640** dmus
+
+```{r}
+final_17_test <- merger2(list(
+  electricity,
+  income_share_20
+))
+
+nrow(final_17_test)
+```
+
+```{r}
+write_final(final_17)
+```
+
 ## Attempt 16 - 2 datasets
 
 | Input       | Output  |
@@ -272,19 +383,24 @@ general <- as.data.frame(general)
 | electricity | poverty |
 
 ```{r}
-final_16 <- general[c(
-  "country",
-  "year",
+final_16 <- merger(c(
   "electricity",
   "poverty"
-)]
-
-final_16 <- drop_na(final_16)
+))
 
 nrow(final_16)
 ```
 
--\> **1652** dmus
+-\> **1645** dmus
+
+```{r}
+final_16 <- merger2(list(
+  electricity,
+  poverty
+))
+
+nrow(final_16)
+```
 
 **Check for 0 values**
 
@@ -302,15 +418,7 @@ unique(final_16$country[final_16$poverty <= 0])
 as.data.frame(table(final_16$country[final_16$poverty <= 0]))
 ```
 
-```{r}
-final_16[final_16 == 0] <- 0.0001
-```
-
-**Export to csv**
-
-```{r}
-write_csv(final_16, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_16.csv")
-```
+Poverty has too many 0 values -\> next attempt with lower income
 
 ## Attempt 15 - 2 datasets
 
@@ -331,7 +439,7 @@ final_15 <- drop_na(final_15)
 nrow(final_15)
 ```
 
--\> **4242** dmus
+-\> **4475** dmus
 
 ```{r}
 # min(final_15$women_in_parliament)
@@ -346,7 +454,7 @@ no 0 values :)
 **Export to csv**
 
 ```{r}
-write_csv(final_15, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_15.csv")
+write_final(final_15)
 ```
 
 ## Attempt 14 - 2 datasets
@@ -368,7 +476,7 @@ final_14 <- drop_na(final_14)
 nrow(final_14)
 ```
 
--\> dmus
+-\> **5892** dmus
 
 **Check for 0 values**
 
@@ -384,8 +492,7 @@ min(final_14$mean_years_in_school)
 
 ```{r}
 print("0 mean years in school:")
-unique(final_14$country[final_14$mean_years_in_school <= 0])
-as.data.frame(table(final_14$country[final_14$mean_years_in_school <= 0]))
+table(final_14$country[final_14$mean_years_in_school <= 0])
 ```
 
 1 entry with 0 mean years in school -\> delete
@@ -397,7 +504,7 @@ final_14 <- filter(final_14, mean_years_in_school != 0)
 **Export to csv**
 
 ```{r}
-write_csv(final_14, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_14.csv")
+write_final(final_14)
 ```
 
 ## Attempt 13 - 2 datasets
@@ -407,14 +514,10 @@ write_csv(final_14, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_
 | CO2   | income |
 
 ```{r}
-final_13 <- general[c(
-  "country",
-  "year",
+final_13 <- merger(c(
   "CO2",
   "income"
-)]
-
-final_13 <- drop_na(final_13)
+))
 
 nrow(final_13)
 ```
@@ -435,8 +538,7 @@ min(final_13$CO2)
 
 ```{r}
 print("0 CO2:")
-unique(final_13$country[final_13$CO2 <= 0])
-as.data.frame(table(final_13$country[final_13$CO2 <= 0]))
+table(final_13$country[final_13$CO2 <= 0])
 ```
 
 6 entries with 0 CO2 -\> delete
@@ -448,7 +550,7 @@ final_13 <- filter(final_13, CO2 != 0)
 **Export to csv**
 
 ```{r}
-write_csv(final_13, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_13.csv")
+write_final(final_13)
 ```
 
 ## Attempt 12 - 2 datasets
@@ -458,14 +560,10 @@ write_csv(final_13, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_
 | CO2   | women_in_parliament |
 
 ```{r}
-final_12 <- general[c(
-  "country",
-  "year",
+final_12 <- merger(c(
   "CO2",
   "women_in_parliament"
-)]
-
-final_12 <- drop_na(final_12)
+))
 
 nrow(final_12)
 ```
@@ -486,8 +584,7 @@ min(final_12$CO2)
 
 ```{r}
 print("0 CO2:")
-unique(final_12$country[final_12$CO2 <= 0])
-as.data.frame(table(final_12$country[final_12$CO2 <= 0]))
+table(final_12$country[final_12$CO2 <= 0])
 ```
 
 2 entries with 0 CO2 -\> delete
@@ -499,7 +596,7 @@ final_12 <- filter(final_12, CO2 != 0)
 **Export to csv**
 
 ```{r}
-write_csv(final_12, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_12.csv")
+write_final(final_12)
 ```
 
 ## Attempt 11 - 5 data sets
@@ -513,22 +610,30 @@ write_csv(final_12, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_
 **Merge data**
 
 ```{r}
-final_11 <- general[c(
-  "country",
-  "year",
+final_11 <- merger(c(
   "employment_rate",
   "mean_years_in_school",
   "CO2",
   "life_expectancy",
   "income"
-)]
-
-final_11 <- drop_na(final_11)
+))
 
 nrow(final_11)
 ```
 
--\> **4232** DMUs
+-\> **4473** DMUs
+
+```{r}
+final_11 <- merger2(list(
+  employment_rate,
+  mean_years_in_school,
+  CO2,
+  life_expectancy,
+  income
+))
+
+nrow(final_11)
+```
 
 **Check for 0 values**
 
@@ -545,7 +650,7 @@ No 0 values
 **Export to csv**
 
 ```{r}
-write_csv(final_11, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_11.csv")
+write_final(final_11)
 ```
 
 ## Attempt 10 - 3 data sets
@@ -558,20 +663,26 @@ write_csv(final_11, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_
 **Merge data**
 
 ```{r}
-final_10 <- general[c(
-  "country",
-  "year",
+final_10 <- merger(c(
   "mean_years_in_school",
   "life_expectancy",
   "income"
-)]
-
-final_10 <- drop_na(final_10)
+))
 
 nrow(final_10)
 ```
 
--\> **5605** DMUs
+-\> **5942** DMUs
+
+```{r}
+final_10 <- merger2(list(
+  mean_years_in_school,
+  life_expectancy,
+  income
+))
+
+nrow(final_10)
+```
 
 **Check for 0 values**
 
@@ -587,7 +698,6 @@ Mean years in school has values of 0
 
 ```{r}
 print("0 mean years in school:")
-unique(final_10$country[final_10$mean_years_in_school <= 0])
 table(final_10$country[final_10$mean_years_in_school <= 0])
 
 ```
@@ -601,7 +711,7 @@ final_10 <- subset(final_10, (mean_years_in_school != 0))
 **Export to csv**
 
 ```{r}
-write_csv(final_10, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_10.csv")
+write_final(final_10)
 ```
 
 ## Attempt 9 - 5 data sets
@@ -615,22 +725,30 @@ write_csv(final_10, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_
 **Merge data**
 
 ```{r}
-final_9 <- general[c(
-  "country",
-  "year",
+final_9 <- merger(c(
   "employment_rate",
   "mean_years_in_school",
   "CO2",
   "life_expectancy",
   "income"
-)]
-
-final_9 <- drop_na(final_9)
+))
 
 nrow(final_9)
 ```
 
--\> **4232** DMUs
+-\> **4473** DMUs
+
+```{r}
+final_9 <- merger2(list(
+  employment_rate,
+  mean_years_in_school,
+  CO2,
+  life_expectancy,
+  income
+))
+
+nrow(final_9)
+```
 
 **Check for 0 values**
 
@@ -647,7 +765,7 @@ No values of 0 or below
 **Export to csv**
 
 ```{r}
-write_csv(final_9, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_9.csv")
+write_final(final_9)
 ```
 
 ## Attempt 8 - 4 data sets
@@ -660,21 +778,17 @@ write_csv(final_9, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_d
 **Merge data**
 
 ```{r}
-final_8 <- general[c(
-  "country",
-  "year",
+final_8 <- merger(c(
   "mean_years_in_school",
   "CO2",
   "life_expectancy",
   "income"
-)]
-
-final_8 <- drop_na(final_8)
+))
 
 nrow(final_8)
 ```
 
--\> **5533** DMUs
+-\> **5865** DMUs
 
 **Check for 0 values**
 
@@ -688,10 +802,8 @@ min(final_8$CO2)
 
 ```{r}
 print("0 mean years in school:")
-unique(final_8$country[final_8$mean_years_in_school <= 0])
 table(final_8$country[final_8$mean_years_in_school <= 0])
 print("0 CO2:")
-unique(final_8$country[final_8$CO2 <= 0])
 table(final_8$country[final_8$CO2 <= 0])
 ```
 
@@ -707,7 +819,7 @@ final_8 <- subset(final_8, (mean_years_in_school != 0 & CO2 != 0))
 **Export to csv**
 
 ```{r}
-write_csv(final_8, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_8.csv")
+write_final(final_8)
 ```
 
 ## Attempt 7 - 5 data sets
@@ -721,22 +833,18 @@ write_csv(final_8, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_d
 **Merge data**
 
 ```{r}
-final_7 <- general[c(
-  "country",
-  "year",
+final_7 <- merger(c(
   "electricity",
   "mean_years_in_school",
   "CO2",
   "life_expectancy",
   "income" 
-)]
-
-final_7 <- drop_na(final_7)
+))
 
 nrow(final_7)
 ```
 
--\> **4037** DMUs
+-\> **4286** DMUs
 
 **Check for 0 values**
 
@@ -748,10 +856,12 @@ min(final_7$mean_years_in_school)
 min(final_7$CO2)
 ```
 
+No 0 values :D
+
 **Export to csv**
 
 ```{r}
-write_csv(final_7, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_7.csv")
+write_final(final_7)
 ```
 
 ## Attempt 6 - 5 data sets
@@ -765,22 +875,30 @@ write_csv(final_7, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_d
 **Merge data**
 
 ```{r}
-final_6 <- general[c(
-  "country",
-  "year",
+final_6 <- merger(c(
   "electricity",
   "employment_rate",
   "CO2",
   "life_expectancy",
   "income"
-)]
-
-final_6 <- drop_na(final_6)
+))
 
 nrow(final_6)
 ```
 
 -\> **4421** DMUs
+
+```{r}
+final_6 <- merger2(list(
+  electricity,
+  employment_rate,
+  CO2,
+  life_expectancy,
+  income
+))
+
+nrow(final_6)
+```
 
 **Check for 0 values**
 
@@ -788,10 +906,12 @@ nrow(final_6)
 min(final_6$CO2)
 ```
 
+No 0 values !!
+
 **Export to csv**
 
 ```{r}
-write_csv(final_6, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_6.csv")
+write_final(final_6)
 ```
 
 ## Attempt 5 - 5 data sets
@@ -805,22 +925,30 @@ write_csv(final_6, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_d
 **Merge data**
 
 ```{r}
-final_5 <- general[c(
-  "country",
-  "year",
+final_5 <- merger(c(
   "electricity",
   "health_worker",
   "CO2",
   "life_expectancy",
   "income"
-)]
-
-final_5 <- drop_na(final_5)
+))
 
 nrow(final_5)
 ```
 
--\> **2594** DMUs
+-\> **2049** DMUs
+
+```{r}
+final_5 <- merger2(list(
+  electricity,
+  health_worker,
+  CO2,
+  life_expectancy,
+  income
+))
+
+nrow(final_5)
+```
 
 **Check for 0 values**
 
@@ -828,10 +956,12 @@ nrow(final_5)
 min(final_5$CO2)
 ```
 
+No 0 values :)
+
 **Export to csv**
 
 ```{r}
-write_csv(final_5, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_5.csv")
+write_final(final_5)
 ```
 
 ## Attempt 4 - 6 data sets
@@ -845,23 +975,32 @@ write_csv(final_5, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_d
 **Merge data**
 
 ```{r}
-final_4 <- general[c(
-  "country",
-  "year",
+final_4 <- merger(c(
   "women_in_parliament",
   "electricity",
   "CO2",
   "life_expectancy",
   "income",
   "health_worker"
-)]
-
-final_4 <- drop_na(final_4)
+))
 
 nrow(final_4)
 ```
 
--\> **2332** DMUs
+-\> **2332 -\> 1809** DMUs
+
+```{r}
+final_4 <- merger2(list(
+  women_in_parliament,
+  electricity,
+  CO2,
+  life_expectancy,
+  income,
+  health_worker
+))
+
+nrow(final_4)
+```
 
 **Check for 0 values**
 
@@ -875,7 +1014,7 @@ min(final_4$CO2)
 
 ```{r}
 print("0 women in parliament:")
-unique(final_4$country[final_4$women_in_parliament <= 0])
+table(final_4$country[final_4$women_in_parliament <= 0])
 ```
 
 Assign very low values where values are 0
@@ -895,7 +1034,7 @@ min(final_4$CO2)
 Export to csv
 
 ```{r}
-write_csv(final_4, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_4.csv")
+write_final(final_4)
 ```
 
 ## Attempt 3 - 8 data sets
@@ -910,7 +1049,80 @@ write_csv(final_4, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_d
 **Merge data**
 
 ```{r}
-final_3 <- general[c(
+final_3 <- merger2(list(
+  women_in_parliament,
+  electricity,
+  CO2,
+  forest_area,
+  life_expectancy,
+  income,
+  health_worker,
+  employment_rate
+))
+
+final_3 <- drop_na(final_3)
+
+nrow(final_3)
+```
+
+```{r}
+final_3 <- merger(c(
+  "women_in_parliament",
+  "electricity",
+  "CO2",
+  "forest_area",
+  "life_expectancy",
+  "income",
+  "health_worker",
+  "employment_rate"
+))
+
+nrow(final_3)
+```
+
+-\> **2201 -\> 1671** DMUs
+
+```{r}
+# Create list of all data frames
+all_data <- list(
+  women_in_parliament,
+  electricity,
+  employment_rate,
+  forest_area,
+  health_worker,
+  life_expectancy,
+  income,
+  CO2
+)
+
+final_3_test <- all_data %>% reduce(full_join, by=c("country", "year"))
+
+# Change column names to something meaningful
+colnames(final_3_test) <- c(
+  "country",
+  "year",
+  "women_in_parliament",
+  "electricity",
+  "employment_rate",
+  "forest_area",
+  "health_worker",
+  "life_expectancy",
+  "income",
+  "CO2"
+  )
+
+# convert tibble to data frame
+final_3_test <- as.data.frame(final_3_test)
+
+final_3_test <- drop_na(final_3_test)
+
+nrow(final_3_test)
+```
+
+-\> **2316** dmus
+
+```{r}
+final_3_test2 <- general[c(
   "country",
   "year",
   "women_in_parliament",
@@ -923,12 +1135,10 @@ final_3 <- general[c(
   "employment_rate"
 )]
 
-final_3 <- drop_na(final_3)
+final_3_test2 <- drop_na(final_3_test2)
 
-nrow(final_3)
+nrow(final_3_test2)
 ```
-
--\> **2201** DMUs
 
 **Check for 0 values**
 
@@ -971,7 +1181,7 @@ In this attempt we try to cover only 8 dimensions in total.
 | mean_years_in_school | employment_rate |
 
 ```{r}
-final <- generak[c(
+final <- general[c(
   "country",
   "year",
   "women_in_parliament",
@@ -1091,7 +1301,6 @@ have less dimensions.
 
 ```{r}
 write_csv(final_1, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/final_1.csv")
-# write_csv(final, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/country_data_general.csv")
 ```
 
 ## 
