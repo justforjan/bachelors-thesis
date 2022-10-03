@@ -31,21 +31,21 @@ library(countrycode)
 
 ```{r}
 # Chose the attempt
-attempt = 3
+attempt = 8
 
 # Number of in- and outputs -> checl struture of selected data set!
-number_of_inputs <- 4
-number_of_outputs <- 4
+number_of_inputs <- 2
+number_of_outputs <- 2
 
 # location of inputs and outputs
-input_cols <- c(2,3,5,8)
-output_cols <- c(4,6,7,9)
+input_cols <- c()
+output_cols <- c()
 
 # only from 1990?
-from_1990 <- "yes"
+from_1990 <- "no"
 
 # only one year?
-only_one_year <- 2010 # 0 means no
+only_one_year <- 0 # 0 means no
 
 # only one country?
 only_one_country <- "Germany" # empty string means no
@@ -179,23 +179,18 @@ data_dea$continent <- countrycode(sourcevar = data_dea$country,
 create name for the file
 
 ```{r}
-filename <- paste(as.character(attempt), 
-      "_", 
-      orientation, 
-      "_", 
-      return_to_scale
-  )
+filename <- paste(as.character(attempt), "_", orientation, "_", return_to_scale, sep = "")
 
 if (from_1990 != "no") {
-  filename <- paste(filename, "_", "from1990")
+  filename <- paste(filename, "_", "from1990", sep = "")
 }
 
 if (only_one_year != 0) {
-  filename <- paste(filename, "_", as.character(only_one_year))  
+  filename <- paste(filename, "_", as.character(only_one_year), sep = "")  
 }
 
 if (only_one_country != "") {
-  filename <- paste(filename, "_", only_one_country)    
+  filename <- paste(filename, "_", only_one_country, sep = "")    
 }
 
 ```
