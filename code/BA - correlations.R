@@ -20,6 +20,8 @@ CO2 <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/prepr
 murder <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/murder.csv",show_col_types = FALSE)
 
 
+
+
 # Create list of all data frames
 all_data <- list(
   women_in_parliament,
@@ -67,9 +69,30 @@ colnames(data) <- c(
   "murder"
 )
 
+data <- separate(data, dmu, c("country", "year"), "_", remove=FALSE)
+
 # Calculate correlations
-correlations <- as.data.frame(cor(data[2:length(data)], use = "pairwise.complete.obs"))
+correlations <- as.data.frame(cor(data[4:length(data)], use = "pairwise.complete.obs"))
+
+# Correlations by decade
+# 1990- 1999
+
+data_90s <- data %>% filter(year >= 1990 & year < 2000)
+correlations_90s <- as.data.frame(cor(data_90s[4:length(data)], use = "pairwise.complete.obs"))
+
+# 2000 - 2009
+
+data_00s <- data %>% filter(year >= 2000 & year < 2010)
+correlations_00s <- as.data.frame(cor(data_00s[4:length(data)], use = "pairwise.complete.obs"))
+
+# 2010 - 2019
+
+data_10s <- data %>% filter(year >= 2010 & year < 2020)
+correlations_10s <- as.data.frame(cor(data_10s[4:length(data)], use = "pairwise.complete.obs"))
 
 # Export as csv
 write_csv(correlations, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/correlations.csv")
+write_csv(correlations_90s, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/correlations_90.csv")
+write_csv(correlations_00s, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/correlations_00.csv")
+write_csv(correlations_10s, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/correlations_10s.csv")
 
