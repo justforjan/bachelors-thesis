@@ -16,7 +16,7 @@ income
 income_share_20
 CO2
 murder
-foreignn_investment
+foreign_investment
 
 **Gapminder**
 women_in_parliament
@@ -32,7 +32,7 @@ income
 income_share_20
 CO2
 murder
-forgein_investment
+foreign_investment
 
 
 **OurWorldInData**
