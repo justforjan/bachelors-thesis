@@ -1,4 +1,3 @@
-
 library(tidyverse)
 
 women_in_parliament <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/women_in_parliament.csv",show_col_types = FALSE)
@@ -18,6 +17,7 @@ income <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/pr
 income_share_20 <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/income_share_20.csv",show_col_types = FALSE)
 CO2 <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/CO2.csv",show_col_types = FALSE)
 murder <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/murder.csv",show_col_types = FALSE)
+foreign_investment <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/foreign_investment.csv",show_col_types = FALSE)
 
 
 
@@ -40,7 +40,8 @@ all_data <- list(
   income,
   income_share_20,
   CO2,
-  murder
+  murder,
+  foreign_investment
 )
 
 # Merge all data frame together by the country attribute
@@ -66,7 +67,8 @@ colnames(data) <- c(
   "income",
   "income_share_20",
   "CO2",
-  "murder"
+  "murder",
+  "foreign_investment"
 )
 
 data <- separate(data, dmu, c("country", "year"), "_", remove=FALSE)
