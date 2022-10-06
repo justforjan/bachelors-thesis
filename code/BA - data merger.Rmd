@@ -33,191 +33,10 @@ murder <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/pr
 foreign_investment <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/foreign_investment.csv",show_col_types = FALSE)
 ```
 
-# General information about data sets
-
-```{r}
-# titles <- c(
-# "women_in_parliament",
-# "basic_sanitation",
-# "basic_water_source",
-# "electricity",
-# "employment_rate",
-# "material_footprint",
-# "forest_area",
-# "mean_years_in_school",
-# "air_pollution",
-# "health_worker",
-# "red_list",
-# "poverty",
-# "life_expectancy",
-# "income",
-# "income_share_20",
-# "CO2",
-# "murder"
-# )
-# 
-# earliest <- c(
-# min(women_in_parliament$year),
-# min(basic_sanitation$year),
-# min(basic_water_source$year),
-# min(electricity$year),
-# min(employment_rate$year),
-# min(material_footprint$year),
-# min(forest_area$year),
-# min(mean_years_in_school$year),
-# min(health_worker$year),
-# min(air_pollution$year),
-# min(red_list$year),
-# min(poverty$year),
-# min(life_expectancy$year),
-# min(income$year),
-# min(income_share_20$year),
-# min(CO2$year),
-# min(murder$year)
-# )
-# 
-# latest <- c(
-# max(women_in_parliament$year),
-# max(basic_sanitation$year),
-# max(basic_water_source$year),
-# max(electricity$year),
-# max(employment_rate$year),
-# max(material_footprint$year),
-# max(forest_area$year),
-# max(mean_years_in_school$year),
-# max(health_worker$year),
-# max(air_pollution$year),
-# max(red_list$year),
-# max(poverty$year),
-# max(life_expectancy$year),
-# max(income$year),
-# max(income_share_20$year),
-# max(CO2$year),
-# max(murder$year)
-# )
-# 
-# datapoints <- c(
-# nrow(women_in_parliament),
-# nrow(basic_sanitation),
-# nrow(basic_water_source),
-# nrow(electricity),
-# nrow(employment_rate),
-# nrow(material_footprint),
-# nrow(forest_area),
-# nrow(mean_years_in_school),
-# nrow(air_pollution),
-# nrow(health_worker),
-# nrow(red_list),
-# nrow(poverty),
-# nrow(life_expectancy),
-# nrow(income),
-# nrow(income_share_20),
-# nrow(CO2),
-# nrow(murder)
-# )
-# 
-# dps_1990_2020 <- c(
-# nrow(subset(women_in_parliament, year %in% c(1990:2020))),
-# nrow(subset(basic_sanitation, year %in% c(1990:2020))),
-# nrow(subset(basic_water_source, year %in% c(1990:2020))),
-# nrow(subset(electricity, year %in% c(1990:2020))),
-# nrow(subset(employment_rate, year %in% c(1990:2020))),
-# nrow(subset(material_footprint, year %in% c(1990:2020))),
-# nrow(subset(forest_area, year %in% c(1990:2020))),
-# nrow(subset(mean_years_in_school, year %in% c(1990:2020))),
-# nrow(subset(air_pollution, year %in% c(1990:2020))),
-# nrow(subset(health_worker, year %in% c(1990:2020))),
-# nrow(subset(red_list, year %in% c(1990:2020))),
-# nrow(subset(poverty, year %in% c(1990:2020))),
-# nrow(subset(life_expectancy, year %in% c(1990:2020))),
-# nrow(subset(income, year %in% c(1990:2020))),
-# nrow(subset(income_share_20, year %in% c(1990:2020))),
-# nrow(subset(CO2, year %in% c(1990:2020))),
-# nrow(subset(murder, year %in% c(1990:2020)))
-# )
-# 
-# 
-# zero_or_below <- c(
-# (min(women_in_parliament$value, na.rm = TRUE) <= 0),
-# (min(basic_sanitation$value, na.rm = TRUE) <= 0),
-# (min(basic_water_source$value, na.rm = TRUE) <= 0),
-# (min(electricity$value, na.rm = TRUE) <= 0),
-# (min(employment_rate$value, na.rm = TRUE) <= 0),
-# (min(material_footprint$value, na.rm = TRUE) <= 0),
-# (min(forest_area$value, na.rm = TRUE) <= 0),
-# (min(mean_years_in_school$value, na.rm = TRUE) <= 0),
-# (min(air_pollution$value, na.rm = TRUE) <= 0),
-# (min(health_worker$value, na.rm = TRUE) <= 0),
-# (min(red_list$value, na.rm = TRUE) <= 0),
-# (min(poverty$value, na.rm = TRUE) <= 0),
-# (min(life_expectancy$value, na.rm = TRUE) <= 0),
-# (min(income$value, na.rm = TRUE) <= 0),
-# (min(income_share_20$value, na.rm = TRUE) <= 0),
-# (min(CO2$value, na.rm = TRUE) <= 0),
-# (min(murder$value, na.rm = TRUE) <= 0)
-# )
-# 
-# dp_per_year <- datapoints / (latest - earliest)
-# 
-# overview <- data.frame(titles, earliest, latest, dps_1990_2020, datapoints, dp_per_year, zero_or_below)
-# overview[order(overview$dps_1990_2020, decreasing = TRUE),]
-# 
-# write_csv(overview, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/overview.csv")
-```
-
-Using data sets that have values of 0 or less might be an issue later on
-when inputting the data into the DEA, unless the 0 values get filtered
-out anyways while merging.
-
 # Functions
 
 ```{r}
-merger <- function(indicators) {
-  d <- general[c("dmu", indicators)]
-  d <- drop_na(d)
-  d
-}
-
-merger2 <- function(indicators) {
-  d <- reduce(indicators, full_join, by="dmu")
-  drop_na(d)
-}
-
-
-write_final <- function(final) {
-  write_csv(final, paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/", deparse(substitute(final)), ".csv", sep = ""))
-}
-
-
-check0 <- function(data) {
-  
-  sum(data <= 0)
-
-  # if (data$women_in_parliament) {
-  #   a <- min(data$women_in_parliament)
-  # }
-  # 
-  # if (data$forest_area) {
-  #   b <- min(data$forest_area)
-  # }
-  # 
-  # if (data$mean_years_in_school) {
-  #   c <- min(data$mean_years_in_school)
-  # }
-  # 
-  # if (data$poverty) {
-  #   d <- min(data$poverty)
-  # }
-  # 
-  # if (data$CO2) {
-  #   e <- min(data$CO2)
-  # }
-
-}
-
-
-
-
+source("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/code/functions.R")
 ```
 
 # Merge data frames
@@ -308,7 +127,8 @@ general <-
   merge(
   merge(
   merge(
-    
+  merge(
+
   women_in_parliament,
   basic_sanitation, by = "dmu", all = TRUE),
   basic_water_source, by = "dmu", all = TRUE),
@@ -325,7 +145,8 @@ general <-
   income, by = "dmu", all = TRUE),
   income_share_20, by = "dmu", all = TRUE),
   CO2, by = "dmu", all = TRUE),
-  murder, by = "dmu", all = TRUE)
+  murder, by = "dmu", all = TRUE),
+  foreign_investment, by = "dmu", all = TRUE)
                                   
 
 ```
@@ -351,7 +172,8 @@ colnames(general) <- c(
   "income",
   "income_share_20",
   "CO2",
-  "murder"
+  "murder",
+  "foreign_investment"
   )
 
 # convert tibble to data frame
@@ -362,254 +184,49 @@ general <- as.data.frame(general)
 write_csv(general, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/general.csv")
 ```
 
-## Attempt 18 - 2 datasets
+## Attempt 12 - 8 data sets (final decision)
 
-| Input         | Output          |
-|---------------|-----------------|
-| health_worker | income_share_20 |
-
-```{r}
-final_18 <- merger(c(
-  "health_worker",
-  "income_share_20"
-))
-
-nrow(final_18)
-
-write_final(final_18)
-```
-
--\> dmus
-
-``` {write_final(final_18)}
-```
-
-## Attempt 17 - 2 datasets
-
-| Input       | Output          |
-|-------------|-----------------|
-| electricity | income_share_20 |
-
-```{r}
-final_17 <- merger(c(
-  "electricity",
-  "income_share_20"
-))
-
-nrow(final_17)
-```
-
--\> **1640** dmus
-
-```{r}
-check0(final_17)
-```
-
-No 0 values
-
-```{r}
-write_final(final_17)
-```
-
-## Attempt 16 - 2 datasets
-
-| Input       | Output  |
-|-------------|---------|
-| electricity | poverty |
-
-```{r}
-final_16 <- merger(c(
-  "electricity",
-  "poverty"
-))
-
-nrow(final_16)
-```
-
--\> **1645** dmus
-
-**Check for 0 values**
-
-```{r}
-# min(final_16$women_in_parliament)
-# min(final_16$forest_area)
-# min(final_16$mean_years_in_school)
-min(final_16$poverty)
-# min(final_16$CO2)
-```
-
-```{r}
-check0(final_16)
-```
-
-Poverty has too many 0 values -\> next attempt with lower income
-
-## Attempt 15 - 2 datasets
-
-| Input                | Output          |
-|----------------------|-----------------|
-| mean_years_in_school | employment_rate |
-
-```{r}
-final_15 <- merger(c(
-  "mean_years_in_school",
-  "employment_rate"
-))
-
-nrow(final_15)
-```
-
--\> **4475** dmus
-
-```{r}
-# min(final_15$women_in_parliament)
-# min(final_15$forest_area)
-min(final_15$mean_years_in_school)
-# min(final_15$poverty)
-# min(final_15$CO2)
-```
-
-no 0 values :)
-
-**Export to csv**
-
-```{r}
-write_final(final_15)
-```
-
-## Attempt 14 - 2 datasets
-
-| Input | Output               |
-|-------|----------------------|
-| CO2   | mean_years_in_school |
-
-```{r}
-final_14 <- merger(c(
-  "CO2",
-  "mean_years_in_school"
-))
-
-nrow(final_14)
-```
-
--\> **5892** DMUs
-
-**Check for 0 values**
-
-```{r}
-# min(final_14$women_in_parliament)
-# min(final_14$forest_area)
-min(final_14$mean_years_in_school)
-# min(final_14$poverty)
-min(final_14$CO2)
-```
-
-0 values in mean_years_in_school
-
-```{r}
-check0(final_14)
-```
-
-2 entry with 0 mean years in school -\> delete
-
-```{r}
-final_14 <- filter(final_14, mean_years_in_school != 0)
-```
-
-**Export to csv**
-
-```{r}
-write_final(final_14)
-```
-
-## Attempt 13 - 2 datasets
-
-| Input | Output |
-|-------|--------|
-| CO2   | income |
-
-```{r}
-final_13 <- merger(c(
-  "CO2",
-  "income"
-))
-
-nrow(final_13)
-```
-
--\> **12446** dmus
-
-**Check for 0 values**
-
-```{r}
-# min(final_13$women_in_parliament)
-# min(final_13$forest_area)
-# min(final_13$mean_years_in_school)
-# min(final_13$poverty)
-min(final_13$CO2)
-```
-
-0 values in CO2
-
-```{r}
-check0(final_13)
-```
-
-6 entries with 0 CO2 -\> delete
-
-```{r}
-final_13 <- filter(final_13, CO2 != 0)
-```
-
-**Export to csv**
-
-```{r}
-write_final(final_13)
-```
-
-## Attempt 12 - 2 datasets
-
-| Input | Output              |
-|-------|---------------------|
-| CO2   | women_in_parliament |
+| Input              | Output               |
+|--------------------|----------------------|
+| CO2                | life_expectancy      |
+| material_footprint | income               |
+| foreign_investment | mean_years_in_school |
+| missing: debts     | murder               |
+|                    | income_share_20      |
 
 ```{r}
 final_12 <- merger(c(
   "CO2",
-  "women_in_parliament"
+  "material_footprint",
+  "foreign_investment",
+  "life_expectancy",
+  "income",
+  "mean_years_in_school",
+  "murder",
+  "income_share_20"
 ))
 
 nrow(final_12)
 ```
+Unfortunately, not many dmus are left.
 
--\> **8847** dmus
-
-**Check for 0 values**
-
-```{r}
-min(final_12$women_in_parliament)
-# min(final_12$forest_area)
-# min(final_12$mean_years_in_school)
-# min(final_12$poverty)
-min(final_12$CO2)
-```
 
 ```{r}
 check0(final_12)
 ```
-
-600 values in CO2. 2 in CO2 column, 598 in women_in_parliament
-
-```{r}
-final_12 <- filter(final_12, CO2 > 0)
-final_12[final_12 == 0] <- 0.001
-```
-
-**Export to csv**
+36 values with 0
 
 ```{r}
-write_final(final_12)
+min(final_12$mean_years_in_school)
+min(final_12$CO2)
+min(final_12$foreign_investment)
 ```
+```{r}
+check0(final_12$foreign_investment)
+```
+Alll negative values are in the foreign investment column
+
+
 
 ## Attempt 11 - 5 data sets
 
