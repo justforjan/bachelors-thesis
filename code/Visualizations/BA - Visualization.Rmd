@@ -13,7 +13,9 @@ library(ggplot2)
 ## load data
 
 ```{r}
-data <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/dea_results_8_io_vrs.csv", show_col_types = FALSE)
+filename <- "dea_results_15_io_vrs_Germany.csv"
+
+data <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/", filename, sep = ""), show_col_types = FALSE)
 ```
 
 ## Some stats
