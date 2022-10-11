@@ -151,6 +151,11 @@ foreign_investment<- foreign_investment %>% gather("year", "value", -country)
 ```{r}
 # Values
 income$value <- as.numeric(gsub("k", "e3", income$value))/1000 # divided by 1000 to avoid different orders of magnitude within dataset
+# foreign_investment$value <- gsub("k", "e3", foreign_investment$value)
+foreign_investment$value <- as.numeric(gsub("−", "-", foreign_investment$value))
+foreign_investment$value <- gsub("µ", "e-3", foreign_investment$value)
+
+foreign_investment$value <- as.numeric(foreign_investment$value)
 
 # Years
 women_in_parliament <- women_in_parliament %>% mutate(year = as.numeric(year))
@@ -178,47 +183,47 @@ foreign_investment <- foreign_investment %>% mutate(year = as.numeric(year))
 Vectors of country names of both Gapminder and OurWorldInData
 
 ```{r}
-gapminder <- unique(c(
-  women_in_parliament$country,
-  basic_sanitation$country,
-  basic_water_source$country,
-  electricity$country,
-  employment_rate$country,
-  material_footprint$country,
-  forest_area$country,
-  poverty$country,
-  life_expectancy$country,
-  income$country,
-  income_share_20$country,
-  CO2$country,
-  murder$country
-))
-
-ourworldindata <- unique(c(
-  mean_years_in_school$country,
-  air_pollution$country,
-  health_worker$country,
-  red_list$country
-))
+# gapminder <- unique(c(
+#   women_in_parliament$country,
+#   basic_sanitation$country,
+#   basic_water_source$country,
+#   electricity$country,
+#   employment_rate$country,
+#   material_footprint$country,
+#   forest_area$country,
+#   poverty$country,
+#   life_expectancy$country,
+#   income$country,
+#   income_share_20$country,
+#   CO2$country,
+#   murder$country
+# ))
+# 
+# ourworldindata <- unique(c(
+#   mean_years_in_school$country,
+#   air_pollution$country,
+#   health_worker$country,
+  # red_list$country
+# ))
 ```
 
 In gapminder, but not in ourworldindata
 
 ```{r}
-ingm <- as.data.frame(sort(setdiff(gapminder, ourworldindata)))
+# ingm <- as.data.frame(sort(setdiff(gapminder, ourworldindata)))
 ```
 
 In ourworldindata but not in gapminder
 
 ```{r}
-inowid <- as.data.frame(sort(setdiff(ourworldindata, gapminder)))
+# inowid <- as.data.frame(sort(setdiff(ourworldindata, gapminder)))
 ```
 
 Manual creation of csv to map country names
 
 ```{r}
-write_csv(ingm, "in_gp.csv")
-write_csv(inowid, "in_owid.csv")
+# write_csv(ingm, "in_gp.csv")
+# write_csv(inowid, "in_owid.csv")
 ```
 
 Read manually created naming conventions file
