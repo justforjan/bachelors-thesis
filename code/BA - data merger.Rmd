@@ -202,18 +202,19 @@ final_12 <- merger(c(
   "life_expectancy",
   "income",
   "mean_years_in_school",
-  "murder",
-  "income_share_20"
+  "murder"
+  # "income_share_20"
 ))
 
 nrow(final_12)
 ```
-Unfortunately, not many dmus are left.
 
+Unfortunately, not many dmus are left. -\> 637
 
 ```{r}
 check0(final_12)
 ```
+
 36 values with 0
 
 ```{r}
@@ -221,12 +222,16 @@ min(final_12$mean_years_in_school)
 min(final_12$CO2)
 min(final_12$foreign_investment)
 ```
+
 ```{r}
 check0(final_12$foreign_investment)
 ```
-Alll negative values are in the foreign investment column
 
+All negative values are in the foreign investment column
 
+```{r}
+write_final(final_12)
+```
 
 ## Attempt 11 - 5 data sets
 
