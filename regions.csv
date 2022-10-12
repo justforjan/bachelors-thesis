@@ -1,242 +1,242 @@
-country,continent,EU
-Afghanistan,Asia,FALSE
-Aland Islands,Europe,FALSE
-Albania,Europe,FALSE
-Algeria,Africa,FALSE
-American Samoa,Oceania,FALSE
-Andorra,Europe,FALSE
-Angola,Africa,FALSE
-Anguilla,Americas,FALSE
-Antigua and Barbuda,Americas,FALSE
-Argentina,Americas,FALSE
-Armenia,Asia,FALSE
-Aruba,Americas,FALSE
-Australia,Oceania,FALSE
-Austria,Europe,TRUE
-Azerbaijan,Asia,FALSE
-Bahamas,Americas,FALSE
-Bahrain,Asia,FALSE
-Bangladesh,Asia,FALSE
-Barbados,Americas,FALSE
-Belarus,Europe,FALSE
-Belgium,Europe,TRUE
-Belize,Americas,FALSE
-Benin,Africa,FALSE
-Bermuda,Americas,FALSE
-Bhutan,Asia,FALSE
-Bolivia,Americas,FALSE
-Bonaire Sint Eustatius and Saba,Americas,FALSE
-Bosnia and Herzegovina,Europe,FALSE
-Botswana,Africa,FALSE
-Brazil,Americas,FALSE
-British Virgin Islands,Americas,FALSE
-Brunei,Asia,FALSE
-Bulgaria,Europe,TRUE
-Burkina Faso,Africa,FALSE
-Burundi,Africa,FALSE
-Cambodia,Asia,FALSE
-Cameroon,Africa,FALSE
-Canada,Americas,FALSE
-Cape Verde,Africa,FALSE
-Cayman Islands,Americas,FALSE
-Central African Republic,Africa,FALSE
-Chad,Africa,FALSE
-Chile,Americas,FALSE
-China,Asia,FALSE
-Christmas Island,Oceania,FALSE
-Colombia,Americas,FALSE
-Comoros,Africa,FALSE
-Congo,Africa,FALSE
-Cook Islands,Oceania,FALSE
-Costa Rica,Americas,FALSE
-Cote d'Ivoire,Africa,FALSE
-Croatia,Europe,TRUE
-Cuba,Americas,FALSE
-Curacao,Americas,FALSE
-Cyprus,Asia,FALSE
-Czechia,Europe,TRUE
-Democratic Republic of Congo,Africa,FALSE
-Denmark,Europe,TRUE
-Djibouti,Africa,FALSE
-Dominica,Americas,FALSE
-Dominican Republic,Americas,FALSE
-Ecuador,Americas,FALSE
-Egypt,Africa,FALSE
-El Salvador,Americas,FALSE
-Equatorial Guinea,Africa,FALSE
-Eritrea,Africa,FALSE
-Estonia,Europe,TRUE
-Eswatini,Africa,FALSE
-Ethiopia,Africa,FALSE
-Faeroe Islands,Europe,FALSE
-Falkland Islands,Americas,FALSE
-Fiji,Oceania,FALSE
-Finland,Europe,TRUE
-France,Europe,TRUE
-French Guiana,Americas,FALSE
-French Polynesia,Oceania,FALSE
-Gabon,Africa,FALSE
-Gambia,Africa,FALSE
-Georgia,Asia,FALSE
-Germany,Europe,TRUE
-Ghana,Africa,FALSE
-Gibraltar,Europe,FALSE
-Greece,Europe,TRUE
-Greenland,Americas,FALSE
-Grenada,Americas,FALSE
-Guadeloupe,Americas,FALSE
-Guam,Oceania,FALSE
-Guatemala,Americas,FALSE
-Guernsey,Europe,FALSE
-Guinea,Africa,FALSE
-Guinea-Bissau,Africa,FALSE
-Guyana,Americas,FALSE
-Haiti,Americas,FALSE
-Honduras,Americas,FALSE
-Hong Kong,Asia,FALSE
-Hungary,Europe,TRUE
-Iceland,Europe,FALSE
-India,Asia,FALSE
-Indonesia,Asia,FALSE
-Iran,Asia,FALSE
-Iraq,Asia,FALSE
-Ireland,Europe,TRUE
-Isle of Man,Europe,FALSE
-Israel,Asia,FALSE
-Italy,Europe,TRUE
-Jamaica,Americas,FALSE
-Japan,Asia,FALSE
-Jersey,Europe,FALSE
-Jordan,Asia,FALSE
-Kazakhstan,Asia,FALSE
-Kenya,Africa,FALSE
-Kiribati,Oceania,FALSE
-Kuwait,Asia,FALSE
-Kyrgyzstan,Asia,FALSE
-Laos,Asia,FALSE
-Latvia,Europe,TRUE
-Lebanon,Asia,FALSE
-Lesotho,Africa,FALSE
-Liberia,Africa,FALSE
-Libya,Africa,FALSE
-Liechtenstein,Europe,FALSE
-Lithuania,Europe,TRUE
-Luxembourg,Europe,TRUE
-Macao,Asia,FALSE
-Madagascar,Africa,FALSE
-Malawi,Africa,FALSE
-Malaysia,Asia,FALSE
-Maldives,Asia,FALSE
-Mali,Africa,FALSE
-Malta,Europe,TRUE
-Marshall Islands,Oceania,FALSE
-Martinique,Americas,FALSE
-Mauritania,Africa,FALSE
-Mauritius,Africa,FALSE
-Mayotte,Africa,FALSE
-Mexico,Americas,FALSE
-Moldova,Europe,FALSE
-Monaco,Europe,FALSE
-Mongolia,Asia,FALSE
-Montenegro,Europe,FALSE
-Montserrat,Americas,FALSE
-Morocco,Africa,FALSE
-Mozambique,Africa,FALSE
-Myanmar,Asia,FALSE
-Namibia,Africa,FALSE
-Nauru,Oceania,FALSE
-Nepal,Asia,FALSE
-Netherlands,Europe,TRUE
-New Caledonia,Oceania,FALSE
-New Zealand,Oceania,FALSE
-Nicaragua,Americas,FALSE
-Niger,Africa,FALSE
-Nigeria,Africa,FALSE
-Niue,Oceania,FALSE
-Norfolk Island,Oceania,FALSE
-North Korea,Asia,FALSE
-North Macedonia,Europe,FALSE
-Northern Mariana Islands,Oceania,FALSE
-Norway,Europe,FALSE
-Oman,Asia,FALSE
-Pakistan,Asia,FALSE
-Palau,Oceania,FALSE
-Palestine,Asia,FALSE
-Panama,Americas,FALSE
-Papua New Guinea,Oceania,FALSE
-Paraguay,Americas,FALSE
-Peru,Americas,FALSE
-Philippines,Asia,FALSE
-Pitcairn,Oceania,FALSE
-Poland,Europe,TRUE
-Portugal,Europe,TRUE
-Puerto Rico,Americas,FALSE
-Qatar,Asia,FALSE
-Reunion,Africa,FALSE
-Romania,Europe,TRUE
-Russia,Europe,FALSE
-Rwanda,Africa,FALSE
-Saint Helena,Africa,FALSE
-Saint Kitts and Nevis,Americas,FALSE
-Saint Lucia,Americas,FALSE
-Saint Martin (French part),Americas,FALSE
-Saint Pierre and Miquelon,Americas,FALSE
-Saint Vincent and the Grenadines,Americas,FALSE
-Samoa,Oceania,FALSE
-San Marino,Europe,FALSE
-Sao Tome and Principe,Africa,FALSE
-Saudi Arabia,Asia,FALSE
-Senegal,Africa,FALSE
-Serbia,Europe,FALSE
-Seychelles,Africa,FALSE
-Sierra Leone,Africa,FALSE
-Singapore,Asia,FALSE
-Sint Maarten (Dutch part),Americas,FALSE
-Slovakia,Europe,TRUE
-Slovenia,Europe,TRUE
-Solomon Islands,Oceania,FALSE
-Somalia,Africa,FALSE
-South Africa,Africa,FALSE
-South Korea,Asia,FALSE
-South Sudan,Africa,FALSE
-Spain,Europe,TRUE
-Sri Lanka,Asia,FALSE
-Sudan,Africa,FALSE
-Suriname,Americas,FALSE
-Svalbard and Jan Mayen,Europe,FALSE
-Sweden,Europe,TRUE
-Switzerland,Europe,FALSE
-Syria,Asia,FALSE
-Taiwan,Asia,FALSE
-Tajikistan,Asia,FALSE
-Tanzania,Africa,FALSE
-Thailand,Asia,FALSE
-Timor-Leste,Asia,FALSE
-Togo,Africa,FALSE
-Tokelau,Oceania,FALSE
-Tonga,Oceania,FALSE
-Trinidad and Tobago,Americas,FALSE
-Tunisia,Africa,FALSE
-Turkey,Asia,FALSE
-Turkmenistan,Asia,FALSE
-Turks and Caicos Islands,Americas,FALSE
-Tuvalu,Oceania,FALSE
-Uganda,Africa,FALSE
-Ukraine,Europe,FALSE
-United Arab Emirates,Asia,FALSE
-United Kingdom,Europe,FALSE
-United States,Americas,FALSE
-United States Virgin Islands,Americas,FALSE
-Uruguay,Americas,FALSE
-USSR,Europe,FALSE
-Uzbekistan,Asia,FALSE
-Vanuatu,Oceania,FALSE
-Vatican,Europe,FALSE
-Venezuela,Americas,FALSE
-Vietnam,Asia,FALSE
-Wallis and Futuna,Oceania,FALSE
-West Germany,Europe,FALSE
-Western Sahara,Africa,FALSE
-Yemen,Asia,FALSE
-Zambia,Africa,FALSE
-Zimbabwe,Africa,FALSE
+country,continent,EU,OECD
+Afghanistan,Asia,FALSE,FALSE
+Aland Islands,Europe,FALSE,FALSE
+Albania,Europe,FALSE,FALSE
+Algeria,Africa,FALSE,FALSE
+American Samoa,Oceania,FALSE,FALSE
+Andorra,Europe,FALSE,FALSE
+Angola,Africa,FALSE,FALSE
+Anguilla,Americas,FALSE,FALSE
+Antigua and Barbuda,Americas,FALSE,FALSE
+Argentina,Americas,FALSE,FALSE
+Armenia,Asia,FALSE,FALSE
+Aruba,Americas,FALSE,FALSE
+Australia,Oceania,FALSE,TRUE
+Austria,Europe,TRUE,TRUE
+Azerbaijan,Asia,FALSE,FALSE
+Bahamas,Americas,FALSE,FALSE
+Bahrain,Asia,FALSE,FALSE
+Bangladesh,Asia,FALSE,FALSE
+Barbados,Americas,FALSE,FALSE
+Belarus,Europe,FALSE,FALSE
+Belgium,Europe,TRUE,TRUE
+Belize,Americas,FALSE,FALSE
+Benin,Africa,FALSE,FALSE
+Bermuda,Americas,FALSE,FALSE
+Bhutan,Asia,FALSE,FALSE
+Bolivia,Americas,FALSE,FALSE
+Bonaire Sint Eustatius and Saba,Americas,FALSE,FALSE
+Bosnia and Herzegovina,Europe,FALSE,FALSE
+Botswana,Africa,FALSE,FALSE
+Brazil,Americas,FALSE,FALSE
+British Virgin Islands,Americas,FALSE,FALSE
+Brunei,Asia,FALSE,FALSE
+Bulgaria,Europe,TRUE,FALSE
+Burkina Faso,Africa,FALSE,FALSE
+Burundi,Africa,FALSE,FALSE
+Cambodia,Asia,FALSE,FALSE
+Cameroon,Africa,FALSE,FALSE
+Canada,Americas,FALSE,TRUE
+Cape Verde,Africa,FALSE,FALSE
+Cayman Islands,Americas,FALSE,FALSE
+Central African Republic,Africa,FALSE,FALSE
+Chad,Africa,FALSE,FALSE
+Chile,Americas,FALSE,TRUE
+China,Asia,FALSE,FALSE
+Christmas Island,Oceania,FALSE,FALSE
+Colombia,Americas,FALSE,TRUE
+Comoros,Africa,FALSE,FALSE
+Congo,Africa,FALSE,FALSE
+Cook Islands,Oceania,FALSE,FALSE
+Costa Rica,Americas,FALSE,TRUE
+Cote d'Ivoire,Africa,FALSE,FALSE
+Croatia,Europe,TRUE,FALSE
+Cuba,Americas,FALSE,FALSE
+Curacao,Americas,FALSE,FALSE
+Cyprus,Asia,FALSE,FALSE
+Czechia,Europe,TRUE,TRUE
+Democratic Republic of Congo,Africa,FALSE,FALSE
+Denmark,Europe,TRUE,TRUE
+Djibouti,Africa,FALSE,FALSE
+Dominica,Americas,FALSE,FALSE
+Dominican Republic,Americas,FALSE,FALSE
+Ecuador,Americas,FALSE,FALSE
+Egypt,Africa,FALSE,FALSE
+El Salvador,Americas,FALSE,FALSE
+Equatorial Guinea,Africa,FALSE,FALSE
+Eritrea,Africa,FALSE,FALSE
+Estonia,Europe,TRUE,TRUE
+Eswatini,Africa,FALSE,FALSE
+Ethiopia,Africa,FALSE,FALSE
+Faeroe Islands,Europe,FALSE,FALSE
+Falkland Islands,Americas,FALSE,FALSE
+Fiji,Oceania,FALSE,FALSE
+Finland,Europe,TRUE,TRUE
+France,Europe,TRUE,TRUE
+French Guiana,Americas,FALSE,FALSE
+French Polynesia,Oceania,FALSE,FALSE
+Gabon,Africa,FALSE,FALSE
+Gambia,Africa,FALSE,FALSE
+Georgia,Asia,FALSE,FALSE
+Germany,Europe,TRUE,TRUE
+Ghana,Africa,FALSE,FALSE
+Gibraltar,Europe,FALSE,FALSE
+Greece,Europe,TRUE,TRUE
+Greenland,Americas,FALSE,FALSE
+Grenada,Americas,FALSE,FALSE
+Guadeloupe,Americas,FALSE,FALSE
+Guam,Oceania,FALSE,FALSE
+Guatemala,Americas,FALSE,FALSE
+Guernsey,Europe,FALSE,FALSE
+Guinea,Africa,FALSE,FALSE
+Guinea-Bissau,Africa,FALSE,FALSE
+Guyana,Americas,FALSE,FALSE
+Haiti,Americas,FALSE,FALSE
+Honduras,Americas,FALSE,FALSE
+Hong Kong,Asia,FALSE,FALSE
+Hungary,Europe,TRUE,TRUE
+Iceland,Europe,FALSE,TRUE
+India,Asia,FALSE,FALSE
+Indonesia,Asia,FALSE,FALSE
+Iran,Asia,FALSE,FALSE
+Iraq,Asia,FALSE,FALSE
+Ireland,Europe,TRUE,TRUE
+Isle of Man,Europe,FALSE,FALSE
+Israel,Asia,FALSE,TRUE
+Italy,Europe,TRUE,TRUE
+Jamaica,Americas,FALSE,FALSE
+Japan,Asia,FALSE,TRUE
+Jersey,Europe,FALSE,FALSE
+Jordan,Asia,FALSE,FALSE
+Kazakhstan,Asia,FALSE,FALSE
+Kenya,Africa,FALSE,FALSE
+Kiribati,Oceania,FALSE,FALSE
+Kuwait,Asia,FALSE,FALSE
+Kyrgyzstan,Asia,FALSE,FALSE
+Laos,Asia,FALSE,FALSE
+Latvia,Europe,TRUE,TRUE
+Lebanon,Asia,FALSE,FALSE
+Lesotho,Africa,FALSE,FALSE
+Liberia,Africa,FALSE,FALSE
+Libya,Africa,FALSE,FALSE
+Liechtenstein,Europe,FALSE,FALSE
+Lithuania,Europe,TRUE,TRUE
+Luxembourg,Europe,TRUE,TRUE
+Macao,Asia,FALSE,FALSE
+Madagascar,Africa,FALSE,FALSE
+Malawi,Africa,FALSE,FALSE
+Malaysia,Asia,FALSE,FALSE
+Maldives,Asia,FALSE,FALSE
+Mali,Africa,FALSE,FALSE
+Malta,Europe,TRUE,FALSE
+Marshall Islands,Oceania,FALSE,FALSE
+Martinique,Americas,FALSE,FALSE
+Mauritania,Africa,FALSE,FALSE
+Mauritius,Africa,FALSE,FALSE
+Mayotte,Africa,FALSE,FALSE
+Mexico,Americas,FALSE,TRUE
+Moldova,Europe,FALSE,FALSE
+Monaco,Europe,FALSE,FALSE
+Mongolia,Asia,FALSE,FALSE
+Montenegro,Europe,FALSE,FALSE
+Montserrat,Americas,FALSE,FALSE
+Morocco,Africa,FALSE,FALSE
+Mozambique,Africa,FALSE,FALSE
+Myanmar,Asia,FALSE,FALSE
+Namibia,Africa,FALSE,FALSE
+Nauru,Oceania,FALSE,FALSE
+Nepal,Asia,FALSE,FALSE
+Netherlands,Europe,TRUE,TRUE
+New Caledonia,Oceania,FALSE,FALSE
+New Zealand,Oceania,FALSE,TRUE
+Nicaragua,Americas,FALSE,FALSE
+Niger,Africa,FALSE,FALSE
+Nigeria,Africa,FALSE,FALSE
+Niue,Oceania,FALSE,FALSE
+Norfolk Island,Oceania,FALSE,FALSE
+North Korea,Asia,FALSE,FALSE
+North Macedonia,Europe,FALSE,FALSE
+Northern Mariana Islands,Oceania,FALSE,FALSE
+Norway,Europe,FALSE,TRUE
+Oman,Asia,FALSE,FALSE
+Pakistan,Asia,FALSE,FALSE
+Palau,Oceania,FALSE,FALSE
+Palestine,Asia,FALSE,FALSE
+Panama,Americas,FALSE,FALSE
+Papua New Guinea,Oceania,FALSE,FALSE
+Paraguay,Americas,FALSE,FALSE
+Peru,Americas,FALSE,FALSE
+Philippines,Asia,FALSE,FALSE
+Pitcairn,Oceania,FALSE,FALSE
+Poland,Europe,TRUE,TRUE
+Portugal,Europe,TRUE,TRUE
+Puerto Rico,Americas,FALSE,FALSE
+Qatar,Asia,FALSE,FALSE
+Reunion,Africa,FALSE,FALSE
+Romania,Europe,TRUE,FALSE
+Russia,Europe,FALSE,FALSE
+Rwanda,Africa,FALSE,FALSE
+Saint Helena,Africa,FALSE,FALSE
+Saint Kitts and Nevis,Americas,FALSE,FALSE
+Saint Lucia,Americas,FALSE,FALSE
+Saint Martin (French part),Americas,FALSE,FALSE
+Saint Pierre and Miquelon,Americas,FALSE,FALSE
+Saint Vincent and the Grenadines,Americas,FALSE,FALSE
+Samoa,Oceania,FALSE,FALSE
+San Marino,Europe,FALSE,FALSE
+Sao Tome and Principe,Africa,FALSE,FALSE
+Saudi Arabia,Asia,FALSE,FALSE
+Senegal,Africa,FALSE,FALSE
+Serbia,Europe,FALSE,FALSE
+Seychelles,Africa,FALSE,FALSE
+Sierra Leone,Africa,FALSE,FALSE
+Singapore,Asia,FALSE,FALSE
+Sint Maarten (Dutch part),Americas,FALSE,FALSE
+Slovakia,Europe,TRUE,TRUE
+Slovenia,Europe,TRUE,TRUE
+Solomon Islands,Oceania,FALSE,FALSE
+Somalia,Africa,FALSE,FALSE
+South Africa,Africa,FALSE,FALSE
+South Korea,Asia,FALSE,TRUE
+South Sudan,Africa,FALSE,FALSE
+Spain,Europe,TRUE,TRUE
+Sri Lanka,Asia,FALSE,FALSE
+Sudan,Africa,FALSE,FALSE
+Suriname,Americas,FALSE,FALSE
+Svalbard and Jan Mayen,Europe,FALSE,FALSE
+Sweden,Europe,TRUE,TRUE
+Switzerland,Europe,FALSE,TRUE
+Syria,Asia,FALSE,FALSE
+Taiwan,Asia,FALSE,FALSE
+Tajikistan,Asia,FALSE,FALSE
+Tanzania,Africa,FALSE,FALSE
+Thailand,Asia,FALSE,FALSE
+Timor-Leste,Asia,FALSE,FALSE
+Togo,Africa,FALSE,FALSE
+Tokelau,Oceania,FALSE,FALSE
+Tonga,Oceania,FALSE,FALSE
+Trinidad and Tobago,Americas,FALSE,FALSE
+Tunisia,Africa,FALSE,FALSE
+Turkey,Asia,FALSE,TRUE
+Turkmenistan,Asia,FALSE,FALSE
+Turks and Caicos Islands,Americas,FALSE,FALSE
+Tuvalu,Oceania,FALSE,FALSE
+Uganda,Africa,FALSE,FALSE
+Ukraine,Europe,FALSE,FALSE
+United Arab Emirates,Asia,FALSE,FALSE
+United Kingdom,Europe,FALSE,TRUE
+United States,Americas,FALSE,TRUE
+United States Virgin Islands,Americas,FALSE,FALSE
+Uruguay,Americas,FALSE,FALSE
+USSR,Europe,FALSE,FALSE
+Uzbekistan,Asia,FALSE,FALSE
+Vanuatu,Oceania,FALSE,FALSE
+Vatican,Europe,FALSE,FALSE
+Venezuela,Americas,FALSE,FALSE
+Vietnam,Asia,FALSE,FALSE
+Wallis and Futuna,Oceania,FALSE,FALSE
+West Germany,Europe,FALSE,FALSE
+Western Sahara,Africa,FALSE,FALSE
+Yemen,Asia,FALSE,FALSE
+Zambia,Africa,FALSE,FALSE
+Zimbabwe,Africa,FALSE,FALSE
