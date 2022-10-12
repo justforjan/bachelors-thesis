@@ -1,0 +1,158 @@
+---
+title: "BA - Visualization"
+output: html_notebook
+---
+
+## load libraries
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+
+regions <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/regions.csv", show_col_types = FALSE)
+
+Africa <- regions$country[regions$continent == "Africa"]
+Europe <- regions$country[regions$continent == "Europe"]
+Americas <- regions$country[regions$continent == "Americas"]
+Asia <- regions$country[regions$continent == "Asia"]
+Oceania <- regions$country[regions$continent == "Oceania"]
+EU <- regions$country[regions$EU == TRUE]
+OECD <- regions$country[regions$OECD == TRUE]
+```
+
+## load data
+
+```{r}
+filename_vrs <- "dea_results_112_io_vrs.csv"
+filename_crs <- "dea_results_112_io_crs.csv"
+
+data_vrs <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/", filename_vrs, sep = ""), show_col_types = FALSE)
+data_crs <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/", filename_crs, sep = ""), show_col_types = FALSE)
+```
+
+## Some stats
+
+```{r}
+summary(data_vrs)
+```
+
+```{r}
+summary(data_crs)
+```
+
+## Problems
+
+-   non-murder rate above 100 in crs data set
+
+-   target mean years in school sometimes ridiculously high
+
+-   Same goes for life expectancy
+
+## Add ranks
+
+```{r}
+data_crs <- data_crs %>% mutate(rank = min_rank(desc(efficiencies)))
+data_vrs <- data_vrs %>% mutate(rank = min_rank(desc(efficiencies)))
+
+data_crs <- data_crs %>% relocate(rank, .after = efficiencies)
+data_vrs <- data_vrs %>% relocate(rank, .after = efficiencies)
+```
+
+## New table: Countries vs. years with
+
+```{r}
+data_crs_wider_rank <- data_crs[c("country", "year", "rank")] %>% pivot_wider(names_from = year, values_from = rank)
+
+data_crs_wider_rank <- data_crs_wider_rank[c("country", as.character(c(1990:2016)))]
+
+data_crs_wider_eff <- data_crs[c("country", "year", "efficiencies")] %>% pivot_wider(names_from = year, values_from = efficiencies)
+
+data_crs_wider_eff <- data_crs_wider_eff[c("country", as.character(c(1990:2016)))]
+```
+
+## Recalculate foreign investment columns
+
+mirror = 253.25
+
+```{r}
+mirror = 253.25
+
+data_crs$foreign_investment <- 2 * mirror - data_crs$foreign_investment - 57.4
+data_crs$target_input.foreign_investment <- 2 * mirror - data_crs$target_input.foreign_investment - 57.4
+
+data_vrs$foreign_investment <- 2 * mirror - data_vrs$foreign_investment - 57.4
+data_vrs$target_input.foreign_investment <- 2 * mirror - data_vrs$target_input.foreign_investment - 57.4
+```
+
+## Average efficiency per country
+
+```{r}
+crs_eff <- data_crs[c("country", "efficiencies")] %>%
+  group_by(country) %>%
+  summarise(across(everything(), mean))
+
+data_crs_wider <- merge(data_crs_wider, crs_eff, by = "country")
+
+data_crs_wider <- data_crs_wider %>% relocate(efficiencies, .after = country)
+
+colnames(data_crs_wider)[2] <- "average_efficiency"
+
+data_crs_wider <- data_crs_wider %>% mutate(rank = min_rank(desc(average_efficiency)))
+
+data_crs_wider <- data_crs_wider %>% relocate(rank)
+
+```
+
+Germany 1990 as 100%
+
+```{r}
+data_crs_normal <- data_crs
+data_crs_normal["efficiencies"] <- data_crs_normal["efficiencies"] / as.numeric(filter(data_crs, dmu == "Germany_1990")["efficiencies"])
+```
+
+## years vs efficiency
+
+```{r}
+data_crs_normal %>%
+  # filter(efficiencies <= quantile(data_crs$efficiencies)[2]) %>%
+  filter(country %in% EU) %>%
+  ggplot(aes(year, efficiencies))+
+  geom_line(aes(
+    color=country
+  ))
+```
+
+## Efficiencies per continent (all years)
+
+```{r}
+data %>%
+  # filter(continent == "Africa") %>%
+  filter(year %in% c(2000:2010)) %>%
+
+  ggplot(aes(continent, efficiencies))+
+  geom_boxplot()+
+  geom_jitter(width = 0.1,
+              alpha = 0.5,
+              aes(
+                color=year
+              )
+              )
+```
+
+```{r}
+
+data %>%
+  # filter(continent == "Africa") %>%
+  filter(year %in% c(2010:2020)) %>%
+
+  ggplot(aes(continent, efficiencies))+
+  geom_boxplot()+
+  geom_jitter(width = 0.1,
+              alpha = 0.5,
+              aes(
+                color=year
+              )
+              )
+
+
+```
