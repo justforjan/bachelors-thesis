@@ -50,15 +50,6 @@ str(data)
 
 In the next part we will adapt all data sets accordingly
 
-## Adjustment of data
-
-Foreign direct investment has the wrong data type
-
-```{r}
-
-data$foreign_investment <- as.numeric(gsub("−", "-",data$foreign_investment))
-```
-
 ### Material footprint
 
 Material footprint is an input.We define, that the material footprint
@@ -117,11 +108,9 @@ Inputs must follow the direction of the less the better. I will mirror
 each value along the middle between min and max
 
 ```{r}
-mirror <- (max(data$foreign_investment) - min(data$foreign_investment)) / 2
+mirror <- (max(data$foreign_investment) - min(data$foreign_investment)) / 2 # = 253.25
 
 data$foreign_investment <- mirror + (mirror - data$foreign_investment)
-
-
 ```
 
 Now, Luxembourg 2007 and Malta 2007 switched places
