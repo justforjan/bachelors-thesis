@@ -167,16 +167,16 @@ mean(CO2_lowerQuantile$efficiencies)
 ```
 
 ```{r}
-MF_upperQuantile <- subset(data_crs, CO2 > as.numeric(quantile(data_crs$material_footprint)[4]))
-MF_lowerQuantile <- subset(data_crs, CO2 <= as.numeric(quantile(data_crs$material_footprint)[2]))
+MF_upperQuantile <- subset(data_crs, material_footprint > as.numeric(quantile(data_crs$material_footprint)[4]))
+MF_lowerQuantile <- subset(data_crs, material_footprint <= as.numeric(quantile(data_crs$material_footprint)[2]))
 
 mean(MF_upperQuantile$efficiencies)
 mean(MF_lowerQuantile$efficiencies)
 ```
 
 ```{r}
-FDI_upperQuantile <- subset(data_crs, CO2 > as.numeric(quantile(data_crs$foreign_investment)[4]))
-FDI_lowerQuantile <- subset(data_crs, CO2 <= as.numeric(quantile(data_crs$foreign_investment)[2]))
+FDI_upperQuantile <- subset(data_crs, foreign_investment > as.numeric(quantile(data_crs$foreign_investment)[4]))
+FDI_lowerQuantile <- subset(data_crs, foreign_investment <= as.numeric(quantile(data_crs$foreign_investment)[2]))
 
 mean(FDI_upperQuantile$efficiencies)
 mean(FDI_lowerQuantile$efficiencies)
@@ -202,7 +202,9 @@ hdi_merge <- merge(data_crs[c("dmu", "efficiencies")], hdi, by = "dmu", all.x = 
 cor(hdi_merge$efficiencies, hdi_merge$value)
 ```
 
-Slight negative correlation between eficiencies and HDI
+Slight negative correlation between efficiencies and HDI
+
+## Which countries improved, which got worse?
 
 ## years vs efficiency
 
