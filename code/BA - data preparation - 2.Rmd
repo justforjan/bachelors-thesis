@@ -133,6 +133,12 @@ The more the better \<- Already fits
 
 It cannot be below 0. No adjustment needed
 
+### Income of lowest 20 percent
+
+The more the better \<- good
+
+Cannot be 0
+
 ### Mean years of schooling
 
 The more the better \<- perfect
