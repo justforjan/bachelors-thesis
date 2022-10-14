@@ -17,6 +17,7 @@ income_share_20
 CO2
 murder
 foreign_investment
+hdi
 
 **Gapminder**
 women_in_parliament
@@ -33,6 +34,7 @@ income_share_20
 CO2
 murder
 foreign_investment
+hdi
 
 
 **OurWorldInData**
