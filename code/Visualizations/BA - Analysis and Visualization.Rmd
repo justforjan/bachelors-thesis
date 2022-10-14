@@ -58,7 +58,7 @@ data_crs <- data_crs %>% relocate(rank, .after = efficiencies)
 data_vrs <- data_vrs %>% relocate(rank, .after = efficiencies)
 ```
 
-## New table: Countries vs. years with
+### New table: Countries vs. years with
 
 ```{r}
 data_crs_wider_rank <- data_crs[c("country", "year", "rank")] %>% pivot_wider(names_from = year, values_from = rank)
@@ -70,36 +70,49 @@ data_crs_wider_eff <- data_crs[c("country", "year", "efficiencies")] %>% pivot_w
 data_crs_wider_eff <- data_crs_wider_eff[c("country", as.character(c(1990:2016)))]
 ```
 
-## Recalculate foreign investment columns
-
-mirror = 253.25
+### Recalculate foreign investment columns
 
 ```{r}
-mirror = 253.25
+# mirror = 253.25
+# 
+# data_crs$foreign_investment <- 2 * mirror - data_crs$foreign_investment - 57.4
+# data_crs$target_input.foreign_investment <- 2 * mirror - data_crs$target_input.foreign_investment - 57.4
+# 
+# data_vrs$foreign_investment <- 2 * mirror - data_vrs$foreign_investment - 57.4
+# data_vrs$target_input.foreign_investment <- 2 * mirror - data_vrs$target_input.foreign_investment - 57.4
 
-data_crs$foreign_investment <- 2 * mirror - data_crs$foreign_investment - 57.4
-data_crs$target_input.foreign_investment <- 2 * mirror - data_crs$target_input.foreign_investment - 57.4
+data_crs$foreign_investment <- (data_crs$foreign_investment * (-1)) + 450
+data_crs$target_input.foreign_investment <- data_crs$target_input.foreign_investment * (-1) + 450
 
-data_vrs$foreign_investment <- 2 * mirror - data_vrs$foreign_investment - 57.4
-data_vrs$target_input.foreign_investment <- 2 * mirror - data_vrs$target_input.foreign_investment - 57.4
+data_vrs$foreign_investment <- (data_vrs$foreign_investment * (-1)) + 450
+data_vrs$target_input.foreign_investment <- data_vrs$target_input.foreign_investment * (-1) + 450
 ```
 
-## Average efficiency per country
+### Average efficiency per country
 
 ```{r}
+# avererage efficiencies for crs data set
 crs_eff <- data_crs[c("country", "efficiencies")] %>%
   group_by(country) %>%
   summarise(across(everything(), mean))
 
-data_crs_wider <- merge(data_crs_wider, crs_eff, by = "country")
+# merge efficienies and wide crs rank data set
+data_crs_wider_rank <- merge(data_crs_wider_rank, crs_eff, by = "country")
+data_crs_wider_rank <- data_crs_wider_rank %>% relocate(efficiencies, .after = country)
+colnames(data_crs_wider_rank)[2] <- "average_efficiency"
 
-data_crs_wider <- data_crs_wider %>% relocate(efficiencies, .after = country)
+# add rank based in average efficiencies
+data_crs_wider_rank <- data_crs_wider_rank %>% mutate(rank = min_rank(desc(average_efficiency)))
+data_crs_wider_rank <- data_crs_wider_rank %>% relocate(rank)
 
-colnames(data_crs_wider)[2] <- "average_efficiency"
+# merge efficienies and wide crs efficiency data set
+data_crs_wider_eff <- merge(data_crs_wider_eff, crs_eff, by = "country")
+data_crs_wider_eff <- data_crs_wider_eff %>% relocate(efficiencies, .after = country)
+colnames(data_crs_wider_eff)[2] <- "average_efficiency"
 
-data_crs_wider <- data_crs_wider %>% mutate(rank = min_rank(desc(average_efficiency)))
-
-data_crs_wider <- data_crs_wider %>% relocate(rank)
+# add rank based in average efficiencies
+data_crs_wider_eff <- data_crs_wider_eff %>% mutate(rank = min_rank(desc(average_efficiency)))
+data_crs_wider_eff <- data_crs_wider_eff %>% relocate(rank)
 
 ```
 
@@ -110,12 +123,93 @@ data_crs_normal <- data_crs
 data_crs_normal["efficiencies"] <- data_crs_normal["efficiencies"] / as.numeric(filter(data_crs, dmu == "Germany_1990")["efficiencies"])
 ```
 
+5 most efficient, 5 least efficient
+
+```{r}
+head(data_crs[order(data_crs$rank),],10)
+tail(data_crs[order(data_crs$rank),],10)
+```
+
+### Correlation between efficiency and input factors
+
+CO2
+
+```{r}
+cor(data_crs[c("CO2", "efficiencies")])
+```
+
+Slight negative correlation (-0.4). The more CO2 emissions per person, the worse the
+
+Foreign Direct Investment
+
+```{r}
+cor(data_crs[c("foreign_investment", "efficiencies")])
+```
+
+No correlation between FDI and the resulting efficiencies
+
+Material footprint
+
+```{r}
+cor(data_crs[c("material_footprint", "efficiencies")])
+```
+
+Small correlation (-0.3)
+
+## Performance of country-year combinations with high inputs
+
+```{r}
+CO2_upperQuantile <- subset(data_crs, CO2 > as.numeric(quantile(data_crs$CO2)[4]))
+CO2_lowerQuantile <- subset(data_crs, CO2 <= as.numeric(quantile(data_crs$CO2)[2]))
+
+mean(CO2_upperQuantile$efficiencies)
+mean(CO2_lowerQuantile$efficiencies)
+```
+
+```{r}
+MF_upperQuantile <- subset(data_crs, CO2 > as.numeric(quantile(data_crs$material_footprint)[4]))
+MF_lowerQuantile <- subset(data_crs, CO2 <= as.numeric(quantile(data_crs$material_footprint)[2]))
+
+mean(MF_upperQuantile$efficiencies)
+mean(MF_lowerQuantile$efficiencies)
+```
+
+```{r}
+FDI_upperQuantile <- subset(data_crs, CO2 > as.numeric(quantile(data_crs$foreign_investment)[4]))
+FDI_lowerQuantile <- subset(data_crs, CO2 <= as.numeric(quantile(data_crs$foreign_investment)[2]))
+
+mean(FDI_upperQuantile$efficiencies)
+mean(FDI_lowerQuantile$efficiencies)
+```
+
+## Correlation with BIP/HDI/HPI
+
+**GDP (income/gdp per person)**
+
+```{r}
+cor(data_crs$income, data_crs$efficiencies)
+```
+
+Almost no correlation
+
+**HDI**
+
+```{r}
+hdi <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/hdi.csv", show_col_types = FALSE)
+
+hdi_merge <- merge(data_crs[c("dmu", "efficiencies")], hdi, by = "dmu", all.x = TRUE)
+
+cor(hdi_merge$efficiencies, hdi_merge$value)
+```
+
+Slight negative correlation between eficiencies and HDI
+
 ## years vs efficiency
 
 ```{r}
 data_crs_normal %>%
   # filter(efficiencies <= quantile(data_crs$efficiencies)[2]) %>%
-  filter(country %in% EU) %>%
+  # filter(country %in% EU) %>%
   ggplot(aes(year, efficiencies))+
   geom_line(aes(
     color=country
