@@ -99,7 +99,7 @@ minimum values is -57.5 (Luxembourg 2007), the maximum value 449 (Malta
 In order to get only positive values, I will add 57.4 to each value.
 
 ```{r}
-data$foreign_investment <- data$foreign_investment + 57.4
+# data$foreign_investment <- data$foreign_investment + 57.4
 ```
 
 **Handling of direction**
@@ -108,9 +108,11 @@ Inputs must follow the direction of the less the better. I will mirror
 each value along the middle between min and max
 
 ```{r}
-mirror <- (max(data$foreign_investment) - min(data$foreign_investment)) / 2 # = 253.25
+# mirror <- (max(data$foreign_investment) - min(data$foreign_investment)) / 2 # = 253.25
+# 
+# data$foreign_investment <- mirror + (mirror - data$foreign_investment)
 
-data$foreign_investment <- mirror + (mirror - data$foreign_investment)
+data$foreign_investment <- (data$foreign_investment - 450) * (-1)
 ```
 
 Now, Luxembourg 2007 and Malta 2007 switched places
