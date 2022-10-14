@@ -16,9 +16,10 @@ editor_options:
 
 ```{r}
 library(tidyverse)
-library(deaR)
-library(ggplot2)
 library(countrycode)
+library(zoo)
+
+source("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/code/functions.R")
 ```
 
 women_in_parliament, basic_sanitation, basic_water_source, electricity,
@@ -26,11 +27,9 @@ employment_rate, material_footprint, forest_area, mean_years_in_school,
 air_pollution, health_worker, red_list, poverty, life_expectancy,
 income, income_share_20, CO2, murder
 
-# Prepare individual data sets
+# Load data
 
-## Load data
-
-### **Gapminder**
+## **Gapminder**
 
 ```{r}
 # Input
@@ -71,7 +70,7 @@ hdi <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/gapmi
 
 ```
 
-### **OurWorldInData**
+## **OurWorldInData**
 
 ```{r}
 # 3:
@@ -98,70 +97,51 @@ colnames(air_pollution) <- c("country", "year", "value")
 colnames(red_list) <- c("country", "year", "value")
 ```
 
-## Remove years 1949 and earlier and 2021 and later
+# Change every table to long format
+
+Only for Gapminder
 
 ```{r}
-drops <- as.character(c(1700:1949, 2021:2200))
-
-# Gapminder
-
-women_in_parliament <- women_in_parliament[ , !(names(women_in_parliament) %in% drops)]
-basic_sanitation <- basic_sanitation[ , !(names(basic_sanitation) %in% drops)]
-basic_water_source <- basic_water_source[ , !(names(basic_water_source) %in% drops)]
-electricity <- electricity[ , !(names(electricity) %in% drops)]
-employment_rate <- employment_rate[ , !(names(employment_rate) %in% drops)]
-material_footprint <- material_footprint[ , !(names(material_footprint) %in% drops)]
-forest_area <- forest_area[ , !(names(forest_area) %in% drops)]
-poverty <- poverty[ , !(names(poverty) %in% drops)]
-life_expectancy <- life_expectancy[ , !(names(life_expectancy) %in% drops)]
-income <- income[ , !(names(income) %in% drops)]
-income_share_20 <- income_share_20[ , !(names(income_share_20) %in% drops)]
-CO2 <- CO2[ , !(names(CO2) %in% drops)]
-murder <- murder[ , !(names(murder) %in% drops)]
-foreign_investment <- foreign_investment[ , !(names(foreign_investment) %in% drops)]
-hdi <- hdi[ , !(names(hdi) %in% drops)]
-
-# OurWorldInData
-
-mean_years_in_school <- subset(mean_years_in_school, !(year %in% drops))
-air_pollution <- subset(air_pollution, !(year %in% drops))
-health_worker <- subset(health_worker, !(year %in% drops))
-red_list <- subset(red_list, !(year %in% drops))
-
+women_in_parliament <- to_long(women_in_parliament)
+basic_sanitation <- to_long(basic_sanitation)
+basic_water_source <- to_long(basic_water_source)
+electricity <- to_long(electricity)
+employment_rate <- to_long(employment_rate)
+material_footprint <- to_long(material_footprint)
+forest_area <- to_long(forest_area)
+poverty <- to_long(poverty)
+life_expectancy <- to_long(life_expectancy)
+income <- to_long(income)
+income_share_20 <- to_long(income_share_20)
+CO2 <- to_long(CO2)
+murder <- to_long(murder)
+foreign_investment <- to_long(foreign_investment)
+hdi <- to_long(hdi)
 ```
 
-## Change tables from wide to long (Gapminder)
+# Adapt data types
+
+-   CO2 mü
+
+-   Income k
+
+-   foreign mü und langer Strich
 
 ```{r}
-women_in_parliament <- women_in_parliament %>% gather("year", "value", -country)
-basic_sanitation <- basic_sanitation %>% gather("year", "value", -country)
-basic_water_source <- basic_water_source %>% gather("year", "value", -country)
-electricity <- electricity %>% gather("year", "value", -country)
-employment_rate <- employment_rate %>% gather("year", "value", -country)
-material_footprint <- material_footprint %>% gather("year", "value", -country)
-forest_area <- forest_area %>% gather("year", "value", -country)
-poverty <- poverty %>% gather("year", "value", -country)
-life_expectancy <- life_expectancy %>% gather("year", "value", -country)
-income <- income %>% gather("year", "value", -country)
-income_share_20 <- income_share_20 %>% gather("year", "value", -country)
-CO2 <- CO2 %>% gather("year", "value", -country)
-murder <- murder %>% gather("year", "value", -country)
-foreign_investment<- foreign_investment %>% gather("year", "value", -country)
-hdi <- hdi %>% gather("year", "value", -country)
-```
+# CO2
+CO2$value <- as.numeric(gsub("µ", "e-3", CO2$value))
 
-## Change data types of columns
+# FDI
 
-```{r}
-# Values
-income$value <- as.numeric(gsub("k", "e3", income$value))/1000 # divided by 1000 to avoid different orders of magnitude within dataset
-# foreign_investment$value <- gsub("k", "e3", foreign_investment$value)
-foreign_investment$value <- as.numeric(gsub("−", "-", foreign_investment$value))
+foreign_investment$value <- as.numeric(gsub("−", "-", foreign_investment$value)) # For some reason 5 values become NA here...
+
 foreign_investment$value <- gsub("µ", "e-3", foreign_investment$value)
 
 foreign_investment$value <- as.numeric(foreign_investment$value)
+  
+# Income
+income$value <- as.numeric(gsub("k", "e3", income$value))/1000 # divided by 1000 to avoid different orders of magnitude within dataset
 
-# Years
 women_in_parliament <- women_in_parliament %>% mutate(year = as.numeric(year))
 basic_sanitation <- basic_sanitation %>% mutate(year = as.numeric(year))
 basic_water_source <- basic_water_source %>% mutate(year = as.numeric(year))
@@ -183,7 +163,158 @@ foreign_investment <- foreign_investment %>% mutate(year = as.numeric(year))
 hdi <- hdi %>% mutate(year = as.numeric(year))
 ```
 
-## Handle differences in naming conventions
+# Interpolate
+
+```{r}
+women_in_parliament <- interpolate(women_in_parliament)
+basic_sanitation <- interpolate(basic_sanitation)
+basic_water_source <- interpolate(basic_water_source)
+electricity <- interpolate(electricity)
+employment_rate <- interpolate(employment_rate)
+material_footprint <- interpolate(material_footprint)
+forest_area <- interpolate(forest_area)
+mean_years_in_school <- interpolate(mean_years_in_school)
+air_pollution <- interpolate(air_pollution)
+health_worker <- interpolate(health_worker)
+red_list <- interpolate(red_list)
+poverty <- interpolate(poverty)
+life_expectancy <- interpolate(life_expectancy)
+income <- interpolate(income)
+income_share_20 <- interpolate(income_share_20)
+CO2 <- interpolate(CO2)
+murder <- interpolate(murder)
+foreign_investment <- interpolate(foreign_investment)
+hdi <- interpolate(hdi)
+```
+
+# Remove years
+
+```{r}
+min_year = 1950
+max_year = 2020
+
+women_in_parliament <- rm.years(women_in_parliament)
+basic_sanitation <- rm.years(basic_sanitation)
+basic_water_source <- rm.years(basic_water_source)
+electricity <- rm.years(electricity)
+employment_rate <- rm.years(employment_rate)
+material_footprint <- rm.years(material_footprint)
+forest_area <- rm.years(forest_area)
+mean_years_in_school <- rm.years(mean_years_in_school)
+air_pollution <- rm.years(air_pollution)
+health_worker <- rm.years(health_worker)
+red_list <- rm.years(red_list)
+poverty <- rm.years(poverty)
+life_expectancy <- rm.years(life_expectancy)
+income <- rm.years(income)
+income_share_20 <- rm.years(income_share_20)
+CO2 <- rm.years(CO2)
+murder <- rm.years(murder)
+foreign_investment <- rm.years(foreign_investment)
+```
+
+# Handle differences in naming conventions
+
+```{r}
+nc <- read_csv("naming_conventions.csv", show_col_types = FALSE)
+
+for (country in 1:nrow(nc)) {
+  women_in_parliament[women_in_parliament == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  basic_sanitation[basic_sanitation == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  basic_water_source[basic_water_source == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  electricity[electricity == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  employment_rate[employment_rate == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  material_footprint[material_footprint == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  forest_area[forest_area == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  mean_years_in_school[mean_years_in_school == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  air_pollution[air_pollution == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  health_worker[health_worker == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  red_list[red_list == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  poverty[poverty == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  life_expectancy[life_expectancy == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  income[income == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  income_share_20[income_share_20 == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  CO2[CO2 == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  murder[murder == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  foreign_investment[foreign_investment == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  hdi[hdi == as.character(nc[country,1])] <- as.character(nc[country,2])
+
+}
+```
+
+# Merge country and year to DMU
+
+and delete country and year column
+
+```{r}
+# rm.country_year = TRUE
+women_in_parliament <- merge_dmu(women_in_parliament)
+basic_sanitation <- merge_dmu(basic_sanitation)
+basic_water_source <- merge_dmu(basic_water_source)
+electricity <- merge_dmu(electricity)
+employment_rate <- merge_dmu(employment_rate)
+material_footprint <- merge_dmu(material_footprint)
+forest_area <- merge_dmu(forest_area)
+mean_years_in_school <- merge_dmu(mean_years_in_school)
+air_pollution <- merge_dmu(air_pollution)
+health_worker <- merge_dmu(health_worker)
+red_list <- merge_dmu(red_list)
+poverty <- merge_dmu(poverty)
+life_expectancy <- merge_dmu(life_expectancy)
+income <- merge_dmu(income)
+income_share_20 <- merge_dmu(income_share_20)
+CO2 <- merge_dmu(CO2)
+murder <- merge_dmu(murder)
+foreign_investment <- merge_dmu(foreign_investment)
+hdi <- merge_dmu(hdi)
+
+```
+
+# Export to csv
+
+```{r}
+write_csv(women_in_parliament, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/women_in_parliament.csv")
+write_csv(basic_sanitation, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/basic_sanitation.csv")
+write_csv(basic_water_source, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/basic_water_source.csv")
+write_csv(electricity, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/electricity.csv")
+write_csv(employment_rate, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/employment_rate.csv")
+write_csv(material_footprint, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/material_footprint.csv")
+write_csv(forest_area, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/forest_area.csv")
+write_csv(mean_years_in_school, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/mean_years_in_school.csv")
+write_csv(air_pollution, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/air_pollution.csv")
+write_csv(health_worker, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/health_worker.csv")
+write_csv(red_list, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/red_list.csv")
+write_csv(poverty, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/poverty.csv")
+write_csv(life_expectancy, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/life_expectancy.csv")
+write_csv(income, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/income.csv")
+write_csv(income_share_20, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/income_share_20.csv")
+write_csv(CO2, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/CO2.csv")
+write_csv(murder, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/murder.csv")
+write_csv(foreign_investment, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/foreign_investment.csv")
+write_csv(hdi, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/hdi.csv")
+```
+
+# Naming conventions
+
+how I figured out which names to change
 
 Vectors of country names of both Gapminder and OurWorldInData
 
@@ -229,163 +360,4 @@ Manual creation of csv to map country names
 ```{r}
 # write_csv(ingm, "in_gp.csv")
 # write_csv(inowid, "in_owid.csv")
-```
-
-Read manually created naming conventions file
-
-```{r}
-nc <- read_csv("naming_conventions.csv", show_col_types = FALSE)
-```
-
-Change country names according to naming convention
-
-```{r}
-for (country in 1:nrow(nc)) {
-  women_in_parliament[women_in_parliament == as.character(nc[country,1])] <- as.character(nc[country,2])
-  
-  basic_sanitation[basic_sanitation == as.character(nc[country,1])] <- as.character(nc[country,2])
-  
-  basic_water_source[basic_water_source == as.character(nc[country,1])] <- as.character(nc[country,2])
-  
-  electricity[electricity == as.character(nc[country,1])] <- as.character(nc[country,2])
-  
-  employment_rate[employment_rate == as.character(nc[country,1])] <- as.character(nc[country,2])
-  
-  material_footprint[material_footprint == as.character(nc[country,1])] <- as.character(nc[country,2])
-  
-  forest_area[forest_area == as.character(nc[country,1])] <- as.character(nc[country,2])
-  
-  mean_years_in_school[mean_years_in_school == as.character(nc[country,1])] <- as.character(nc[country,2])
-  
-  air_pollution[air_pollution == as.character(nc[country,1])] <- as.character(nc[country,2])
-  
-  health_worker[health_worker == as.character(nc[country,1])] <- as.character(nc[country,2])
-  
-  red_list[red_list == as.character(nc[country,1])] <- as.character(nc[country,2])
-  
-  poverty[poverty == as.character(nc[country,1])] <- as.character(nc[country,2])
-  
-  life_expectancy[life_expectancy == as.character(nc[country,1])] <- as.character(nc[country,2])
-  
-  income[income == as.character(nc[country,1])] <- as.character(nc[country,2])
-  
-  income_share_20[income_share_20 == as.character(nc[country,1])] <- as.character(nc[country,2])
-  
-  CO2[CO2 == as.character(nc[country,1])] <- as.character(nc[country,2])
-  
-  murder[murder == as.character(nc[country,1])] <- as.character(nc[country,2])
-  
-  foreign_investment[foreign_investment == as.character(nc[country,1])] <- as.character(nc[country,2])
-  
-  hdi[hdi == as.character(nc[country,1])] <- as.character(nc[country,2])
-
-}
-```
-
-## Merge country and year to dmu
-
-```{r}
-women_in_parliament$dmu <- str_c(women_in_parliament$country, "_", women_in_parliament$year)
-basic_sanitation$dmu <- str_c(basic_sanitation$country, "_", basic_sanitation$year)
-basic_water_source$dmu <- str_c(basic_water_source$country, "_", basic_water_source$year)
-electricity$dmu <- str_c(electricity$country, "_", electricity$year)
-employment_rate$dmu <- str_c(employment_rate$country, "_", employment_rate$year)
-material_footprint$dmu <- str_c(material_footprint$country, "_", material_footprint$year)
-forest_area$dmu <- str_c(forest_area$country, "_", forest_area$year)
-mean_years_in_school$dmu <- str_c(mean_years_in_school$country, "_", mean_years_in_school$year)
-air_pollution$dmu <- str_c(air_pollution$country, "_", air_pollution$year)
-health_worker$dmu <- str_c(health_worker$country, "_", health_worker$year)
-red_list$dmu <- str_c(red_list$country, "_", red_list$year)
-poverty$dmu <- str_c(poverty$country, "_", poverty$year)
-life_expectancy$dmu <- str_c(life_expectancy$country, "_", life_expectancy$year)
-income$dmu <- str_c(income$country, "_", income$year)
-income_share_20$dmu <- str_c(income_share_20$country, "_", income_share_20$year)
-CO2$dmu <- str_c(CO2$country, "_", CO2$year)
-murder$dmu <- str_c(murder$country, "_", murder$year)
-foreign_investment$dmu <- str_c(foreign_investment$country, "_", foreign_investment$year)
-hdi$dmu <- str_c(hdi$country, "_", hdi$year)
-
-women_in_parliament$country <- NULL
-basic_sanitation$country <- NULL
-basic_water_source$country <- NULL
-electricity$country <- NULL
-employment_rate$country <- NULL
-material_footprint$country <- NULL
-forest_area$country <- NULL
-mean_years_in_school$country <- NULL
-air_pollution$country <- NULL
-health_worker$country <- NULL
-red_list$country <- NULL
-poverty$country <- NULL
-life_expectancy$country <- NULL
-income$country <- NULL
-income_share_20$country <- NULL
-CO2$country <- NULL
-murder$country <- NULL
-foreign_investment$country <- NULL
-hdi$country <- NULL
-
-women_in_parliament$year <- NULL
-basic_sanitation$year <- NULL
-basic_water_source$year <- NULL
-electricity$year <- NULL
-employment_rate$year <- NULL
-material_footprint$year <- NULL
-forest_area$year <- NULL
-mean_years_in_school$year <- NULL
-air_pollution$year <- NULL
-health_worker$year <- NULL
-red_list$year <- NULL
-poverty$year <- NULL
-life_expectancy$year <- NULL
-income$year <- NULL
-income_share_20$year <- NULL
-CO2$year <- NULL
-murder$year <- NULL
-foreign_investment$year <- NULL
-hdi$year <- NULL
-
-women_in_parliament <- women_in_parliament %>% relocate(dmu)
-basic_sanitation <- basic_sanitation %>% relocate(dmu)
-basic_water_source <- basic_water_source %>% relocate(dmu)
-electricity <- electricity %>% relocate(dmu)
-employment_rate <- employment_rate %>% relocate(dmu)
-material_footprint <- material_footprint %>% relocate(dmu)
-forest_area <- forest_area %>% relocate(dmu)
-mean_years_in_school <- mean_years_in_school %>% relocate(dmu)
-air_pollution <- air_pollution %>% relocate(dmu)
-health_worker <- health_worker %>% relocate(dmu)
-red_list <- red_list %>% relocate(dmu)
-poverty <- poverty %>% relocate(dmu)
-life_expectancy <- life_expectancy %>% relocate(dmu)
-income <- income %>% relocate(dmu)
-income_share_20 <- income_share_20 %>% relocate(dmu)
-CO2 <- CO2 %>% relocate(dmu)
-murder <- murder %>% relocate(dmu)
-foreign_investment <- foreign_investment %>% relocate(dmu)
-hdi <- hdi %>% relocate(dmu)
-```
-
-## Save individual data sets as csvs
-
-```{r}
-write_csv(women_in_parliament, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/women_in_parliament.csv")
-write_csv(basic_sanitation, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/basic_sanitation.csv")
-write_csv(basic_water_source, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/basic_water_source.csv")
-write_csv(electricity, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/electricity.csv")
-write_csv(employment_rate, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/employment_rate.csv")
-write_csv(material_footprint, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/material_footprint.csv")
-write_csv(forest_area, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/forest_area.csv")
-write_csv(mean_years_in_school, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/mean_years_in_school.csv")
-write_csv(air_pollution, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/air_pollution.csv")
-write_csv(health_worker, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/health_worker.csv")
-write_csv(red_list, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/red_list.csv")
-write_csv(poverty, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/poverty.csv")
-write_csv(life_expectancy, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/life_expectancy.csv")
-write_csv(income, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/income.csv")
-write_csv(income_share_20, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/income_share_20.csv")
-write_csv(CO2, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/CO2.csv")
-write_csv(murder, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/murder.csv")
-write_csv(foreign_investment, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/foreign_investment.csv")
-write_csv(hdi, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/hdi.csv")
 ```
