@@ -67,6 +67,8 @@ CO2 <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/gapmi
 # 16:
 murder <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/gapminder/murder_per_100000_people.csv",show_col_types = FALSE)
 
+hdi <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/gapminder/hdi_human_development_index.csv",show_col_types = FALSE)
+
 ```
 
 ### **OurWorldInData**
@@ -117,6 +119,7 @@ income_share_20 <- income_share_20[ , !(names(income_share_20) %in% drops)]
 CO2 <- CO2[ , !(names(CO2) %in% drops)]
 murder <- murder[ , !(names(murder) %in% drops)]
 foreign_investment <- foreign_investment[ , !(names(foreign_investment) %in% drops)]
+hdi <- hdi[ , !(names(hdi) %in% drops)]
 
 # OurWorldInData
 
@@ -144,6 +147,7 @@ income_share_20 <- income_share_20 %>% gather("year", "value", -country)
 CO2 <- CO2 %>% gather("year", "value", -country)
 murder <- murder %>% gather("year", "value", -country)
 foreign_investment<- foreign_investment %>% gather("year", "value", -country)
+hdi <- hdi %>% gather("year", "value", -country)
 ```
 
 ## Change data types of columns
@@ -176,6 +180,7 @@ income_share_20 <- income_share_20 %>% mutate(year = as.numeric(year))
 CO2 <- CO2 %>% mutate(year = as.numeric(year))
 murder <- murder %>% mutate(year = as.numeric(year))
 foreign_investment <- foreign_investment %>% mutate(year = as.numeric(year))
+hdi <- hdi %>% mutate(year = as.numeric(year))
 ```
 
 ## Handle differences in naming conventions
@@ -271,6 +276,8 @@ for (country in 1:nrow(nc)) {
   murder[murder == as.character(nc[country,1])] <- as.character(nc[country,2])
   
   foreign_investment[foreign_investment == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  hdi[hdi == as.character(nc[country,1])] <- as.character(nc[country,2])
 
 }
 ```
@@ -296,6 +303,7 @@ income_share_20$dmu <- str_c(income_share_20$country, "_", income_share_20$year)
 CO2$dmu <- str_c(CO2$country, "_", CO2$year)
 murder$dmu <- str_c(murder$country, "_", murder$year)
 foreign_investment$dmu <- str_c(foreign_investment$country, "_", foreign_investment$year)
+hdi$dmu <- str_c(hdi$country, "_", hdi$year)
 
 women_in_parliament$country <- NULL
 basic_sanitation$country <- NULL
@@ -315,6 +323,7 @@ income_share_20$country <- NULL
 CO2$country <- NULL
 murder$country <- NULL
 foreign_investment$country <- NULL
+hdi$country <- NULL
 
 women_in_parliament$year <- NULL
 basic_sanitation$year <- NULL
@@ -334,6 +343,7 @@ income_share_20$year <- NULL
 CO2$year <- NULL
 murder$year <- NULL
 foreign_investment$year <- NULL
+hdi$year <- NULL
 
 women_in_parliament <- women_in_parliament %>% relocate(dmu)
 basic_sanitation <- basic_sanitation %>% relocate(dmu)
@@ -353,6 +363,7 @@ income_share_20 <- income_share_20 %>% relocate(dmu)
 CO2 <- CO2 %>% relocate(dmu)
 murder <- murder %>% relocate(dmu)
 foreign_investment <- foreign_investment %>% relocate(dmu)
+hdi <- hdi %>% relocate(dmu)
 ```
 
 ## Save individual data sets as csvs
@@ -376,4 +387,5 @@ write_csv(income_share_20, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw
 write_csv(CO2, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/CO2.csv")
 write_csv(murder, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/murder.csv")
 write_csv(foreign_investment, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/foreign_investment.csv")
+write_csv(hdi, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/hdi.csv")
 ```
