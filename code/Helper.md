@@ -18,6 +18,7 @@ CO2
 murder
 foreign_investment
 hdi
+government_debt
 
 **Gapminder**
 women_in_parliament
@@ -42,6 +43,9 @@ mean_years_in_school
 air_pollution
 health_worker
 red_list
+
+**IWF**
+government_debt
 
 # Countries to consider
 
