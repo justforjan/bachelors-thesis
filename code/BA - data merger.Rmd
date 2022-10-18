@@ -31,6 +31,7 @@ income_share_20 <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/ra
 CO2 <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/CO2.csv",show_col_types = FALSE)
 murder <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/murder.csv",show_col_types = FALSE)
 foreign_investment <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/foreign_investment.csv",show_col_types = FALSE)
+government_debt <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/government_debt.csv",show_col_types = FALSE)
 ```
 
 # Functions
@@ -98,6 +99,7 @@ general <-
   merge(
   merge(
   merge(
+  merge(
 
   women_in_parliament,
   basic_sanitation, by = "dmu", all = TRUE),
@@ -116,7 +118,8 @@ general <-
   income_share_20, by = "dmu", all = TRUE),
   CO2, by = "dmu", all = TRUE),
   murder, by = "dmu", all = TRUE),
-  foreign_investment, by = "dmu", all = TRUE)
+  foreign_investment, by = "dmu", all = TRUE),
+  government_debt, by = "dmu", all = TRUE)
 
 # Change column names to something meaningful
 colnames(general) <- c(
@@ -138,7 +141,8 @@ colnames(general) <- c(
   "income_share_20",
   "CO2",
   "murder",
-  "foreign_investment"
+  "foreign_investment",
+  "government_debt"
   )
 
 # convert tibble to data frame
@@ -149,6 +153,56 @@ general <- as.data.frame(general)
 
 ```{r}
 write_csv(general, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/general.csv")
+```
+
+## Attempt 13 - 9 data sets (final decision)
+
+| Input              | Output               |
+|--------------------|----------------------|
+| CO2                | life_expectancy      |
+| material_footprint | income               |
+| foreign_investment | mean_years_in_school |
+| missing: debts     | murder               |
+|                    | income_share_20      |
+
+```{r}
+final_13 <- merger(c(
+  "CO2",
+  "material_footprint",
+  "foreign_investment",
+  "government_debt",
+  "life_expectancy",
+  "income",
+  "mean_years_in_school",
+  "murder",
+  "income_share_20"
+))
+
+nrow(final_13)
+```
+
+Unfortunately, not many dmus are left. -\> (852 with interpolation)
+
+```{r}
+check0(final_13)
+```
+
+36 values with 0
+
+```{r}
+min(final_13$mean_years_in_school)
+min(final_13$CO2)
+min(final_13$foreign_investment)
+```
+
+```{r}
+check0(final_13$foreign_investment)
+```
+
+All negative values are in the foreign investment column
+
+```{r}
+write_final(final_13)
 ```
 
 ## Attempt 12 - 8 data sets (final decision)
