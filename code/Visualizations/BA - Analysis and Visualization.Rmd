@@ -3,11 +3,14 @@ title: "BA - Visualization"
 output: html_notebook
 ---
 
-## load libraries
+## load libraries and other stuff
 
 ```{r}
 library(tidyverse)
 library(ggplot2)
+library(gridExtra)
+
+source("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/code/functions.R")
 
 regions <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/regions.csv", show_col_types = FALSE)
 
@@ -23,8 +26,8 @@ OECD <- regions$country[regions$OECD == TRUE]
 ## load data
 
 ```{r}
-filename_vrs <- "dea_results_112_io_vrs.csv"
-filename_crs <- "dea_results_112_io_crs.csv"
+filename_vrs <- "dea_results_113_io_vrs.csv"
+filename_crs <- "dea_results_113_io_crs.csv"
 
 data_vrs <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/", filename_vrs, sep = ""), show_col_types = FALSE)
 data_crs <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/", filename_crs, sep = ""), show_col_types = FALSE)
@@ -42,7 +45,7 @@ summary(data_crs)
 
 ## Problems
 
--   non-murder rate above 100 in crs data set
+-   target non-murder rate above 100 in crs data set
 
 -   target mean years in school sometimes ridiculously high
 
@@ -81,11 +84,34 @@ data_crs_wider_eff <- data_crs_wider_eff[c("country", as.character(c(1990:2016))
 # data_vrs$foreign_investment <- 2 * mirror - data_vrs$foreign_investment - 57.4
 # data_vrs$target_input.foreign_investment <- 2 * mirror - data_vrs$target_input.foreign_investment - 57.4
 
-data_crs$foreign_investment <- (data_crs$foreign_investment * (-1)) + 450
-data_crs$target_input.foreign_investment <- data_crs$target_input.foreign_investment * (-1) + 450
+# # crs
+# data_crs$foreign_investment <- (data_crs$foreign_investment * (-1)) + 450
+# 
+# data_crs$target_input.foreign_investment <- data_crs$target_input.foreign_investment * (-1) + 450
+# 
+# # vrs
+# data_vrs$foreign_investment <- (data_vrs$foreign_investment * (-1)) + 450
+# 
+# data_vrs$target_input.foreign_investment <- data_vrs$target_input.foreign_investment * (-1) + 450
 
-data_vrs$foreign_investment <- (data_vrs$foreign_investment * (-1)) + 450
-data_vrs$target_input.foreign_investment <- data_vrs$target_input.foreign_investment * (-1) + 450
+# crs
+data_crs$foreign_investment <- data_crs$foreign_investment - 58.5
+
+data_crs$target_input.foreign_investment <- data_crs$target_input.foreign_investment - 58.5
+
+# vrs
+data_vrs$foreign_investment <- data_vrs$foreign_investment - 58.5
+
+data_vrs$target_input.foreign_investment <- data_vrs$target_input.foreign_investment - 58.5
+```
+
+## Means
+
+```{r}
+means_crs <- data_crs %>%
+  select(country,efficiencies, CO2, material_footprint, foreign_investment, government_debt, life_expectancy, income, mean_years_in_school, murder, income_share_20) %>%
+  group_by(country) %>%
+  summarize(across(everything(), mean))
 ```
 
 ### Average efficiency per country
@@ -120,17 +146,17 @@ Germany 1990 as 100%
 
 ```{r}
 data_crs_normal <- data_crs
-data_crs_normal["efficiencies"] <- data_crs_normal["efficiencies"] / as.numeric(filter(data_crs, dmu == "Germany_1990")["efficiencies"])
+data_crs_normal["efficiencies"] <- data_crs_normal["efficiencies"] / as.numeric(filter(data_crs, dmu == "Germany_1991")["efficiencies"])
 ```
 
-5 most efficient, 5 least efficient
+## 10 most efficient, 10 least efficient
 
 ```{r}
 head(data_crs[order(data_crs$rank),],10)
 tail(data_crs[order(data_crs$rank),],10)
 ```
 
-### Correlation between efficiency and input factors
+## Correlation between efficiency and input factors
 
 CO2
 
@@ -182,6 +208,14 @@ mean(FDI_upperQuantile$efficiencies)
 mean(FDI_lowerQuantile$efficiencies)
 ```
 
+```{r}
+DEBTS_upperQuantile <- subset(data_crs, government_debt > as.numeric(quantile(data_crs$government_debt)[4]))
+DEBTS_lowerQuantile <- subset(data_crs, government_debt <= as.numeric(quantile(data_crs$government_debt)[2]))
+
+mean(DEBTS_upperQuantile$efficiencies)
+mean(DEBTS_lowerQuantile$efficiencies)
+```
+
 ## Correlation with BIP/HDI/HPI
 
 **GDP (income/gdp per person)**
@@ -206,10 +240,55 @@ Slight negative correlation between efficiencies and HDI
 
 ## Which countries improved, which got worse?
 
+....
+
+## Deep-dive into some countries
+
+Make data set even longer :)
+
+```{r}
+data_verylong <- data_crs %>%
+  select(dmu, country, year, efficiencies, CO2, material_footprint, foreign_investment, government_debt) %>%
+  pivot_longer(cols = c("efficiencies", "CO2", "material_footprint", "foreign_investment", "government_debt"), names_to = "indicator")
+```
+
+### Germany
+
+```{r}
+deepdive("Germany")
+
+```
+
+### Denmark
+
+```{r}
+deepdive("Denmark")
+```
+
+### USA
+
+```{r}
+deepdive("United States")
+```
+
+### Least efficient and most efficient
+
+```{r}
+means_crs$country[means_crs$efficiencies == max(means_crs$efficiencies)]
+
+
+data_verylong %>%
+  filter(country %in% c("United States")) %>%
+  ggplot(aes(year, value, color=indicator))+
+  geom_line()+
+  facet_wrap(vars(indicator), scales = "free_y", ncol = 1, strip.position = "top")+
+  theme(strip.background = element_blank(), strip.placement = "outside")
+```
+
 ## years vs efficiency
 
 ```{r}
-data_crs_normal %>%
+data_crs %>%
   # filter(efficiencies <= quantile(data_crs$efficiencies)[2]) %>%
   # filter(country %in% EU) %>%
   ggplot(aes(year, efficiencies))+
@@ -221,9 +300,24 @@ data_crs_normal %>%
 ## Efficiencies per continent (all years)
 
 ```{r}
-data %>%
+data_crs %>%
   # filter(continent == "Africa") %>%
-  filter(year %in% c(2000:2010)) %>%
+  filter(year %in% c(1990:1999)) %>%
+
+  ggplot(aes(continent, efficiencies))+
+  geom_boxplot()+
+  geom_jitter(width = 0.1,
+              alpha = 0.5,
+              aes(
+                color=year
+              )
+              )
+```
+
+```{r}
+data_crs %>%
+  # filter(continent == "Africa") %>%
+  filter(year %in% c(2000:2009)) %>%
 
   ggplot(aes(continent, efficiencies))+
   geom_boxplot()+
@@ -237,9 +331,9 @@ data %>%
 
 ```{r}
 
-data %>%
+data_crs %>%
   # filter(continent == "Africa") %>%
-  filter(year %in% c(2010:2020)) %>%
+  filter(year %in% c(2010:2019)) %>%
 
   ggplot(aes(continent, efficiencies))+
   geom_boxplot()+
@@ -252,3 +346,5 @@ data %>%
 
 
 ```
+
+In 90s not data about Africa, in 10 no data about Americas...not even USA
