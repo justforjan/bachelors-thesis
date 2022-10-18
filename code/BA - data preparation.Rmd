@@ -97,9 +97,15 @@ colnames(air_pollution) <- c("country", "year", "value")
 colnames(red_list) <- c("country", "year", "value")
 ```
 
+## IWF
+
+```{r}
+government_debt <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/IWF/imf-dm-export-20221006.csv",show_col_types = FALSE)
+```
+
 # Change every table to long format
 
-Only for Gapminder
+Only for Gapminder and IWF
 
 ```{r}
 women_in_parliament <- to_long(women_in_parliament)
@@ -117,6 +123,8 @@ CO2 <- to_long(CO2)
 murder <- to_long(murder)
 foreign_investment <- to_long(foreign_investment)
 hdi <- to_long(hdi)
+
+government_debt <- to_long(government_debt)
 ```
 
 # Adapt data types
@@ -161,6 +169,7 @@ CO2 <- CO2 %>% mutate(year = as.numeric(year))
 murder <- murder %>% mutate(year = as.numeric(year))
 foreign_investment <- foreign_investment %>% mutate(year = as.numeric(year))
 hdi <- hdi %>% mutate(year = as.numeric(year))
+government_debt <- government_debt %>% mutate(year = as.numeric(year))
 ```
 
 # Interpolate
@@ -185,6 +194,7 @@ CO2 <- interpolate(CO2)
 murder <- interpolate(murder)
 foreign_investment <- interpolate(foreign_investment)
 hdi <- interpolate(hdi)
+government_debt <- interpolate(government_debt)
 ```
 
 # Remove years
@@ -211,6 +221,7 @@ income_share_20 <- rm.years(income_share_20)
 CO2 <- rm.years(CO2)
 murder <- rm.years(murder)
 foreign_investment <- rm.years(foreign_investment)
+government_debt <- rm.years(government_debt)
 ```
 
 # Handle differences in naming conventions
@@ -256,6 +267,8 @@ for (country in 1:nrow(nc)) {
   foreign_investment[foreign_investment == as.character(nc[country,1])] <- as.character(nc[country,2])
   
   hdi[hdi == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  government_debt[government_debt == as.character(nc[country,1])] <- as.character(nc[country,2])
 
 }
 ```
@@ -285,6 +298,7 @@ CO2 <- merge_dmu(CO2)
 murder <- merge_dmu(murder)
 foreign_investment <- merge_dmu(foreign_investment)
 hdi <- merge_dmu(hdi)
+government_debt <- merge_dmu(government_debt)
 
 ```
 
@@ -310,6 +324,7 @@ write_csv(CO2, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/prepro
 write_csv(murder, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/murder.csv")
 write_csv(foreign_investment, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/foreign_investment.csv")
 write_csv(hdi, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/hdi.csv")
+write_csv(government_debt, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/government_debt.csv")
 ```
 
 # Naming conventions
@@ -318,7 +333,7 @@ how I figured out which names to change
 
 Vectors of country names of both Gapminder and OurWorldInData
 
-```{r}
+```{# {r}
 # gapminder <- unique(c(
 #   women_in_parliament$country,
 #   basic_sanitation$country,
@@ -339,8 +354,10 @@ Vectors of country names of both Gapminder and OurWorldInData
 #   mean_years_in_school$country,
 #   air_pollution$country,
 #   health_worker$country,
-  # red_list$country
+# red_list$country
 # ))
+# 
+# iwf <- unique(government_debt$country)
 ```
 
 In gapminder, but not in ourworldindata
