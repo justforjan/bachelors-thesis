@@ -41,5 +41,6 @@ vignettes/*.pdf
 raw_data/gapminder/
 raw_data/IWF/
 raw_data/OurWorldInData/
+raw_data/Map/
 
 *.nb.html
