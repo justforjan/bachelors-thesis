@@ -48,11 +48,11 @@ Selection_01 <- regions$country[regions$selection_01 == TRUE]
 
 ```{r}
 # Chose the attempt
-attempt = 112
+attempt = 113
 
 # Number of in- and outputs -> checl struture of selected data set!
-number_of_inputs <- 3
-number_of_outputs <- 4
+number_of_inputs <- 4
+number_of_outputs <- 5
 
 # location of inputs and outputs
 input_cols <- c()
@@ -71,7 +71,7 @@ orientation <- "io"
 # io: input oriented
 # oo: output oriented
 
-return_to_scale <- "vrs"
+return_to_scale <- "crs"
 # crs: constant return to scale
 # vrs: variable return to scale
 # nirs: non-increasing
@@ -229,9 +229,55 @@ if (!is.null(chosen_countries)) {
     filename <- paste(filename, "_", "notAllCountries", sep = "")
   }
 }
-
 ```
 
 ```{r}
 write_csv(data_dea, paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/dea_results_", filename, ".csv", sep = ""))
+```
+
+## 1on1 DEA
+
+```{r}
+for (i in 1:number_of_inputs) {
+  for (j in 1:number_of_outputs) {
+     model_data <- read_data(data[c(1,1+j,5+j)], 
+                        ni=1, 
+                        no=1, 
+                        dmus = 1)
+     
+     result <- model_basic(model_data, orientation = orientation, rts=return_to_scale)
+     
+     # Efficiencies
+    eff <- as.data.frame(efficiencies(result))
+    # add column for dmu names
+    eff$dmu <- rownames(eff)
+    # delete rownames
+    rownames(eff) <- NULL
+    # Rename efficiency column
+    colnames(eff)[1] <- "efficiencies"
+    
+    # get targets
+    targets <- as.data.frame(targets(result))
+    # add column for dmu names
+    targets$dmu <- rownames(targets)
+    # delte rownames
+    rownames(targets) <- NULL
+    
+    data_and_results <- list(
+      data[c(1,1+j,5+j)],
+      eff,
+      targets
+    )
+    
+    data_dea <- data_and_results %>% reduce(full_join, by="dmu")
+    
+    data_dea <- data_dea %>% relocate(efficiencies, .after = dmu)
+    
+    data_dea <- separate(data_dea, dmu, c("country", "year"), "_", remove=FALSE)
+        
+    write_csv(data_dea, paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/dea_results_", filename, "_", as.character(i), as.character(j), ".csv", sep = "") )
+
+  }
+  
+}
 ```
