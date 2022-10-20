@@ -61,7 +61,7 @@ data_crs <- data_crs %>% relocate(rank, .after = efficiencies)
 data_vrs <- data_vrs %>% relocate(rank, .after = efficiencies)
 ```
 
-### New table: Countries vs. years with
+## New table: Countries vs. years with
 
 ```{r}
 data_crs_wider_rank <- data_crs[c("country", "year", "rank")] %>% pivot_wider(names_from = year, values_from = rank)
@@ -73,7 +73,7 @@ data_crs_wider_eff <- data_crs[c("country", "year", "efficiencies")] %>% pivot_w
 data_crs_wider_eff <- data_crs_wider_eff[c("country", as.character(c(1990:2016)))]
 ```
 
-### Recalculate foreign investment columns
+## Recalculate foreign investment columns
 
 ```{r}
 # mirror = 253.25
@@ -240,7 +240,31 @@ Slight negative correlation between efficiencies and HDI
 
 ## Which countries improved, which got worse?
 
-....
+Development of efficiency over time compares to first year
+
+```{r}
+change_eff <- data_crs_wider_eff %>%
+  filter(!is.na(`1990`))
+
+change_eff[4:ncol(change_eff)] <- change_eff[4:ncol(change_eff)] / change_eff[,4]
+
+change_eff <- pivot_longer(change_eff, cols = colnames(change_eff)[4:ncol(change_eff)], names_to = "year")
+
+change_eff <- drop_na(change_eff)
+
+change_eff <- merge_dmu(change_eff, rm.country_year = FALSE)
+```
+
+```{r}
+change_eff %>%
+  filter(country %in% c("Denmark", "Austria", "Australia", "Belgium", "Ireland"))%>%
+  ggplot(aes(year, value, group = country))+
+  geom_line(aes(
+    color = country
+  ))+
+  geom_hline(yintercept=1, linetype="dashed")+
+  scale_x_discrete(breaks = seq(1990, 2020, by = 5))
+```
 
 ## Deep-dive into some countries
 
@@ -255,49 +279,102 @@ data_verylong <- data_crs %>%
 ### Germany
 
 ```{r}
-deepdive("Germany")
+deepdive_input("Germany")
 
 ```
 
 ### Denmark
 
 ```{r}
-deepdive("Denmark")
+deepdive_input("Denmark")
 ```
 
 ### USA
 
 ```{r}
-deepdive("United States")
+deepdive_input("United States")
 ```
 
-### Least efficient and most efficient
+## Least efficient and most efficient
 
 ```{r}
 means_crs$country[means_crs$efficiencies == max(means_crs$efficiencies)]
+means_crs$country[means_crs$efficiencies == min(means_crs$efficiencies)]
 
-
-data_verylong %>%
-  filter(country %in% c("United States")) %>%
-  ggplot(aes(year, value, color=indicator))+
-  geom_line()+
-  facet_wrap(vars(indicator), scales = "free_y", ncol = 1, strip.position = "top")+
-  theme(strip.background = element_blank(), strip.placement = "outside")
 ```
+
+## Why are efficient countries efficient?
+
+```{r}
+means_crs$country[means_crs$efficiencies == max(means_crs$efficiencies)]
+means_crs$country[means_crs$efficiencies == min(means_crs$efficiencies)]
+```
+
+## 1on1 DEA vs full DEA
+
+```{r}
+
+oneonone <- data_crs %>%
+  select(dmu, efficiencies)
+
+names(oneonone)[length(names(oneonone))] <- "full_dea"
+
+for (i in 1:4) {
+  for (j in 1:5) {
+    
+    # read file and merge it
+    oneonone <- merge(oneonone, select(read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/dea_results_113_io_crs_", as.character(i),  as.character(j), ".csv", sep = ""), show_col_types = FALSE), dmu, efficiencies), by = "dmu")
+    
+    # rename new column  
+    names(oneonone)[ncol(oneonone)] <- paste(as.character(i), as.character(j), sep = "")
+  }
+}
+```
+
+```{r}
+oneonone_correlation <- as.data.frame(cor(oneonone[2:ncol(oneonone)]))
+
+write_csv(oneonone_correlation, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/oneonone_correlation.csv" )
+```
+
+![](oneonone.PNG)
+
+Sames output means same efficiency.
 
 ## years vs efficiency
 
 ```{r}
 data_crs %>%
   # filter(efficiencies <= quantile(data_crs$efficiencies)[2]) %>%
-  # filter(country %in% EU) %>%
+  filter(country %in% c("Germany", "United States", "France", "Thailand", "Ghana", "South Africa")) %>%
   ggplot(aes(year, efficiencies))+
+  geom_point(aes(
+    color=country
+    )
+  )+
   geom_line(aes(
     color=country
-  ))
+    )
+  )
+
 ```
 
 ## Efficiencies per continent (all years)
+
+```{r}
+data_crs %>%
+  # filter(continent == "Africa") %>%
+  # filter(year %in% c(1990:1999)) %>%
+
+  ggplot(aes(continent, efficiencies))+
+  geom_boxplot()+
+  geom_jitter(width = 0.1,
+              alpha = 0.5,
+              aes(
+                color=year
+              )
+              )
+```
 
 ```{r}
 data_crs %>%
