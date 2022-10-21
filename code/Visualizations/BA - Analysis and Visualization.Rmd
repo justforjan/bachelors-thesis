@@ -51,6 +51,8 @@ summary(data_crs)
 
 -   Same goes for life expectancy
 
+# Preparation of several data
+
 ## Add ranks
 
 ```{r}
@@ -105,16 +107,41 @@ data_vrs$foreign_investment <- data_vrs$foreign_investment - 58.5
 data_vrs$target_input.foreign_investment <- data_vrs$target_input.foreign_investment - 58.5
 ```
 
-## Means
+##  Make very long datasets
 
 ```{r}
-means_crs <- data_crs %>%
+data_verylong_input <- data_crs %>%
+  select(dmu, country, year, efficiencies, CO2, material_footprint, foreign_investment, government_debt) %>%
+  pivot_longer(cols = c("efficiencies", "CO2", "material_footprint", "foreign_investment", "government_debt"), names_to = "indicator")
+
+data_verylong_output <- data_crs %>%
+  select(dmu, country, year, efficiencies, life_expectancy, income, mean_years_in_school, murder, income_share_20) %>%
+  pivot_longer(cols = c("efficiencies", "life_expectancy", "income", "mean_years_in_school", "murder", "income_share_20"), names_to = "indicator")
+```
+
+# Analyses
+
+## Means
+
+### Means per country
+
+```{r}
+means_country_crs <- data_crs %>%
   select(country,efficiencies, CO2, material_footprint, foreign_investment, government_debt, life_expectancy, income, mean_years_in_school, murder, income_share_20) %>%
   group_by(country) %>%
   summarize(across(everything(), mean))
 ```
 
-### Average efficiency per country
+### Means per year
+
+```{r}
+means_year_crs <- data_crs %>%
+  select(year,efficiencies, CO2, material_footprint, foreign_investment, government_debt, life_expectancy, income, mean_years_in_school, murder, income_share_20) %>%
+  group_by(year) %>%
+  summarize(across(everything(), mean))
+```
+
+## Average efficiency per country
 
 ```{r}
 # avererage efficiencies for crs data set
@@ -127,7 +154,7 @@ data_crs_wider_rank <- merge(data_crs_wider_rank, crs_eff, by = "country")
 data_crs_wider_rank <- data_crs_wider_rank %>% relocate(efficiencies, .after = country)
 colnames(data_crs_wider_rank)[2] <- "average_efficiency"
 
-# add rank based in average efficiencies
+# add rank based on average efficiencies
 data_crs_wider_rank <- data_crs_wider_rank %>% mutate(rank = min_rank(desc(average_efficiency)))
 data_crs_wider_rank <- data_crs_wider_rank %>% relocate(rank)
 
@@ -136,7 +163,7 @@ data_crs_wider_eff <- merge(data_crs_wider_eff, crs_eff, by = "country")
 data_crs_wider_eff <- data_crs_wider_eff %>% relocate(efficiencies, .after = country)
 colnames(data_crs_wider_eff)[2] <- "average_efficiency"
 
-# add rank based in average efficiencies
+# add rank based on average efficiencies
 data_crs_wider_eff <- data_crs_wider_eff %>% mutate(rank = min_rank(desc(average_efficiency)))
 data_crs_wider_eff <- data_crs_wider_eff %>% relocate(rank)
 
@@ -149,11 +176,31 @@ data_crs_normal <- data_crs
 data_crs_normal["efficiencies"] <- data_crs_normal["efficiencies"] / as.numeric(filter(data_crs, dmu == "Germany_1991")["efficiencies"])
 ```
 
-## 10 most efficient, 10 least efficient
+## Most efficient, Least efficient
 
 ```{r}
-head(data_crs[order(data_crs$rank),],10)
+head(data_crs[order(data_crs$rank),],70)
 tail(data_crs[order(data_crs$rank),],10)
+```
+
+```{r}
+unique(head(data_crs[order(data_crs$rank),],70)$country)
+```
+
+## Why are efficient countries efficient?
+
+...and non-efficient ones non-efficient
+
+Albania is in the years 1996 to 1998 fully efficient. As we can see in the following plot this this coincides with relatively low inputs.
+
+```{r}
+deepdive_input("Albania")
+```
+
+Interestingly, the outputs do not all follow the same pattern. Income, life expectancy and mean years in school are the lowest in the beginning.
+
+```{r}
+deepdive_output("Albania")
 ```
 
 ## Correlation between efficiency and input factors
@@ -270,12 +317,6 @@ change_eff %>%
 
 Make data set even longer :)
 
-```{r}
-data_verylong <- data_crs %>%
-  select(dmu, country, year, efficiencies, CO2, material_footprint, foreign_investment, government_debt) %>%
-  pivot_longer(cols = c("efficiencies", "CO2", "material_footprint", "foreign_investment", "government_debt"), names_to = "indicator")
-```
-
 ### Germany
 
 ```{r}
@@ -301,13 +342,6 @@ deepdive_input("United States")
 means_crs$country[means_crs$efficiencies == max(means_crs$efficiencies)]
 means_crs$country[means_crs$efficiencies == min(means_crs$efficiencies)]
 
-```
-
-## Why are efficient countries efficient?
-
-```{r}
-means_crs$country[means_crs$efficiencies == max(means_crs$efficiencies)]
-means_crs$country[means_crs$efficiencies == min(means_crs$efficiencies)]
 ```
 
 ## 1on1 DEA vs full DEA
