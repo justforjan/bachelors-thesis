@@ -61,7 +61,16 @@ read_final <- function(attempt) {
 
 
 deepdive_input <- function(a) {
-  data_verylong %>%
+  data_verylong_input %>%
+    filter(country == a)%>%
+    ggplot(aes(year, value, color=indicator))+
+    geom_line()+
+    facet_wrap(vars(indicator), scales = "free_y", ncol = 1, strip.position = "top")+
+    theme(strip.background = element_blank(), strip.placement = "outside")
+}
+
+deepdive_output <- function(a) {
+  data_verylong_output %>%
     filter(country == a)%>%
     ggplot(aes(year, value, color=indicator))+
     geom_line()+
