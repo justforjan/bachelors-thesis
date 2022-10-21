@@ -9,6 +9,7 @@ output: html_notebook
 library(tidyverse)
 library(ggplot2)
 library(gridExtra)
+library(factoextra)
 
 source("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/code/functions.R")
 
@@ -45,13 +46,15 @@ summary(data_crs)
 
 ## Problems
 
+at first sight
+
 -   target non-murder rate above 100 in crs data set
 
 -   target mean years in school sometimes ridiculously high
 
 -   Same goes for life expectancy
 
-# Preparation of several data
+# Preparation of several tables
 
 ## Add ranks
 
@@ -63,7 +66,7 @@ data_crs <- data_crs %>% relocate(rank, .after = efficiencies)
 data_vrs <- data_vrs %>% relocate(rank, .after = efficiencies)
 ```
 
-## New table: Countries vs. years with
+## New table: Countries vs. years
 
 ```{r}
 data_crs_wider_rank <- data_crs[c("country", "year", "rank")] %>% pivot_wider(names_from = year, values_from = rank)
@@ -141,7 +144,17 @@ means_year_crs <- data_crs %>%
   summarize(across(everything(), mean))
 ```
 
-## Average efficiency per country
+Visualization of average development over time
+
+```{r}
+means_year_crs %>%
+  pivot_longer(cols = c("efficiencies", "CO2", "material_footprint", "foreign_investment", "government_debt", "life_expectancy", "income", "mean_years_in_school", "murder", "income_share_20"), names_to = "indicator") %>%
+  ggplot(aes(year, value))+
+  geom_line()+
+  facet_wrap(vars(indicator), scales = "free_y")
+```
+
+### Add average efficiency to wide data frames
 
 ```{r}
 # avererage efficiencies for crs data set
@@ -169,7 +182,70 @@ data_crs_wider_eff <- data_crs_wider_eff %>% relocate(rank)
 
 ```
 
-Germany 1990 as 100%
+## Clustering
+
+```{r}
+data.lables <- data_crs$dmu
+
+data_scale <- scale(data_crs[6:ncol(data_crs)-1])
+
+# How many cluster do we need?
+fviz_nbclust(data_scale, kmeans, method = "wss")
+```
+
+It is difficult to make out the ideal number of cluster but 6 seems to be one of the better options.
+
+```{r}
+km.out <- kmeans(data_scale, centers = 3, nstart = 100)
+# print(km.out)
+```
+
+```{r}
+km.clusters <- km.out$cluster
+rownames(data_scale) <- data.lables
+fviz_cluster(list(data=data_scale, cluster=km.clusters))
+```
+
+```{r}
+data_crs_cluster <- data_crs
+data_crs_cluster$cluster <- km.clusters
+```
+
+What countries are in the cluster?
+
+```{r}
+cluster_country <- data_crs_cluster %>%
+  group_by(cluster)%>%
+  summarize(unique_countries = unique(country))
+
+cluster_1 <- cluster_country %>%
+  filter(cluster == 1) %>%
+  select(unique_countries)
+
+cluster_2 <- cluster_country %>%
+  filter(cluster == 2) %>%
+  select(unique_countries)
+
+cluster_3 <- cluster_country %>%
+  filter(cluster == 3) %>%
+  select(unique_countries)
+
+cluster_4 <- cluster_country %>%
+  filter(cluster == 4) %>%
+  select(unique_countries)
+
+cluster_5 <- cluster_country %>%
+  filter(cluster == 5) %>%
+  select(unique_countries)
+
+cluster_6 <- cluster_country %>%
+  filter(cluster == 6) %>%
+  select(unique_countries)
+```
+
+## Normalize efficiency
+
+Germany 1991 as basis
 
 ```{r}
 data_crs_normal <- data_crs
@@ -177,6 +253,15 @@ data_crs_normal["efficiencies"] <- data_crs_normal["efficiencies"] / as.numeric(
 ```
 
 ## Most efficient, Least efficient
+
+On average
+
+```{r}
+means_country_crs$country[means_country_crs$efficiencies == max(means_country_crs$efficiencies)]
+means_country_crs$country[means_country_crs$efficiencies == min(means_country_crs$efficiencies)]
+```
+
+Individual DMUs
 
 ```{r}
 head(data_crs[order(data_crs$rank),],70)
@@ -190,6 +275,8 @@ unique(head(data_crs[order(data_crs$rank),],70)$country)
 ## Why are efficient countries efficient?
 
 ...and non-efficient ones non-efficient
+
+### Albania
 
 Albania is in the years 1996 to 1998 fully efficient. As we can see in the following plot this this coincides with relatively low inputs.
 
@@ -334,14 +421,6 @@ deepdive_input("Denmark")
 
 ```{r}
 deepdive_input("United States")
-```
-
-## Least efficient and most efficient
-
-```{r}
-means_crs$country[means_crs$efficiencies == max(means_crs$efficiencies)]
-means_crs$country[means_crs$efficiencies == min(means_crs$efficiencies)]
-
 ```
 
 ## 1on1 DEA vs full DEA
