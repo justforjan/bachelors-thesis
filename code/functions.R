@@ -65,6 +65,7 @@ deepdive_input <- function(a) {
     filter(country == a)%>%
     ggplot(aes(year, value, color=indicator))+
     geom_line()+
+    geom_point()+
     facet_wrap(vars(indicator), scales = "free_y", ncol = 1, strip.position = "top")+
     theme(strip.background = element_blank(), strip.placement = "outside")
 }
@@ -74,6 +75,7 @@ deepdive_output <- function(a) {
     filter(country == a)%>%
     ggplot(aes(year, value, color=indicator))+
     geom_line()+
+    geom_point()+
     facet_wrap(vars(indicator), scales = "free_y", ncol = 1, strip.position = "top")+
     theme(strip.background = element_blank(), strip.placement = "outside")
 }
