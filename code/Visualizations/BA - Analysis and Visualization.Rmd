@@ -147,6 +147,21 @@ Ranks are not identical.
 (data_vrs$efficiencies - data_crs$efficiencies) < 0
 ```
 
+```{r}
+crs_vrs_ranks <- merge(data_crs[c("dmu", "rank")], data_vrs[c("dmu", "rank")], by = "dmu") %>%
+  rename(crs = rank.x, vrs = rank.y) %>%
+  pivot_longer(cols = c("crs", "vrs"), names_to = "method", values_to = "rank") %>%
+  mutate(paired = rep(1:(n()/2),each=2),
+         rank = factor(rank))
+```
+
+```{r}
+crs_vrs_ranks %>% 
+  ggplot(aes(rank, reorder(dmu,rank)))+
+  geom_line(aes(group = paired))+
+  geom_point(aes(color = method), size = 4)
+```
+
 ## Means
 
 ### Means per country
@@ -461,10 +476,30 @@ mean(DEBTS_lowerQuantile$efficiencies)
 
 ## Correlation with BIP/HDI/HPI
 
+Connect all the data
+
+```{r}
+wellfare_ind <- data_crs %>%
+  select(dmu, country, continent, efficiencies, income)
+
+hdi <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/hdi.csv", show_col_types = FALSE)
+
+wellfare_ind <- merge(wellfare_ind, hdi, by = "dmu", all.x = TRUE)
+
+colnames(wellfare_ind)[ncol(wellfare_ind)] <- "hdi"
+
+
+wellfare_ind <- merge(wellfare_ind, data_crs_cluster[c("dmu", "cluster")])
+
+wellfare_ind$cluster <- factor(wellfare_ind$cluster)
+```
+
 ### **GDP (income/gdp per person)**
 
 ```{r}
-cor(data_crs$income, data_crs$efficiencies)
+wellfare_ind %>%
+  select(income, efficiencies)%>%
+  cor()
 ```
 
 Almost no correlation
@@ -472,17 +507,9 @@ Almost no correlation
 ### **HDI**
 
 ```{r}
-hdi <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/hdi.csv", show_col_types = FALSE)
-
-hdi_merge <- merge(data_crs[c("dmu", "efficiencies")], hdi, by = "dmu", all.x = TRUE)
-
-colnames(hdi_merge)[3] <- "hdi"
-
-hdi_merge <- merge(hdi_merge, data_crs_cluster[c("dmu", "cluster", "country")])
-
-hdi_merge$cluster <- as.character(hdi_merge$cluster)
-
-cor(hdi_merge[2:3])
+wellfare_ind %>%
+  select(efficiencies, hdi)%>%
+  cor
 ```
 
 Slight negative correlation between efficiencies and HDI.
@@ -491,7 +518,7 @@ Visualization, color-coded by previously clusters, continents
 
 ```{r}
 # Color-coded by cluster
-hdi_merge %>%
+wellfare_ind %>%
   ggplot(aes(efficiencies, hdi))+
   geom_point(aes(
     color = cluster
@@ -501,7 +528,7 @@ hdi_merge %>%
 The clusters seemto very well represent the different development classes based on the HDI
 
 ```{r}
-hdi_merge %>%
+wellfare_ind %>%
   ggplot(aes(cluster, hdi))+
   geom_boxplot()+
   geom_jitter(width = 0.1,
@@ -511,10 +538,10 @@ hdi_merge %>%
 
 ```{r}
 # Color-coded by continent
-hdi_merge %>%
+wellfare_ind %>%
   ggplot(aes(efficiencies, hdi))+
   geom_point(aes(
-    color = cluster
+    color = continent
   ))
 ```
 
