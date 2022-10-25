@@ -110,7 +110,7 @@ data_vrs$foreign_investment <- data_vrs$foreign_investment - 58.5
 data_vrs$target_input.foreign_investment <- data_vrs$target_input.foreign_investment - 58.5
 ```
 
-##  Make very long datasets
+## Make very long datasets
 
 ```{r}
 data_verylong_input <- data_crs %>%
@@ -122,7 +122,30 @@ data_verylong_output <- data_crs %>%
   pivot_longer(cols = c("efficiencies", "life_expectancy", "income", "mean_years_in_school", "murder", "income_share_20"), names_to = "indicator")
 ```
 
+## Normalize efficiency
+
+Germany 1991 as basis
+
+```{r}
+data_crs_normal <- data_crs
+data_crs_normal["efficiencies"] <- data_crs_normal["efficiencies"] / as.numeric(filter(data_crs, dmu == "Germany_1991")["efficiencies"])
+```
+
 # Analyses
+
+## VRS vs. CRS
+
+### Same order?
+
+```{r}
+identical(data_vrs$rank, data_crs$rank)
+```
+
+Ranks are not identical.
+
+```{r}
+(data_vrs$efficiencies - data_crs$efficiencies) < 0
+```
 
 ## Means
 
@@ -154,6 +177,12 @@ means_year_crs %>%
   facet_wrap(vars(indicator), scales = "free_y")
 ```
 
+CO2 emissions per person have been decreasing since the 00s.
+
+Mean years in school have been increasing
+
+Average efficiencies higher in the the 90s than in nowdays, but rising again? Why??
+
 ### Add average efficiency to wide data frames
 
 ```{r}
@@ -184,6 +213,8 @@ data_crs_wider_eff <- data_crs_wider_eff %>% relocate(rank)
 
 ## Clustering
 
+### Clustering of all DMUs
+
 ```{r}
 data.lables <- data_crs$dmu
 
@@ -196,7 +227,7 @@ fviz_nbclust(data_scale, kmeans, method = "wss")
 It is difficult to make out the ideal number of cluster but 6 seems to be one of the better options.
 
 ```{r}
-km.out <- kmeans(data_scale, centers = 3, nstart = 100)
+km.out <- kmeans(data_scale, centers = 6, nstart = 100)
 # print(km.out)
 ```
 
@@ -243,16 +274,29 @@ cluster_6 <- cluster_country %>%
   select(unique_countries)
 ```
 
-## Normalize efficiency
-
-Germany 1991 as basis
+### Clustering of average country values
 
 ```{r}
-data_crs_normal <- data_crs
-data_crs_normal["efficiencies"] <- data_crs_normal["efficiencies"] / as.numeric(filter(data_crs, dmu == "Germany_1991")["efficiencies"])
+data.lables_mean <- means_country_crs$country
+
+data_scale_mean <- scale(means_country_crs[3:ncol(means_country_crs)])
+
+# How many cluster do we need?
+fviz_nbclust(data_scale, kmeans, method = "wss")
 ```
 
-## Most efficient, Least efficient
+3 clusters makes the most sense
+
+```{r}
+km.out_mean <- kmeans(data_scale_mean, centers = 6, nstart = 100)
+# print(km.out)
+
+km.clusters_mean <- km.out_mean$cluster
+rownames(data_scale_mean) <- data.lables_mean
+fviz_cluster(list(data=data_scale_mean, cluster=km.clusters_mean))
+```
+
+## Most efficient, Least efficient, big changes
 
 On average
 
@@ -270,11 +314,33 @@ tail(data_crs[order(data_crs$rank),],10)
 
 ```{r}
 unique(head(data_crs[order(data_crs$rank),],70)$country)
+unique(tail(data_crs[order(data_crs$rank),],10)$country)
 ```
 
-## Why are efficient countries efficient?
+```{r}
+# data_crs %>%
+#   group_by(country) %>%
+#   filter((max(efficiencies - min(efficiencies) >= 0.2)))
+```
 
-...and non-efficient ones non-efficient
+## Deep-dive into some countries
+
+Very efficient, very in-efficient, big change in efficiency over time
+
+Countries to consider:
+
+| 100% efficiency in some years |                           | Lowest efficiency in some years |                 | Big change in efficiency |
+|---------------|---------------|---------------|---------------|---------------|
+| Albania                       | 1996-1998                 | Malta                           | 2006-2009, 2011 |                          |
+| Armenia                       | 2006-2008                 | Cyprus                          | 10,12,12,14,15  |                          |
+| Belarus                       | 1998-2001                 |                                 |                 |                          |
+| Denmark                       | 1997,2004,2012            |                                 |                 |                          |
+| Estonia                       | 2003-2008                 |                                 |                 |                          |
+| Germany                       | 2011,2014                 |                                 |                 |                          |
+| Kazakhztan                    | 2005,2006,2008            |                                 |                 |                          |
+| Moldova (very often 100%)     | 1999-2016                 |                                 |                 |                          |
+| Switzerland                   | 1990-1993,1997, 2011-2013 |                                 |                 |                          |
+|                               |                           |                                 |                 |                          |
 
 ### Albania
 
@@ -282,12 +348,51 @@ Albania is in the years 1996 to 1998 fully efficient. As we can see in the follo
 
 ```{r}
 deepdive_input("Albania")
+deepdive_output("Albania")
 ```
 
 Interestingly, the outputs do not all follow the same pattern. Income, life expectancy and mean years in school are the lowest in the beginning.
 
+### Armenia
+
 ```{r}
-deepdive_output("Albania")
+deepdive_input("Armenia")
+deepdive_output("Armenia")
+```
+
+### Denmark
+
+```{r}
+deepdive_input("Denmark")
+deepdive_output("Denmark")
+```
+
+### Estonia
+
+```{r}
+deepdive_input("Estonia")
+deepdive_output("Estonia")
+```
+
+### Germany
+
+```{r}
+deepdive_input("Germany")
+deepdive_output("Germany")
+```
+
+### Kazakhstan
+
+```{r}
+deepdive_input("Kazakhstan")
+deepdive_output("Kazakhstan")
+```
+
+### Moldova
+
+```{r}
+deepdive_input("Moldova")
+deepdive_output("Moldova")
 ```
 
 ## Correlation between efficiency and input factors
@@ -315,6 +420,10 @@ cor(data_crs[c("material_footprint", "efficiencies")])
 ```
 
 Small correlation (-0.3)
+
+```{r}
+cor(data_crs[c("government_debt", "efficiencies")])
+```
 
 ## Performance of country-year combinations with high inputs
 
@@ -352,7 +461,7 @@ mean(DEBTS_lowerQuantile$efficiencies)
 
 ## Correlation with BIP/HDI/HPI
 
-**GDP (income/gdp per person)**
+### **GDP (income/gdp per person)**
 
 ```{r}
 cor(data_crs$income, data_crs$efficiencies)
@@ -360,17 +469,54 @@ cor(data_crs$income, data_crs$efficiencies)
 
 Almost no correlation
 
-**HDI**
+### **HDI**
 
 ```{r}
 hdi <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/hdi.csv", show_col_types = FALSE)
 
 hdi_merge <- merge(data_crs[c("dmu", "efficiencies")], hdi, by = "dmu", all.x = TRUE)
 
-cor(hdi_merge$efficiencies, hdi_merge$value)
+colnames(hdi_merge)[3] <- "hdi"
+
+hdi_merge <- merge(hdi_merge, data_crs_cluster[c("dmu", "cluster", "country")])
+
+hdi_merge$cluster <- as.character(hdi_merge$cluster)
+
+cor(hdi_merge[2:3])
 ```
 
-Slight negative correlation between efficiencies and HDI
+Slight negative correlation between efficiencies and HDI.
+
+Visualization, color-coded by previously clusters, continents
+
+```{r}
+# Color-coded by cluster
+hdi_merge %>%
+  ggplot(aes(efficiencies, hdi))+
+  geom_point(aes(
+    color = cluster
+  ))
+```
+
+The clusters seemto very well represent the different development classes based on the HDI
+
+```{r}
+hdi_merge %>%
+  ggplot(aes(cluster, hdi))+
+  geom_boxplot()+
+  geom_jitter(width = 0.1,
+              alpha = 0.5,
+              aes(color = efficiencies))
+```
+
+```{r}
+# Color-coded by continent
+hdi_merge %>%
+  ggplot(aes(efficiencies, hdi))+
+  geom_point(aes(
+    color = cluster
+  ))
+```
 
 ## Which countries improved, which got worse?
 
@@ -398,29 +544,6 @@ change_eff %>%
   ))+
   geom_hline(yintercept=1, linetype="dashed")+
   scale_x_discrete(breaks = seq(1990, 2020, by = 5))
-```
-
-## Deep-dive into some countries
-
-Make data set even longer :)
-
-### Germany
-
-```{r}
-deepdive_input("Germany")
-
-```
-
-### Denmark
-
-```{r}
-deepdive_input("Denmark")
-```
-
-### USA
-
-```{r}
-deepdive_input("United States")
 ```
 
 ## 1on1 DEA vs full DEA
