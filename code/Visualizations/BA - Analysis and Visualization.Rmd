@@ -144,7 +144,7 @@ identical(data_vrs$rank, data_crs$rank)
 Ranks are not identical.
 
 ```{r}
-(data_vrs$efficiencies - data_crs$efficiencies) < 0
+# (data_vrs$efficiencies - data_crs$efficiencies) < 0
 ```
 
 ```{r}
@@ -153,13 +153,6 @@ crs_vrs_ranks <- merge(data_crs[c("dmu", "rank")], data_vrs[c("dmu", "rank")], b
   pivot_longer(cols = c("crs", "vrs"), names_to = "method", values_to = "rank") %>%
   mutate(paired = rep(1:(n()/2),each=2),
          rank = factor(rank))
-```
-
-```{r}
-crs_vrs_ranks %>% 
-  ggplot(aes(rank, reorder(dmu,rank)))+
-  geom_line(aes(group = paired))+
-  geom_point(aes(color = method), size = 4)
 ```
 
 ## Means
@@ -479,16 +472,25 @@ mean(DEBTS_lowerQuantile$efficiencies)
 Connect all the data
 
 ```{r}
+# GDP
 wellfare_ind <- data_crs %>%
   select(dmu, country, continent, efficiencies, income)
 
+# HDI
 hdi <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/hdi.csv", show_col_types = FALSE)
 
 wellfare_ind <- merge(wellfare_ind, hdi, by = "dmu", all.x = TRUE)
 
 colnames(wellfare_ind)[ncol(wellfare_ind)] <- "hdi"
 
+#HPI
+hpi <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/hpi.csv", show_col_types = FALSE)
 
+wellfare_ind <- merge(wellfare_ind, hpi, by = "dmu", all.x = TRUE)
+
+colnames(wellfare_ind)[ncol(wellfare_ind)] <- "hpi"
+
+# Cluster
 wellfare_ind <- merge(wellfare_ind, data_crs_cluster[c("dmu", "cluster")])
 
 wellfare_ind$cluster <- factor(wellfare_ind$cluster)
@@ -509,7 +511,7 @@ Almost no correlation
 ```{r}
 wellfare_ind %>%
   select(efficiencies, hdi)%>%
-  cor
+  cor()
 ```
 
 Slight negative correlation between efficiencies and HDI.
@@ -542,7 +544,26 @@ wellfare_ind %>%
   ggplot(aes(efficiencies, hdi))+
   geom_point(aes(
     color = continent
-  ))
+  ))+
+  geom_smooth()
+```
+
+### HPI
+
+```{r}
+wellfare_ind %>%
+  select(efficiencies, hpi)%>%
+  cor(use = "pairwise.complete.obs")
+```
+
+```{r}
+# Color-coded by cluster
+wellfare_ind %>%
+  ggplot(aes(efficiencies, hpi))+
+  geom_point(aes(
+    color = cluster
+  ))+
+  geom_smooth()
 ```
 
 ## Which countries improved, which got worse?
