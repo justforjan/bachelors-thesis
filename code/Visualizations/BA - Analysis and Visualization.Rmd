@@ -524,7 +524,7 @@ deepdive("Moldova", "o")
 CO2
 
 ```{r}
-cor(data_general[c("CO2", "efficiencies")])
+cor(data_general[c("CO2", "efficiency_crs")])
 ```
 
 Slight negative correlation (-0.4). The more CO2 emissions per person, the worse the
@@ -532,7 +532,7 @@ Slight negative correlation (-0.4). The more CO2 emissions per person, the worse
 Foreign Direct Investment
 
 ```{r}
-cor(data_general[c("foreign_investment", "efficiencies")])
+cor(data_general[c("foreign_investment", "efficiency_crs")])
 ```
 
 No correlation between FDI and the resulting efficiencies
@@ -540,18 +540,40 @@ No correlation between FDI and the resulting efficiencies
 Material footprint
 
 ```{r}
-cor(data_general[c("material_footprint", "efficiencies")])
+cor(data_general[c("material_footprint", "efficiency_crs")])
 ```
 
 Small correlation (-0.3)
 
 ```{r}
-cor(data_general[c("government_debt", "efficiencies")])
+cor(data_general[c("government_debt", "efficiency_crs")])
 ```
 
 ![](images/paste-3DFE937F.png)
 
 The correlation between inputs and the efficiency does not correlate with the variance of the inputs.
+
+## Correlation between GDP and other factors
+
+```{r}
+cor(data_general$income, data_general$CO2)
+```
+
+-\> strong correlations
+
+```{r}
+cor(data_general$income, data_general$foreign_investment)
+```
+
+```{r}
+cor(data_general$income, data_general$mean_years_in_school)
+```
+
+```{r}
+cor(data_general$income, data_general$material_footprint)
+```
+
+-\> strong correlation
 
 ## Performance of country-year combinations with high inputs
 
@@ -686,6 +708,16 @@ wellfare_ind %>%
   geom_smooth()
 ```
 
+```{r}
+# Color-coded by continent
+wellfare_ind %>%
+  ggplot(aes(efficiency_crs, hpi))+
+  geom_point(aes(
+    color = continent
+  ))+
+  geom_smooth()
+```
+
 ## Which countries improved, which got worse?
 
 Development of efficiency over time compares to first year
@@ -721,7 +753,7 @@ change_eff %>%
 oneonone <- data_crs %>%
   select(dmu, efficiencies)
 
-names(oneonone)[length(names(oneonone))] <- "full_dea"
+names(oneonone)[length(names(oneonone))] <- "full_dea_crs"
 
 for (i in 1:4) {
   for (j in 1:5) {
