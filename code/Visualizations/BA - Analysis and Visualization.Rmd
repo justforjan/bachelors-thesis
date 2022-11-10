@@ -56,28 +56,6 @@ at first sight
 
 # Preparation of several tables
 
-## Add ranks
-
-```{r}
-data_crs <- data_crs %>% mutate(rank = min_rank(desc(efficiencies)))
-data_vrs <- data_vrs %>% mutate(rank = min_rank(desc(efficiencies)))
-
-data_crs <- data_crs %>% relocate(rank, .after = efficiencies)
-data_vrs <- data_vrs %>% relocate(rank, .after = efficiencies)
-```
-
-## New table: Countries vs. years
-
-```{r}
-data_crs_wider_rank <- data_crs[c("country", "year", "rank")] %>% pivot_wider(names_from = year, values_from = rank)
-
-data_crs_wider_rank <- data_crs_wider_rank[c("country", as.character(c(1990:2016)))]
-
-data_crs_wider_eff <- data_crs[c("country", "year", "efficiencies")] %>% pivot_wider(names_from = year, values_from = efficiencies)
-
-data_crs_wider_eff <- data_crs_wider_eff[c("country", as.character(c(1990:2016)))]
-```
-
 ## Recalculate foreign investment columns
 
 ```{r}
@@ -110,16 +88,83 @@ data_vrs$foreign_investment <- data_vrs$foreign_investment - 58.5
 data_vrs$target_input.foreign_investment <- data_vrs$target_input.foreign_investment - 58.5
 ```
 
+## CRS-VRS general data set
+
+Excluding target values
+
+```{r}
+data_general <- merge( data_crs %>% 
+                         rename(efficiency_crs = efficiencies) %>% 
+                         select(dmu, country, ,continent, year, efficiency_crs, CO2, material_footprint, foreign_investment, government_debt,life_expectancy, income, mean_years_in_school, murder, income_share_20), 
+                       data_vrs %>% 
+                         rename(efficiency_vrs = efficiencies) %>% 
+                         select(dmu, efficiency_vrs),
+                       by = "dmu") %>%
+  relocate(efficiency_vrs, .after = efficiency_crs)
+```
+
+## Add ranks
+
+```{r}
+data_general <- data_general %>% 
+  mutate(rank_crs = min_rank(desc(efficiency_crs)),
+         rank_vrs = min_rank(desc(efficiency_vrs))) %>%
+  relocate(rank_crs, .after = efficiency_vrs) %>%
+  relocate(rank_vrs, .after = rank_crs)
+```
+
+## New table: Countries vs. years
+
+```{r}
+#CRS
+data_crs_wider_rank <- data_general[c("country", "year", "rank_crs")] %>% pivot_wider(names_from = year, values_from = rank_crs)
+
+data_crs_wider_rank <- data_crs_wider_rank[c("country", as.character(c(1990:2016)))]
+
+data_crs_wider_eff <- data_general[c("country", "year", "efficiency_crs")] %>% pivot_wider(names_from = year, values_from = efficiency_crs)
+
+data_crs_wider_eff <- data_crs_wider_eff[c("country", as.character(c(1990:2016)))]
+
+# VRS
+data_vrs_wider_rank <- data_general[c("country", "year", "rank_vrs")] %>% pivot_wider(names_from = year, values_from = rank_vrs)
+
+data_vrs_wider_rank <- data_vrs_wider_rank[c("country", as.character(c(1990:2016)))]
+
+data_vrs_wider_eff <- data_general[c("country", "year", "efficiency_vrs")] %>% pivot_wider(names_from = year, values_from = efficiency_vrs)
+
+data_vrs_wider_eff <- data_vrs_wider_eff[c("country", as.character(c(1990:2016)))]
+```
+
 ## Make very long datasets
 
 ```{r}
-data_verylong_input <- data_crs %>%
+# CRS
+data_verylong_input_crs <- data_crs %>%
   select(dmu, country, year, efficiencies, CO2, material_footprint, foreign_investment, government_debt) %>%
   pivot_longer(cols = c("efficiencies", "CO2", "material_footprint", "foreign_investment", "government_debt"), names_to = "indicator")
 
-data_verylong_output <- data_crs %>%
+data_verylong_output_crs <- data_crs %>%
   select(dmu, country, year, efficiencies, life_expectancy, income, mean_years_in_school, murder, income_share_20) %>%
   pivot_longer(cols = c("efficiencies", "life_expectancy", "income", "mean_years_in_school", "murder", "income_share_20"), names_to = "indicator")
+
+#VRS
+data_verylong_input_vrs <- data_vrs %>%
+  select(dmu, country, year, efficiencies, CO2, material_footprint, foreign_investment, government_debt) %>%
+  pivot_longer(cols = c("efficiencies", "CO2", "material_footprint", "foreign_investment", "government_debt"), names_to = "indicator")
+
+data_verylong_output_vrs <- data_vrs %>%
+  select(dmu, country, year, efficiencies, life_expectancy, income, mean_years_in_school, murder, income_share_20) %>%
+  pivot_longer(cols = c("efficiencies", "life_expectancy", "income", "mean_years_in_school", "murder", "income_share_20"), names_to = "indicator")
+
+# Both
+
+data_verylong_input <- data_general %>%
+  select(dmu, country, year, efficiency_crs, efficiency_vrs, CO2, material_footprint, foreign_investment, government_debt) %>%
+  pivot_longer(cols = -c("dmu", "country", "year"), names_to = "indicator")
+
+data_verylong_output <- data_general %>%
+  select(dmu, country, year, efficiency_crs, efficiency_vrs, life_expectancy, income, mean_years_in_school, murder, income_share_20) %>%
+  pivot_longer(cols = -c("dmu", "country", "year"), names_to = "indicator")
 ```
 
 ## Normalize efficiency
@@ -138,7 +183,7 @@ data_crs_normal["efficiencies"] <- data_crs_normal["efficiencies"] / as.numeric(
 ### Same order?
 
 ```{r}
-identical(data_vrs$rank, data_crs$rank)
+identical(data_general$rank_crs, data_general$rank_vrs)
 ```
 
 Ranks are not identical.
@@ -155,22 +200,33 @@ crs_vrs_ranks <- merge(data_crs[c("dmu", "rank")], data_vrs[c("dmu", "rank")], b
          rank = factor(rank))
 ```
 
-## Means
+## Means and variance
 
 ### Means per country
 
 ```{r}
-means_country_crs <- data_crs %>%
-  select(country,efficiencies, CO2, material_footprint, foreign_investment, government_debt, life_expectancy, income, mean_years_in_school, murder, income_share_20) %>%
+means_country <- data_general %>%
+  select(-dmu, -continent, -year, -rank_crs, -rank_vrs) %>%
   group_by(country) %>%
   summarize(across(everything(), mean))
+  
+```
+
+### Variance per country
+
+```{r}
+variance_country <- data_general %>%
+  select(-dmu, -continent, -year, -rank_crs, -rank_vrs) %>%
+  group_by(country) %>%
+  summarize(across(everything(), var))
+
 ```
 
 ### Means per year
 
 ```{r}
-means_year_crs <- data_crs %>%
-  select(year,efficiencies, CO2, material_footprint, foreign_investment, government_debt, life_expectancy, income, mean_years_in_school, murder, income_share_20) %>%
+means_year <- data_general %>%
+  select(-dmu, -continent, -country, -rank_crs, -rank_vrs) %>%
   group_by(year) %>%
   summarize(across(everything(), mean))
 ```
@@ -178,8 +234,8 @@ means_year_crs <- data_crs %>%
 Visualization of average development over time
 
 ```{r}
-means_year_crs %>%
-  pivot_longer(cols = c("efficiencies", "CO2", "material_footprint", "foreign_investment", "government_debt", "life_expectancy", "income", "mean_years_in_school", "murder", "income_share_20"), names_to = "indicator") %>%
+means_year %>%
+  pivot_longer(cols = c("efficiency_crs", "efficiency_vrs", "CO2", "material_footprint", "foreign_investment", "government_debt", "life_expectancy", "income", "mean_years_in_school", "murder", "income_share_20"), names_to = "indicator") %>%
   ggplot(aes(year, value))+
   geom_line()+
   facet_wrap(vars(indicator), scales = "free_y")
@@ -190,6 +246,26 @@ CO2 emissions per person have been decreasing since the 00s.
 Mean years in school have been increasing
 
 Average efficiencies higher in the the 90s than in nowdays, but rising again? Why??
+
+### Variance per year
+
+```{r}
+variance_year <- data_general %>%
+  select(-dmu, -continent, -country, -rank_crs, -rank_vrs) %>%
+  group_by(year) %>%
+  summarize(across(everything(), var))
+```
+
+### Mean efficiency vrs and crs comparison
+
+```{r}
+means_year %>%
+  select(year, efficiency_crs, efficiency_vrs) %>%
+  pivot_longer(cols = c("efficiency_crs", "efficiency_vrs"), names_to = "method", values_to = "efficiency") %>%
+  ggplot(aes(year, efficiency)) +
+  geom_line(aes(color = method))
+
+```
 
 ### Add average efficiency to wide data frames
 
@@ -217,6 +293,32 @@ colnames(data_crs_wider_eff)[2] <- "average_efficiency"
 data_crs_wider_eff <- data_crs_wider_eff %>% mutate(rank = min_rank(desc(average_efficiency)))
 data_crs_wider_eff <- data_crs_wider_eff %>% relocate(rank)
 
+
+
+
+# avererage efficiencies for vrs data set
+vrs_eff <- data_vrs[c("country", "efficiencies")] %>%
+  group_by(country) %>%
+  summarise(across(everything(), mean))
+
+# merge efficienies and wide vrs rank data set
+data_vrs_wider_rank <- merge(data_vrs_wider_rank, vrs_eff, by = "country")
+data_vrs_wider_rank <- data_vrs_wider_rank %>% relocate(efficiencies, .after = country)
+colnames(data_vrs_wider_rank)[2] <- "average_efficiency"
+
+# add rank based on average efficiencies
+data_vrs_wider_rank <- data_vrs_wider_rank %>% mutate(rank = min_rank(desc(average_efficiency)))
+data_vrs_wider_rank <- data_vrs_wider_rank %>% relocate(rank)
+
+# merge efficienies and wide vrs efficiency data set
+data_vrs_wider_eff <- merge(data_vrs_wider_eff, vrs_eff, by = "country")
+data_vrs_wider_eff <- data_vrs_wider_eff %>% relocate(efficiencies, .after = country)
+colnames(data_vrs_wider_eff)[2] <- "average_efficiency"
+
+# add rank based on average efficiencies
+data_vrs_wider_eff <- data_vrs_wider_eff %>% mutate(rank = min_rank(desc(average_efficiency)))
+data_vrs_wider_eff <- data_vrs_wider_eff %>% relocate(rank)
+
 ```
 
 ## Clustering
@@ -224,9 +326,9 @@ data_crs_wider_eff <- data_crs_wider_eff %>% relocate(rank)
 ### Clustering of all DMUs
 
 ```{r}
-data.lables <- data_crs$dmu
+data.lables <- data_general$dmu
 
-data_scale <- scale(data_crs[6:ncol(data_crs)-1])
+data_scale <- scale(data_general[9:ncol(data_general)])
 
 # How many cluster do we need?
 fviz_nbclust(data_scale, kmeans, method = "wss")
@@ -235,7 +337,7 @@ fviz_nbclust(data_scale, kmeans, method = "wss")
 It is difficult to make out the ideal number of cluster but 6 seems to be one of the better options.
 
 ```{r}
-km.out <- kmeans(data_scale, centers = 6, nstart = 100)
+km.out <- kmeans(data_scale, centers = 5, nstart = 100)
 # print(km.out)
 ```
 
@@ -246,14 +348,14 @@ fviz_cluster(list(data=data_scale, cluster=km.clusters))
 ```
 
 ```{r}
-data_crs_cluster <- data_crs
-data_crs_cluster$cluster <- km.clusters
+data_general_cluster <- data_general
+data_general_cluster$cluster <- km.clusters
 ```
 
 What countries are in the cluster?
 
 ```{r}
-cluster_country <- data_crs_cluster %>%
+cluster_country <- data_general_cluster %>%
   group_by(cluster)%>%
   summarize(unique_countries = unique(country))
 
@@ -285,9 +387,9 @@ cluster_6 <- cluster_country %>%
 ### Clustering of average country values
 
 ```{r}
-data.lables_mean <- means_country_crs$country
+data.lables_mean <- means_country$country
 
-data_scale_mean <- scale(means_country_crs[3:ncol(means_country_crs)])
+data_scale_mean <- scale(means_country[4:ncol(means_country)])
 
 # How many cluster do we need?
 fviz_nbclust(data_scale, kmeans, method = "wss")
@@ -296,7 +398,7 @@ fviz_nbclust(data_scale, kmeans, method = "wss")
 3 clusters makes the most sense
 
 ```{r}
-km.out_mean <- kmeans(data_scale_mean, centers = 6, nstart = 100)
+km.out_mean <- kmeans(data_scale_mean, centers = 4, nstart = 100)
 # print(km.out)
 
 km.clusters_mean <- km.out_mean$cluster
@@ -306,36 +408,50 @@ fviz_cluster(list(data=data_scale_mean, cluster=km.clusters_mean))
 
 ## Most efficient, Least efficient, big changes
 
+### CRS
+
 On average
 
 ```{r}
-means_country_crs$country[means_country_crs$efficiencies == max(means_country_crs$efficiencies)]
-means_country_crs$country[means_country_crs$efficiencies == min(means_country_crs$efficiencies)]
+means_country$country[means_country$efficiency_crs == 1]
+
+means_country$country[means_country$efficiency_crs == min(means_country$efficiency_crs)]
 ```
 
 Individual DMUs
 
 ```{r}
-head(data_crs[order(data_crs$rank),],70)
-tail(data_crs[order(data_crs$rank),],10)
+head(data_general[order(data_general$rank_crs),],70)
+tail(data_general[order(data_general$rank_crs),],10)
 ```
 
 ```{r}
-unique(head(data_crs[order(data_crs$rank),],70)$country)
-unique(tail(data_crs[order(data_crs$rank),],10)$country)
+unique(head(data_general[order(data_general$rank_crs),],70)$country)
+unique(tail(data_general[order(data_general$rank_crs),],10)$country)
 ```
 
+### VRS
+
+On average:
+
 ```{r}
-# data_crs %>%
-#   group_by(country) %>%
-#   filter((max(efficiencies - min(efficiencies) >= 0.2)))
+means_country$country[means_country$efficiency_vrs == 1]
+
+means_country$country[means_country$efficiency_vrs == min(means_country$efficiency_crs)]
+```
+
+Individual DMUs
+
+```{r}
+head(data_general[order(data_general$rank_vrs),],70)
+tail(data_general[order(data_general$rank_vrs),],10)
 ```
 
 ## Deep-dive into some countries
 
 Very efficient, very in-efficient, big change in efficiency over time
 
-Countries to consider:
+Countries to consider (CRS):
 
 | 100% efficiency in some years |                           | Lowest efficiency in some years |                 | Big change in efficiency |
 |---------------|---------------|---------------|---------------|---------------|
@@ -355,8 +471,8 @@ Countries to consider:
 Albania is in the years 1996 to 1998 fully efficient. As we can see in the following plot this this coincides with relatively low inputs.
 
 ```{r}
-deepdive_input("Albania")
-deepdive_output("Albania")
+deepdive("Albania", "i")
+deepdive("Albania", "o")
 ```
 
 Interestingly, the outputs do not all follow the same pattern. Income, life expectancy and mean years in school are the lowest in the beginning.
@@ -364,43 +480,43 @@ Interestingly, the outputs do not all follow the same pattern. Income, life expe
 ### Armenia
 
 ```{r}
-deepdive_input("Armenia")
-deepdive_output("Armenia")
+deepdive("Armenia", "i")
+deepdive("Armenia", "o")
 ```
 
 ### Denmark
 
 ```{r}
-deepdive_input("Denmark")
-deepdive_output("Denmark")
+deepdive("Denmark", "i")
+deepdive("Denmark", "o")
 ```
 
 ### Estonia
 
 ```{r}
-deepdive_input("Estonia")
-deepdive_output("Estonia")
+deepdive("Estonia", "i")
+deepdive("Estonia", "o")
 ```
 
 ### Germany
 
 ```{r}
-deepdive_input("Germany")
-deepdive_output("Germany")
+deepdive("Germany", "i")
+deepdive("Germany", "o")
 ```
 
 ### Kazakhstan
 
 ```{r}
-deepdive_input("Kazakhstan")
-deepdive_output("Kazakhstan")
+deepdive("Kazakhstan", "i")
+deepdive("Kazakhstan", "o")
 ```
 
 ### Moldova
 
 ```{r}
-deepdive_input("Moldova")
-deepdive_output("Moldova")
+deepdive("Moldova", "i")
+deepdive("Moldova", "o")
 ```
 
 ## Correlation between efficiency and input factors
@@ -408,7 +524,7 @@ deepdive_output("Moldova")
 CO2
 
 ```{r}
-cor(data_crs[c("CO2", "efficiencies")])
+cor(data_general[c("CO2", "efficiencies")])
 ```
 
 Slight negative correlation (-0.4). The more CO2 emissions per person, the worse the
@@ -416,7 +532,7 @@ Slight negative correlation (-0.4). The more CO2 emissions per person, the worse
 Foreign Direct Investment
 
 ```{r}
-cor(data_crs[c("foreign_investment", "efficiencies")])
+cor(data_general[c("foreign_investment", "efficiencies")])
 ```
 
 No correlation between FDI and the resulting efficiencies
@@ -424,14 +540,18 @@ No correlation between FDI and the resulting efficiencies
 Material footprint
 
 ```{r}
-cor(data_crs[c("material_footprint", "efficiencies")])
+cor(data_general[c("material_footprint", "efficiencies")])
 ```
 
 Small correlation (-0.3)
 
 ```{r}
-cor(data_crs[c("government_debt", "efficiencies")])
+cor(data_general[c("government_debt", "efficiencies")])
 ```
+
+![](images/paste-3DFE937F.png)
+
+The correlation between inputs and the efficiency does not correlate with the variance of the inputs.
 
 ## Performance of country-year combinations with high inputs
 
@@ -473,8 +593,8 @@ Connect all the data
 
 ```{r}
 # GDP
-wellfare_ind <- data_crs %>%
-  select(dmu, country, continent, efficiencies, income)
+wellfare_ind <- data_general %>%
+  select(dmu, country, continent, efficiency_crs, efficiency_vrs, income)
 
 # HDI
 hdi <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/hdi.csv", show_col_types = FALSE)
@@ -491,7 +611,7 @@ wellfare_ind <- merge(wellfare_ind, hpi, by = "dmu", all.x = TRUE)
 colnames(wellfare_ind)[ncol(wellfare_ind)] <- "hpi"
 
 # Cluster
-wellfare_ind <- merge(wellfare_ind, data_crs_cluster[c("dmu", "cluster")])
+wellfare_ind <- merge(wellfare_ind, data_general_cluster[c("dmu", "cluster")])
 
 wellfare_ind$cluster <- factor(wellfare_ind$cluster)
 ```
@@ -500,7 +620,7 @@ wellfare_ind$cluster <- factor(wellfare_ind$cluster)
 
 ```{r}
 wellfare_ind %>%
-  select(income, efficiencies)%>%
+  select(income, efficiency_crs, efficiency_vrs)%>%
   cor()
 ```
 
@@ -510,7 +630,7 @@ Almost no correlation
 
 ```{r}
 wellfare_ind %>%
-  select(efficiencies, hdi)%>%
+  select(efficiency_crs, efficiency_vrs, hdi)%>%
   cor()
 ```
 
@@ -521,13 +641,13 @@ Visualization, color-coded by previously clusters, continents
 ```{r}
 # Color-coded by cluster
 wellfare_ind %>%
-  ggplot(aes(efficiencies, hdi))+
+  ggplot(aes(efficiency_crs, hdi))+
   geom_point(aes(
     color = cluster
   ))
 ```
 
-The clusters seemto very well represent the different development classes based on the HDI
+The clusters seem to very well represent the different development classes based on the HDI
 
 ```{r}
 wellfare_ind %>%
@@ -535,13 +655,13 @@ wellfare_ind %>%
   geom_boxplot()+
   geom_jitter(width = 0.1,
               alpha = 0.5,
-              aes(color = efficiencies))
+              aes(color = efficiency_crs))
 ```
 
 ```{r}
 # Color-coded by continent
 wellfare_ind %>%
-  ggplot(aes(efficiencies, hdi))+
+  ggplot(aes(efficiency_crs, hdi))+
   geom_point(aes(
     color = continent
   ))+
@@ -552,14 +672,14 @@ wellfare_ind %>%
 
 ```{r}
 wellfare_ind %>%
-  select(efficiencies, hpi)%>%
+  select(efficiency_crs, hpi)%>%
   cor(use = "pairwise.complete.obs")
 ```
 
 ```{r}
 # Color-coded by cluster
 wellfare_ind %>%
-  ggplot(aes(efficiencies, hpi))+
+  ggplot(aes(efficiency_crs, hpi))+
   geom_point(aes(
     color = cluster
   ))+
