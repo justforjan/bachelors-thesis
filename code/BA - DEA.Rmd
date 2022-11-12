@@ -34,18 +34,6 @@ Selection_01 <- regions$country[regions$selection_01 == TRUE]
 
 ## Select data to be used and set parameter
 
-| Attempt | DMUs | No. of inputs | No. of outputs |
-|---------|------|---------------|----------------|
-| 3       | 2201 | 4             | 4              |
-| 4       | 2332 | 3             | 3              |
-| 5       | 2594 | 2             | 3              |
-| 6       | 4421 | 2             | 3              |
-| 7       | 4037 | 2             | 3              |
-| 8       | 5533 | 2             | 2              |
-| 9       | 4232 | 2             | 3              |
-| 10      | 5605 | 1             | 2              |
-| 11      | 4232 | 2             | 3              |
-
 ```{r}
 # Chose the attempt
 attempt = 113
@@ -67,11 +55,11 @@ only_one_year <- 0 # 0 means no
 # onyl specified chosen_countries?
 chosen_countries <- c() # enter a vector with strings; empty means all
 
-orientation <- "io"
+orient <- "io"
 # io: input oriented
 # oo: output oriented
 
-return_to_scale <- "crs"
+return_to_scale <- "vrs"
 # crs: constant return to scale
 # vrs: variable return to scale
 # nirs: non-increasing
@@ -142,7 +130,7 @@ if (length(input_cols) == 0) {
 }
 
 
-result <- model_basic(model_data, orientation = orientation, rts=return_to_scale)
+result <- model_basic(model_data, orientation = orient, rts=return_to_scale)
 ```
 
 ## Efficiencies and Targets
@@ -200,7 +188,7 @@ data_dea$continent <- countrycode(sourcevar = data_dea$country,
 create name for the file
 
 ```{r}
-filename <- paste(as.character(attempt), "_", orientation, "_", return_to_scale, sep = "")
+filename <- paste(as.character(attempt), "_", orient, "_", return_to_scale, sep = "")
 
 if (from_1990 != "no") {
   filename <- paste(filename, "_", "from1990", sep = "")
@@ -240,44 +228,52 @@ write_csv(data_dea, paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/proc
 ```{r}
 for (i in 1:number_of_inputs) {
   for (j in 1:number_of_outputs) {
-     model_data <- read_data(data[c(1,1+j,5+j)], 
-                        ni=1, 
-                        no=1, 
+    
+    partial_data <- data[c(1,1+i,number_of_inputs+1+j)]
+    
+    model_data <- read_data(partial_data,
+                        ni=1,
+                        no=1,
                         dmus = 1)
-     
-     result <- model_basic(model_data, orientation = orientation, rts=return_to_scale)
-     
-     # Efficiencies
+
+    result <- model_basic(model_data, orientation = orient, rts=return_to_scale)
+
+
+# Efficiencies
     eff <- as.data.frame(efficiencies(result))
-    # add column for dmu names
+
+# add column for dmu names
     eff$dmu <- rownames(eff)
-    # delete rownames
+
+# delete rownames
     rownames(eff) <- NULL
-    # Rename efficiency column
+
+# Rename efficiency column
     colnames(eff)[1] <- "efficiencies"
-    
-    # get targets
-    targets <- as.data.frame(targets(result))
-    # add column for dmu names
-    targets$dmu <- rownames(targets)
-    # delte rownames
-    rownames(targets) <- NULL
-    
+
+# get targets
+    # targets <- as.data.frame(targets(result))
+
+# add column for dmu names
+    # targets$dmu <- rownames(targets)
+
+# delte rownames
+    # rownames(targets) <- NULL
+
     data_and_results <- list(
-      data[c(1,1+j,5+j)],
-      eff,
-      targets
+      partial_data,
+      eff
     )
-    
+
     data_dea <- data_and_results %>% reduce(full_join, by="dmu")
-    
+
     data_dea <- data_dea %>% relocate(efficiencies, .after = dmu)
-    
+
     data_dea <- separate(data_dea, dmu, c("country", "year"), "_", remove=FALSE)
-        
-    write_csv(data_dea, paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/dea_results_", filename, "_", as.character(i), as.character(j), ".csv", sep = "") )
+
+    write_csv(data_dea, paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/dea_results_", filename, "_", as.character(i), as.character(j), ".csv", sep = ""))
 
   }
-  
+
 }
 ```
