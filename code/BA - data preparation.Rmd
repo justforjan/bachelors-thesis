@@ -103,6 +103,24 @@ colnames(red_list) <- c("country", "year", "value")
 government_debt <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/IWF/imf-dm-export-20221006.csv",show_col_types = FALSE)
 ```
 
+## HPI
+
+```{r}
+hpi <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/HPI/hpi.csv",show_col_types = FALSE)
+```
+
+## World Happiness Report
+
+```{r}
+world_happiness_report <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/world_happiness_report.csv",show_col_types = FALSE)
+
+world_happiness_report <- world_happiness_report[1:3]
+
+colnames(world_happiness_report)[1] <- "country"
+
+colnames(world_happiness_report)[3] <- "value"
+```
+
 # Change every table to long format
 
 Only for Gapminder and IWF
@@ -170,6 +188,8 @@ murder <- murder %>% mutate(year = as.numeric(year))
 foreign_investment <- foreign_investment %>% mutate(year = as.numeric(year))
 hdi <- hdi %>% mutate(year = as.numeric(year))
 government_debt <- government_debt %>% mutate(year = as.numeric(year))
+hpi <- hpi %>% mutate(year = as.numeric(year))
+world_happiness_report <- world_happiness_report %>% mutate(year = as.numeric(year))
 ```
 
 # Interpolate
@@ -195,6 +215,7 @@ murder <- interpolate(murder)
 foreign_investment <- interpolate(foreign_investment)
 hdi <- interpolate(hdi)
 government_debt <- interpolate(government_debt)
+hpi <- interpolate(hpi)
 ```
 
 # Remove years
@@ -269,6 +290,10 @@ for (country in 1:nrow(nc)) {
   hdi[hdi == as.character(nc[country,1])] <- as.character(nc[country,2])
   
   government_debt[government_debt == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  hpi[hpi == as.character(nc[country,1])] <- as.character(nc[country,2])
+  
+  world_happiness_report[world_happiness_report == as.character(nc[country,1])] <- as.character(nc[country,2])
 
 }
 ```
@@ -299,6 +324,8 @@ murder <- merge_dmu(murder)
 foreign_investment <- merge_dmu(foreign_investment)
 hdi <- merge_dmu(hdi)
 government_debt <- merge_dmu(government_debt)
+hpi <- merge_dmu(hpi)
+world_happiness_report <- merge_dmu(world_happiness_report)
 
 ```
 
@@ -325,6 +352,8 @@ write_csv(murder, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/pre
 write_csv(foreign_investment, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/foreign_investment.csv")
 write_csv(hdi, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/hdi.csv")
 write_csv(government_debt, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/government_debt.csv")
+write_csv(hpi, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/hpi.csv")
+write_csv(world_happiness_report, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/world_happiness_report.csv")
 ```
 
 # Naming conventions
@@ -333,31 +362,32 @@ how I figured out which names to change
 
 Vectors of country names of both Gapminder and OurWorldInData
 
-```{# {r}
-# gapminder <- unique(c(
-#   women_in_parliament$country,
-#   basic_sanitation$country,
-#   basic_water_source$country,
-#   electricity$country,
-#   employment_rate$country,
-#   material_footprint$country,
-#   forest_area$country,
-#   poverty$country,
-#   life_expectancy$country,
-#   income$country,
-#   income_share_20$country,
-#   CO2$country,
-#   murder$country
-# ))
-# 
-# ourworldindata <- unique(c(
-#   mean_years_in_school$country,
-#   air_pollution$country,
-#   health_worker$country,
-# red_list$country
-# ))
-# 
-# iwf <- unique(government_debt$country)
+```{r}
+gapminder <- unique(c(
+   women_in_parliament$country,
+   basic_sanitation$country,
+   basic_water_source$country,
+   electricity$country,
+   employment_rate$country,
+   material_footprint$country,
+   forest_area$country,
+   poverty$country,
+   life_expectancy$country,
+   income$country,
+   income_share_20$country,
+   CO2$country,
+   murder$country
+   ))
+   
+ ourworldindata <- unique(c(
+   mean_years_in_school$country,
+   air_pollution$country,
+   health_worker$country,
+ red_list$country ))
+ 
+ iwf <- unique(government_debt$country)
+ 
+ hpi_bla <- unique(hpi$country)
 ```
 
 In gapminder, but not in ourworldindata
