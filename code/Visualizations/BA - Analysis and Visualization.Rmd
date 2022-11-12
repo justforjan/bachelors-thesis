@@ -10,6 +10,7 @@ library(tidyverse)
 library(ggplot2)
 library(gridExtra)
 library(factoextra)
+library(countrycode)
 
 source("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/code/functions.R")
 
@@ -193,11 +194,11 @@ Ranks are not identical.
 ```
 
 ```{r}
-crs_vrs_ranks <- merge(data_crs[c("dmu", "rank")], data_vrs[c("dmu", "rank")], by = "dmu") %>%
-  rename(crs = rank.x, vrs = rank.y) %>%
-  pivot_longer(cols = c("crs", "vrs"), names_to = "method", values_to = "rank") %>%
-  mutate(paired = rep(1:(n()/2),each=2),
-         rank = factor(rank))
+# crs_vrs_ranks <- merge(data_crs[c("dmu", "rank")], data_vrs[c("dmu", "rank")], by = "dmu") %>%
+#   rename(crs = rank.x, vrs = rank.y) %>%
+#   pivot_longer(cols = c("crs", "vrs"), names_to = "method", values_to = "rank") %>%
+#   mutate(paired = rep(1:(n()/2),each=2),
+#          rank = factor(rank))
 ```
 
 ## Means and variance
@@ -254,6 +255,14 @@ variance_year <- data_general %>%
   select(-dmu, -continent, -country, -rank_crs, -rank_vrs) %>%
   group_by(year) %>%
   summarize(across(everything(), var))
+```
+
+```{r}
+variance_year %>%
+  pivot_longer(cols = c("efficiency_crs", "efficiency_vrs", "CO2", "material_footprint", "foreign_investment", "government_debt", "life_expectancy", "income", "mean_years_in_school", "murder", "income_share_20"), names_to = "indicator") %>%
+  ggplot(aes(year, value))+
+  geom_line()+
+  facet_wrap(vars(indicator), scales = "free_y")
 ```
 
 ### Mean efficiency vrs and crs comparison
@@ -403,7 +412,16 @@ km.out_mean <- kmeans(data_scale_mean, centers = 4, nstart = 100)
 
 km.clusters_mean <- km.out_mean$cluster
 rownames(data_scale_mean) <- data.lables_mean
-fviz_cluster(list(data=data_scale_mean, cluster=km.clusters_mean))
+p<- fviz_cluster(list(data=data_scale_mean, cluster=km.clusters_mean))
+p
+```
+
+```{r}
+pca_analyse <- prcomp(data_scale_mean, rank =4)
+pca_analyse$rotation[,1:4]
+#?prcomp
+
+
 ```
 
 ## Most efficient, Least efficient, big changes
@@ -551,7 +569,21 @@ cor(data_general[c("government_debt", "efficiency_crs")])
 
 ![](images/paste-3DFE937F.png)
 
-The correlation between inputs and the efficiency does not correlate with the variance of the inputs.
+Varianz durch Mittelwert
+
+```{r}
+c(var(data_general$CO2),var(data_general$material_footprint)
+,var(data_general$foreign_investment)
+,var(data_general$government_debt))/c(mean(data_general$CO2),
+                                      mean(data_general$material_footprint)
+,mean(data_general$foreign_investment)
+,mean(data_general$government_debt))
+  
+
+
+variance <- var(data_general %>%
+                  select(-dmu, -year, -country, -continent)) 
+```
 
 ## Correlation between GDP and other factors
 
@@ -636,6 +668,18 @@ colnames(wellfare_ind)[ncol(wellfare_ind)] <- "hpi"
 wellfare_ind <- merge(wellfare_ind, data_general_cluster[c("dmu", "cluster")])
 
 wellfare_ind$cluster <- factor(wellfare_ind$cluster)
+
+
+# Average
+avg_wellfare_ind <- wellfare_ind %>%
+  select(country, efficiency_crs, efficiency_vrs, hdi, hpi, income) %>%
+  group_by(country) %>%
+  summarize(across(everything(), mean)) %>%
+  mutate(cluster = as.character(km.clusters_mean))
+
+avg_wellfare_ind$continent <- countrycode(sourcevar = avg_wellfare_ind$country,
+                               origin = "country.name",
+                               destination = "continent")
 ```
 
 ### **GDP (income/gdp per person)**
@@ -671,6 +715,8 @@ wellfare_ind %>%
 
 The clusters seem to very well represent the different development classes based on the HDI
 
+![](images/paste-2B2B1FE9.png)
+
 ```{r}
 wellfare_ind %>%
   ggplot(aes(cluster, hdi))+
@@ -688,6 +734,20 @@ wellfare_ind %>%
     color = continent
   ))+
   geom_smooth()
+```
+
+#### Average values
+
+```{r}
+avg_wellfare_ind %>% 
+  ggplot(aes(efficiency_crs, hdi)) +
+  geom_point(aes(color = cluster))
+```
+
+```{r}
+avg_hdi_comp %>% 
+  ggplot(aes(efficiency_crs, hdi)) +
+  geom_point(aes(color = continent))
 ```
 
 ### HPI
@@ -716,6 +776,14 @@ wellfare_ind %>%
     color = continent
   ))+
   geom_smooth()
+```
+
+#### Average values
+
+```{r}
+avg_wellfare_ind %>%
+  ggplot(aes(efficiency_crs, hpi)) +
+  geom_point(aes(color = cluster))
 ```
 
 ## Which countries improved, which got worse?
@@ -748,34 +816,7 @@ change_eff %>%
 
 ## 1on1 DEA vs full DEA
 
-```{r}
-
-oneonone <- data_crs %>%
-  select(dmu, efficiencies)
-
-names(oneonone)[length(names(oneonone))] <- "full_dea_crs"
-
-for (i in 1:4) {
-  for (j in 1:5) {
-    
-    # read file and merge it
-    oneonone <- merge(oneonone, select(read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/dea_results_113_io_crs_", as.character(i),  as.character(j), ".csv", sep = ""), show_col_types = FALSE), dmu, efficiencies), by = "dmu")
-    
-    # rename new column  
-    names(oneonone)[ncol(oneonone)] <- paste(as.character(i), as.character(j), sep = "")
-  }
-}
-```
-
-```{r}
-oneonone_correlation <- as.data.frame(cor(oneonone[2:ncol(oneonone)]))
-
-write_csv(oneonone_correlation, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/oneonone_correlation.csv" )
-```
-
-![](oneonone.PNG)
-
-Sames output means same efficiency.
+![](images/paste-6AB40972.png)
 
 ## years vs efficiency
 
@@ -793,6 +834,16 @@ data_crs %>%
     )
   )
 
+```
+
+```{r}
+deepdive("Thailand", "i")
+deepdive("Thailand", "o")
+```
+
+```{r}
+deepdive("Germany", "i")
+deepdive("Germany", "o")
 ```
 
 ## Efficiencies per continent (all years)
