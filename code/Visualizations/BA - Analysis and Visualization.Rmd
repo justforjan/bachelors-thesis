@@ -122,14 +122,20 @@ data_crs_wider_rank <- data_general[c("country", "year", "rank_crs")] %>% pivot_
 
 data_crs_wider_rank <- data_crs_wider_rank[c("country", as.character(c(1990:2016)))]
 
+data_crs_wider_rank$range <- apply(data_crs_wider_rank[,4:ncol(data_crs_wider_rank)], 1, FUN = range, na.rm=TRUE)
+
 data_crs_wider_eff <- data_general[c("country", "year", "efficiency_crs")] %>% pivot_wider(names_from = year, values_from = efficiency_crs)
 
 data_crs_wider_eff <- data_crs_wider_eff[c("country", as.character(c(1990:2016)))]
+
+
 
 # VRS
 data_vrs_wider_rank <- data_general[c("country", "year", "rank_vrs")] %>% pivot_wider(names_from = year, values_from = rank_vrs)
 
 data_vrs_wider_rank <- data_vrs_wider_rank[c("country", as.character(c(1990:2016)))]
+
+
 
 data_vrs_wider_eff <- data_general[c("country", "year", "efficiency_vrs")] %>% pivot_wider(names_from = year, values_from = efficiency_vrs)
 
@@ -223,6 +229,14 @@ variance_country <- data_general %>%
 
 ```
 
+Check if variance greater than mean
+
+```{r}
+variance_country > means_country
+```
+
+Especially foreign investment and government debt mean cannot be used. The income column also shows some TRUE values.
+
 ### Means per year
 
 ```{r}
@@ -265,6 +279,8 @@ variance_year %>%
   facet_wrap(vars(indicator), scales = "free_y")
 ```
 
+Variance over year too big -\> we cannot use the means per year data
+
 ### Mean efficiency vrs and crs comparison
 
 ```{r}
@@ -304,7 +320,6 @@ data_crs_wider_eff <- data_crs_wider_eff %>% relocate(rank)
 
 
 
-
 # avererage efficiencies for vrs data set
 vrs_eff <- data_vrs[c("country", "efficiencies")] %>%
   group_by(country) %>%
@@ -330,6 +345,28 @@ data_vrs_wider_eff <- data_vrs_wider_eff %>% relocate(rank)
 
 ```
 
+## PCA
+
+```{r}
+# PCA -------
+pca <- prcomp(data_general[,9:ncol(data_general)], scale = TRUE)
+pca
+summary(pca)
+# -> die ersten 6 PCs stellen 90 Prozent dar
+plot(pca, tpye = "l")
+biplot(pca, scale = 0)
+
+# EXTRACT PC SCORES ------
+str(pca)
+pca$x
+
+data_general2 <- cbind(data_general, pca$x[,1:2])
+
+# CORRELATION
+cor(data_general[,9:ncol(data_general)], pca$x)
+
+```
+
 ## Clustering
 
 ### Clustering of all DMUs
@@ -337,7 +374,7 @@ data_vrs_wider_eff <- data_vrs_wider_eff %>% relocate(rank)
 ```{r}
 data.lables <- data_general$dmu
 
-data_scale <- scale(data_general[9:ncol(data_general)])
+data_scale <- scale(data_general[,9:ncol(data_general)])
 
 # How many cluster do we need?
 fviz_nbclust(data_scale, kmeans, method = "wss")
@@ -472,7 +509,7 @@ Very efficient, very in-efficient, big change in efficiency over time
 Countries to consider (CRS):
 
 | 100% efficiency in some years |                           | Lowest efficiency in some years |                 | Big change in efficiency |
-|---------------|---------------|---------------|---------------|---------------|
+|-------------------------------|---------------------------|---------------------------------|-----------------|--------------------------|
 | Albania                       | 1996-1998                 | Malta                           | 2006-2009, 2011 |                          |
 | Armenia                       | 2006-2008                 | Cyprus                          | 10,12,12,14,15  |                          |
 | Belarus                       | 1998-2001                 |                                 |                 |                          |
@@ -542,7 +579,7 @@ deepdive("Moldova", "o")
 CO2
 
 ```{r}
-cor(data_general[c("CO2", "efficiency_crs")])
+cor(data_general[c("CO2", "efficiency_crs")]) # = 24
 ```
 
 Slight negative correlation (-0.4). The more CO2 emissions per person, the worse the
@@ -550,7 +587,7 @@ Slight negative correlation (-0.4). The more CO2 emissions per person, the worse
 Foreign Direct Investment
 
 ```{r}
-cor(data_general[c("foreign_investment", "efficiency_crs")])
+cor(data_general[c("foreign_investment", "efficiency_crs")]) # = 48
 ```
 
 No correlation between FDI and the resulting efficiencies
@@ -558,16 +595,14 @@ No correlation between FDI and the resulting efficiencies
 Material footprint
 
 ```{r}
-cor(data_general[c("material_footprint", "efficiency_crs")])
+cor(data_general[c("material_footprint", "efficiency_crs")]) # = 27
 ```
 
 Small correlation (-0.3)
 
 ```{r}
-cor(data_general[c("government_debt", "efficiency_crs")])
+cor(data_general[c("government_debt", "efficiency_crs")]) # = -43
 ```
-
-![](images/paste-3DFE937F.png)
 
 Varianz durch Mittelwert
 
@@ -578,12 +613,9 @@ c(var(data_general$CO2),var(data_general$material_footprint)
                                       mean(data_general$material_footprint)
 ,mean(data_general$foreign_investment)
 ,mean(data_general$government_debt))
-  
-
-
-variance <- var(data_general %>%
-                  select(-dmu, -year, -country, -continent)) 
 ```
+
+![](images/paste-3DFE937F.png)
 
 ## Correlation between GDP and other factors
 
@@ -784,6 +816,30 @@ wellfare_ind %>%
 avg_wellfare_ind %>%
   ggplot(aes(efficiency_crs, hpi)) +
   geom_point(aes(color = cluster))
+```
+
+## Mics
+
+Is PC1 or PC2 like HDI?
+
+```{r}
+# PCA -------
+pca <- prcomp(data_general[,9:ncol(data_general)], scale = TRUE)
+pca
+summary(pca)
+# -> die ersten 6 PCs stellen 0 Prozent dar
+plot(pca, tpye = "l")
+biplot(pca, scale = 0)
+
+# EXTRACT PC SCORES ------
+str(pca)
+pca$x
+
+data_general2 <- cbind(data_general, pca$x[,1:2])
+
+# CORRELATION
+cor(data_general[,9:ncol(data_general)], pca$x)
+
 ```
 
 ## Which countries improved, which got worse?
