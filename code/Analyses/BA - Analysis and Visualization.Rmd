@@ -122,7 +122,6 @@ data_crs_wider_rank <- data_general[c("country", "year", "rank_crs")] %>% pivot_
 
 data_crs_wider_rank <- data_crs_wider_rank[c("country", as.character(c(1990:2016)))]
 
-data_crs_wider_rank$range <- apply(data_crs_wider_rank[,4:ncol(data_crs_wider_rank)], 1, FUN = range, na.rm=TRUE)
 
 data_crs_wider_eff <- data_general[c("country", "year", "efficiency_crs")] %>% pivot_wider(names_from = year, values_from = efficiency_crs)
 
@@ -342,7 +341,28 @@ colnames(data_vrs_wider_eff)[2] <- "average_efficiency"
 # add rank based on average efficiencies
 data_vrs_wider_eff <- data_vrs_wider_eff %>% mutate(rank = min_rank(desc(average_efficiency)))
 data_vrs_wider_eff <- data_vrs_wider_eff %>% relocate(rank)
+```
 
+### Well-being indicator data set
+
+```{r}
+# GDP
+wellfare_ind <- data_general %>%
+  select(dmu, country, continent, efficiency_crs, efficiency_vrs, income)
+
+# HDI
+hdi <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/hdi.csv", show_col_types = FALSE)
+
+wellfare_ind <- merge(wellfare_ind, hdi, by = "dmu", all.x = TRUE)
+
+colnames(wellfare_ind)[ncol(wellfare_ind)] <- "hdi"
+
+#HPI
+hpi <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/hpi.csv", show_col_types = FALSE)
+
+wellfare_ind <- merge(wellfare_ind, hpi, by = "dmu", all.x = TRUE)
+
+colnames(wellfare_ind)[ncol(wellfare_ind)] <- "hpi"
 ```
 
 ## PCA
@@ -366,6 +386,19 @@ data_general2 <- cbind(data_general, pca$x[,1:2])
 cor(data_general[,9:ncol(data_general)], pca$x)
 
 ```
+
+> In PC1 most influencial factors (all positive)
+>
+> 1.  income
+> 2.  material footprint
+> 3.  life expectancy
+> 4.  CO2
+> 5.  mean years in school
+> 6.  murder
+>
+> In PC2:
+>
+> 1.  government debt (+)
 
 ## Clustering
 
@@ -430,6 +463,33 @@ cluster_6 <- cluster_country %>%
   select(unique_countries)
 ```
 
+```{r}
+cluster_ind_info_mean <- data_general_cluster %>%
+  select(CO2, material_footprint, foreign_investment, government_debt, life_expectancy, income, mean_years_in_school, murder, income_share_20, cluster) %>%
+  group_by(cluster) %>%
+  summarise_all(mean)
+
+write_csv(cluster_ind_info_mean, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/cluster_ind_info_mean.csv")
+
+cluster_ind_info_var <- data_general_cluster %>%
+  select(CO2, material_footprint, foreign_investment, government_debt, life_expectancy, income, mean_years_in_school, murder, income_share_20, cluster) %>%
+  group_by(cluster) %>%
+  summarise_all(var)
+
+write_csv(cluster_ind_info_var, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/cluster_ind_info_var.csv")
+```
+
+```{r}
+data_general_cluster %>%
+  select(CO2, material_footprint, foreign_investment, government_debt, life_expectancy, income, mean_years_in_school, murder, income_share_20, cluster) %>%
+  pivot_longer(cols = c("CO2", "material_footprint", "foreign_investment", "government_debt", "life_expectancy", "income", "mean_years_in_school", "murder", "income_share_20"), names_to = "indicator") %>%
+  ggplot(aes(indicator, value)) +
+  geom_boxplot()+
+  geom_jitter(width = 0.1,
+              alpha = 0.5,
+              )
+```
+
 ### Clustering of average country values
 
 ```{r}
@@ -438,7 +498,7 @@ data.lables_mean <- means_country$country
 data_scale_mean <- scale(means_country[4:ncol(means_country)])
 
 # How many cluster do we need?
-fviz_nbclust(data_scale, kmeans, method = "wss")
+fviz_nbclust(data_scale_mean, kmeans, method = "wss")
 ```
 
 3 clusters makes the most sense
@@ -579,7 +639,8 @@ deepdive("Moldova", "o")
 CO2
 
 ```{r}
-cor(data_general[c("CO2", "efficiency_crs")]) # = 24
+cor(data_general[c("CO2", "efficiency_crs")]) # = -24
+cor(data_general[c("CO2", "efficiency_vrs")]) # = -25
 ```
 
 Slight negative correlation (-0.4). The more CO2 emissions per person, the worse the
@@ -587,7 +648,8 @@ Slight negative correlation (-0.4). The more CO2 emissions per person, the worse
 Foreign Direct Investment
 
 ```{r}
-cor(data_general[c("foreign_investment", "efficiency_crs")]) # = 48
+cor(data_general[c("foreign_investment", "efficiency_crs")]) # = -48
+cor(data_general[c("foreign_investment", "efficiency_vrs")]) # = -38
 ```
 
 No correlation between FDI and the resulting efficiencies
@@ -595,14 +657,27 @@ No correlation between FDI and the resulting efficiencies
 Material footprint
 
 ```{r}
-cor(data_general[c("material_footprint", "efficiency_crs")]) # = 27
+cor(data_general[c("material_footprint", "efficiency_crs")]) # = -27
+cor(data_general[c("material_footprint", "efficiency_vrs")]) # = -19
 ```
 
 Small correlation (-0.3)
 
 ```{r}
 cor(data_general[c("government_debt", "efficiency_crs")]) # = -43
+cor(data_general[c("government_debt", "efficiency_vrs")]) # = -27
 ```
+
+> Foreign investment highest input on efficiency
+>
+> Order:
+>
+> 1.  foreign investment
+> 2.  government debt
+> 3.  material footprint
+> 4.  CO2
+
+![](images/paste-3DFE937F.png)
 
 Varianz durch Mittelwert
 
@@ -615,9 +690,18 @@ c(var(data_general$CO2),var(data_general$material_footprint)
 ,mean(data_general$government_debt))
 ```
 
-![](images/paste-3DFE937F.png)
+> foreign investment highest relationship between variance and mean, supports the high (negative) correlation between efficiency and foreign investment
+>
+> Order:
+>
+> 1.  foreign investment
+> 2.  government debt
+> 3.  material footprint
+> 4.  CO2
 
 ## Correlation between GDP and other factors
+
+### Input factors
 
 ```{r}
 cor(data_general$income, data_general$CO2)
@@ -638,6 +722,14 @@ cor(data_general$income, data_general$material_footprint)
 ```
 
 -\> strong correlation
+
+### Other well-begin factors
+
+```{r}
+cor(wellfare_ind$income, wellfare_ind$hdi, use = "pairwise.complete.obs")
+cor(wellfare_ind$income, wellfare_ind$hpi, use = "pairwise.complete.obs")
+
+```
 
 ## Performance of country-year combinations with high inputs
 
@@ -678,24 +770,7 @@ mean(DEBTS_lowerQuantile$efficiencies)
 Connect all the data
 
 ```{r}
-# GDP
-wellfare_ind <- data_general %>%
-  select(dmu, country, continent, efficiency_crs, efficiency_vrs, income)
-
-# HDI
-hdi <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/hdi.csv", show_col_types = FALSE)
-
-wellfare_ind <- merge(wellfare_ind, hdi, by = "dmu", all.x = TRUE)
-
-colnames(wellfare_ind)[ncol(wellfare_ind)] <- "hdi"
-
-#HPI
-hpi <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/hpi.csv", show_col_types = FALSE)
-
-wellfare_ind <- merge(wellfare_ind, hpi, by = "dmu", all.x = TRUE)
-
-colnames(wellfare_ind)[ncol(wellfare_ind)] <- "hpi"
-
+# Adding more data to data set for grouping
 # Cluster
 wellfare_ind <- merge(wellfare_ind, data_general_cluster[c("dmu", "cluster")])
 
