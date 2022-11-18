@@ -369,7 +369,7 @@ relocate(data_general, cluster, .after = continent)
 What countries are in the cluster?
 
 ```{r}
-cluster_country <- data_general_cluster %>%
+cluster_country <- data_general %>%
   group_by(cluster)%>%
   summarize(unique_countries = unique(country))
 
@@ -399,14 +399,14 @@ cluster_6 <- cluster_country %>%
 ```
 
 ```{r}
-cluster_ind_info_mean <- data_general_cluster %>%
+cluster_ind_info_mean <- data_general %>%
   select(CO2, material_footprint, foreign_investment, government_debt, life_expectancy, income, mean_years_in_school, murder, income_share_20, cluster) %>%
   group_by(cluster) %>%
   summarise_all(mean)
 
 write_csv(cluster_ind_info_mean, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/cluster_ind_info_mean.csv")
 
-cluster_ind_info_var <- data_general_cluster %>%
+cluster_ind_info_var <- data_general %>%
   select(CO2, material_footprint, foreign_investment, government_debt, life_expectancy, income, mean_years_in_school, murder, income_share_20, cluster) %>%
   group_by(cluster) %>%
   summarise_all(var)
@@ -415,7 +415,7 @@ write_csv(cluster_ind_info_var, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesi
 ```
 
 ```{r}
-data_general_cluster %>%
+data_general %>%
   select(CO2, material_footprint, foreign_investment, government_debt, life_expectancy, income, mean_years_in_school, murder, income_share_20, cluster) %>%
   pivot_longer(cols = c("CO2", "material_footprint", "foreign_investment", "government_debt", "life_expectancy", "income", "mean_years_in_school", "murder", "income_share_20"), names_to = "indicator") %>%
   ggplot(aes(indicator, value)) +
