@@ -1,4 +1,5 @@
 library(tidyverse)
+library(corrplot)
 
 women_in_parliament <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/women_in_parliament.csv",show_col_types = FALSE)
 basic_sanitation <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/basic_sanitation.csv",show_col_types = FALSE)
@@ -18,8 +19,7 @@ income_share_20 <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/ra
 CO2 <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/CO2.csv",show_col_types = FALSE)
 murder <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/murder.csv",show_col_types = FALSE)
 foreign_investment <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/foreign_investment.csv",show_col_types = FALSE)
-
-
+government_debt <- read_csv("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/raw_data/preprocessed_data/government_debt.csv",show_col_types = FALSE)
 
 
 # Create list of all data frames
@@ -41,7 +41,8 @@ all_data <- list(
   income_share_20,
   CO2,
   murder,
-  foreign_investment
+  foreign_investment,
+  government_debt
 )
 
 # Merge all data frame together by the country attribute
@@ -68,33 +69,80 @@ colnames(data) <- c(
   "income_share_20",
   "CO2",
   "murder",
-  "foreign_investment"
+  "foreign_investment",
+  "government_debt"
 )
 
 data <- separate(data, dmu, c("country", "year"), "_", remove=FALSE)
 
+
+# Create list of all data frames
+used_data <- list(
+  CO2,
+  material_footprint,
+  foreign_investment,
+  government_debt,
+  life_expectancy,
+  income,
+  mean_years_in_school,
+  income_share_20,
+  murder
+)
+
+used_data <- used_data %>% reduce(full_join, by="dmu")
+
+# Change column names to something meaningful
+colnames(used_data) <- c(
+  "dmu",
+  "CO2",
+  "material_footprint",
+  "foreign_investment",
+  "government_debt",
+  "life_expectancy",
+  "income",
+  "mean_years_in_school",
+  "income_share_20",
+  "murder"
+)
+
+
+
 # Calculate correlations
-correlations <- as.data.frame(cor(data[4:length(data)], use = "pairwise.complete.obs"))
+correlations_all <- as.data.frame(cor(data[4:length(data)], use = "pairwise.complete.obs"))
 
-# Correlations by decade
-# 1990- 1999
+correlations_used <- as.data.frame(cor(used_data[,2:length(used_data)], use = "pairwise.complete.obs"))
 
-data_90s <- data %>% filter(year >= 1990 & year < 2000)
-correlations_90s <- as.data.frame(cor(data_90s[4:length(data)], use = "pairwise.complete.obs"))
+# # Correlations by decade
+# # 1990- 1999
+# 
+# data_90s <- data %>% filter(year >= 1990 & year < 2000)
+# correlations_90s <- as.data.frame(cor(data_90s[4:length(data)], use = "pairwise.complete.obs"))
+# 
+# # 2000 - 2009
+# 
+# data_00s <- data %>% filter(year >= 2000 & year < 2010)
+# correlations_00s <- as.data.frame(cor(data_00s[4:length(data)], use = "pairwise.complete.obs"))
+# 
+# # 2010 - 2019
+# 
+# data_10s <- data %>% filter(year >= 2010 & year < 2020)
+# correlations_10s <- as.data.frame(cor(data[4:length(data)], use = "pairwise.complete.obs"))
 
-# 2000 - 2009
+# correlation plot
+used_data %>%
+  select(CO2, material_footprint, foreign_investment, government_debt, life_expectancy, income, income_share_20, murder, mean_years_in_school) %>%
+  cor(use = "pairwise.complete.obs") %>%
+  corrplot(method = "number")
 
-data_00s <- data %>% filter(year >= 2000 & year < 2010)
-correlations_00s <- as.data.frame(cor(data_00s[4:length(data)], use = "pairwise.complete.obs"))
+corrplot(correlations_used, method = "number")
 
-# 2010 - 2019
 
-data_10s <- data %>% filter(year >= 2010 & year < 2020)
-correlations_10s <- as.data.frame(cor(data_10s[4:length(data)], use = "pairwise.complete.obs"))
 
 # Export as csv
 write_csv(correlations, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/correlations.csv")
 write_csv(correlations_90s, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/correlations_90.csv")
 write_csv(correlations_00s, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/correlations_00.csv")
 write_csv(correlations_10s, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/correlations_10s.csv")
+
+write_csv(correlations_used, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/correlations_used.csv")
 
