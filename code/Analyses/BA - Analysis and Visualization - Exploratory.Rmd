@@ -78,15 +78,15 @@ at first sight
 # 
 # data_vrs$target_input.foreign_investment <- data_vrs$target_input.foreign_investment * (-1) + 450
 
-# crs
-data_crs$foreign_investment <- data_crs$foreign_investment - 58.5
-
-data_crs$target_input.foreign_investment <- data_crs$target_input.foreign_investment - 58.5
-
-# vrs
-data_vrs$foreign_investment <- data_vrs$foreign_investment - 58.5
-
-data_vrs$target_input.foreign_investment <- data_vrs$target_input.foreign_investment - 58.5
+# # crs
+# data_crs$foreign_investment <- data_crs$foreign_investment - 58.5
+# 
+# data_crs$target_input.foreign_investment <- data_crs$target_input.foreign_investment - 58.5
+# 
+# # vrs
+# data_vrs$foreign_investment <- data_vrs$foreign_investment - 58.5
+# 
+# data_vrs$target_input.foreign_investment <- data_vrs$target_input.foreign_investment - 58.5
 ```
 
 ## CRS-VRS general data set
@@ -456,27 +456,26 @@ pca_analyse$rotation[,1:4]
 
 ```
 
-
 ## Correlation between GDP and other factors
 
 ### Input factors
 
 ```{r}
-cor(data_general$income, data_general$CO2)
+cor(data_general$income, data_general$CO2) # / 0.62
 ```
 
 -\> strong correlations
 
 ```{r}
-cor(data_general$income, data_general$foreign_investment)
+cor(data_general$income, data_general$foreign_investment) # / 0.40
 ```
 
 ```{r}
-cor(data_general$income, data_general$mean_years_in_school)
+cor(data_general$income, data_general$mean_years_in_school) # / 0.41
 ```
 
 ```{r}
-cor(data_general$income, data_general$material_footprint)
+cor(data_general$income, data_general$material_footprint) # / 0.84
 ```
 
 -\> strong correlation
@@ -484,13 +483,12 @@ cor(data_general$income, data_general$material_footprint)
 ### Other well-begin factors
 
 ```{r}
-cor(wellfare_ind$income, wellfare_ind$hdi, use = "pairwise.complete.obs")
-cor(wellfare_ind$income, wellfare_ind$hpi, use = "pairwise.complete.obs")
+cor(wellfare_ind$income, wellfare_ind$hdi, use = "pairwise.complete.obs") # / 0.97
+cor(wellfare_ind$income, wellfare_ind$hpi, use = "pairwise.complete.obs") # / -0.08
 
 ```
 
 ## Add clusters to wellfare_ind data set
-
 
 ```{r}
 # Adding more data to data set for grouping
@@ -498,8 +496,18 @@ cor(wellfare_ind$income, wellfare_ind$hpi, use = "pairwise.complete.obs")
 wellfare_ind <- merge(wellfare_ind, data_general[c("dmu", "cluster")])
 
 wellfare_ind$cluster <- factor(wellfare_ind$cluster)
-```
 
+# Average
+avg_wellfare_ind <- wellfare_ind %>%
+  select(country, efficiency_crs, efficiency_vrs, hdi, hpi, income) %>%
+  group_by(country) %>%
+  summarize(across(everything(), mean)) %>%
+  mutate(cluster = as.character(km.clusters_mean))
+
+avg_wellfare_ind$continent <- countrycode(sourcevar = avg_wellfare_ind$country,
+                               origin = "country.name",
+                               destination = "continent")
+```
 
 # Export data sets for further analysis
 
@@ -509,6 +517,9 @@ write_csv(data_general, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/proces
 
 write_csv(wellfare_ind, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/wellfare_ind.csv")
 
+write_csv(avg_wellfare_ind, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/avg_wellfare_ind.csv")
+
+
 # means and variance
 write_csv(means_country, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/means_country.csv")
 
@@ -517,6 +528,7 @@ write_csv(means_year, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processe
 write_csv(variance_country, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/variance_country.csv")
 
 write_csv(variance_year, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/variance_year.csv")
+
 
 # wide data sets
 write_csv(data_crs_wider_eff, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/data_crs_wider_eff.csv")
@@ -528,4 +540,3 @@ write_csv(data_vrs_wider_eff, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/
 write_csv(data_vrs_wider_rank, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/data_vrs_wider_rank.csv")
 
 ```
-
