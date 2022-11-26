@@ -38,33 +38,33 @@ if (scaled == TRUE) {
 }
 
 # general data sets
-data_general <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/data_general", s, ".csv", sep = ""))
+data_general <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files 113/data_general", s, ".csv", sep = ""))
 
-wellfare_ind <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/wellfare_ind", s, ".csv", sep = ""))
+wellfare_ind <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files 113/wellfare_ind", s, ".csv", sep = ""))
 
 wellfare_ind$cluster <- as.factor(wellfare_ind$cluster)
 
-avg_wellfare_ind <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/avg_wellfare_ind", s, ".csv", sep = ""))
+avg_wellfare_ind <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files 113/avg_wellfare_ind", s, ".csv", sep = ""))
 
 
 # means and variance
-means_country <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/means_country", s, ".csv", sep = ""))
+means_country <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files 113/means_country", s, ".csv", sep = ""))
 
-means_year <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/means_year", s, ".csv", sep = ""))
+means_year <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files 113/means_year", s, ".csv", sep = ""))
 
-variance_country <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/variance_country", s, ".csv", sep = ""))
+variance_country <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files 113/variance_country", s, ".csv", sep = ""))
 
-variance_year <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/variance_year", s, ".csv", sep = ""))
+variance_year <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files 113/variance_year", s, ".csv", sep = ""))
 
 
 # wide data sets
-data_crs_wider_eff <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/data_crs_wider_eff", s, ".csv", sep = ""))
+data_crs_wider_eff <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files 113/data_crs_wider_eff", s, ".csv", sep = ""))
 
-data_crs_wider_rank <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/data_crs_wider_rank", s, ".csv", sep = ""))
+data_crs_wider_rank <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files 113/data_crs_wider_rank", s, ".csv", sep = ""))
 
-data_vrs_wider_eff <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/data_vrs_wider_eff", s, ".csv", sep = ""))
+data_vrs_wider_eff <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files 113/data_vrs_wider_eff", s, ".csv", sep = ""))
 
-data_vrs_wider_rank <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/data_vrs_wider_rank", s, ".csv", sep = ""))
+data_vrs_wider_rank <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files 113/data_vrs_wider_rank", s, ".csv", sep = ""))
 ```
 
 ## Problems
@@ -142,8 +142,8 @@ cor(data_general %>% select(efficiency_crs, efficiency_vrs))
 ### 100% efficient
 
 ```{r}
-sum(data_general$efficiency_crs == 1) # = 63 / 53
-sum(data_general$efficiency_vrs == 1) # = 193 / 127
+sum(data_general$efficiency_crs == 1) # = 63 / 56
+sum(data_general$efficiency_vrs == 1) # = 193 / 151
 ```
 
 ## Most efficient, Least efficient, big changes
@@ -156,6 +156,8 @@ On average
 means_country$country[means_country$efficiency_crs == 1]
 
 means_country$country[means_country$efficiency_crs == min(means_country$efficiency_crs)]
+
+head(means_country[order(-means_country$efficiency_crs),],10)
 ```
 
 Individual DMUs
@@ -183,6 +185,8 @@ On average:
 means_country$country[means_country$efficiency_vrs == 1]
 
 means_country$country[means_country$efficiency_vrs == min(means_country$efficiency_crs)]
+
+head(means_country[order(-means_country$efficiency_vrs),],20)
 ```
 
 Individual DMUs
@@ -237,8 +241,8 @@ crsvrs_means_comp
 CO2
 
 ```{r}
-cor(data_general[c("CO2", "efficiency_crs")]) # = -24 / -28
-cor(data_general[c("CO2", "efficiency_vrs")]) # = -25 / -28
+cor(data_general[c("CO2", "efficiency_crs")]) # = -24 / -21
+cor(data_general[c("CO2", "efficiency_vrs")]) # = -25 / -21
 ```
 
 Slight negative correlation (-0.4). The more CO2 emissions per person, the worse the
@@ -246,8 +250,8 @@ Slight negative correlation (-0.4). The more CO2 emissions per person, the worse
 Foreign Direct Investment
 
 ```{r}
-cor(data_general[c("foreign_investment", "efficiency_crs")]) # = -48 / -48
-cor(data_general[c("foreign_investment", "efficiency_vrs")]) # = -38 / -40
+cor(data_general[c("foreign_investment", "efficiency_crs")]) # = -48 / -52
+cor(data_general[c("foreign_investment", "efficiency_vrs")]) # = -38 / -44
 ```
 
 No correlation between FDI and the resulting efficiencies
@@ -255,15 +259,15 @@ No correlation between FDI and the resulting efficiencies
 Material footprint
 
 ```{r}
-cor(data_general[c("material_footprint", "efficiency_crs")]) # = -27 / -28
-cor(data_general[c("material_footprint", "efficiency_vrs")]) # = -19 / -22
+cor(data_general[c("material_footprint", "efficiency_crs")]) # = -27 / -24
+cor(data_general[c("material_footprint", "efficiency_vrs")]) # = -19 / -17
 ```
 
 Small correlation (-0.3)
 
 ```{r}
-cor(data_general[c("government_debt", "efficiency_crs")]) # = -43 / -41
-cor(data_general[c("government_debt", "efficiency_vrs")]) # = -27 / -25
+cor(data_general[c("government_debt", "efficiency_crs")]) # = -43 / -42
+cor(data_general[c("government_debt", "efficiency_vrs")]) # = -27 / -27
 ```
 
 > Foreign investment highest input on efficiency
@@ -364,10 +368,31 @@ Countries to consider (CRS):
 | Denmark                       | 1997,2004,2012            |                                 |                 |                          |
 | Estonia                       | 2003-2008                 |                                 |                 |                          |
 | Germany                       | 2011,2014                 |                                 |                 |                          |
-| Kazakhztan                    | 2005,2006,2008            |                                 |                 |                          |
+| Kazakhstan                    | 2005,2006,2008            |                                 |                 |                          |
 | Moldova (very often 100%)     | 1999-2016                 |                                 |                 |                          |
 | Switzerland                   | 1990-1993,1997, 2011-2013 |                                 |                 |                          |
 |                               |                           |                                 |                 |                          |
+
+### Iceland
+
+```{r}
+deepdive("Iceland", "i")
+deepdive("Iceland", "o")
+```
+
+### Bulgaria
+
+```{r}
+deepdive("Bulgaria", "i")
+deepdive("Bulgaria", "o")
+```
+
+### Colombia
+
+```{r}
+deepdive("Colombia", "i")
+deepdive("Colombia", "o")
+```
 
 ### Albania
 
@@ -422,7 +447,7 @@ deepdive("Moldova", "i")
 deepdive("Moldova", "o")
 ```
 
-## Correlation with BIP/HDI/HPI
+## Comparison with BIP/HDI/HPI
 
 ### **GDP (income/gdp per person)**
 
@@ -433,6 +458,21 @@ wellfare_ind %>%
 ```
 
 Almost no correlation
+
+Best performing countries based on GDP
+
+```{r}
+# Individual DMUS
+unique(head(data_general[order(-data_general$income),],200)$country)
+
+# on average
+unique(head(means_country[order(-means_country$income),],10)$country)
+
+# latest year
+latest_data <- subset(data_general, year == 2016)
+latest_data[order(-latest_data$income),]
+nrow(latest_data)
+```
 
 ### **HDI**
 
@@ -454,6 +494,7 @@ vrs_vs_hdi_cluster <- wellfare_ind %>%
     color = cluster
   ))+
   theme(legend.position="bottom")
+vrs_vs_hdi_cluster
 ```
 
 The clusters seem to very well represent the different development classes based on the HDI
@@ -477,6 +518,7 @@ vrs_vs_hdi_continent <- wellfare_ind %>%
     color = continent
   ))+
   theme(legend.position="bottom")
+vrs_vs_hdi_continent
 ```
 
 ```{r}
@@ -501,28 +543,36 @@ avg_wellfare_ind %>%
 
 ```{r}
 wellfare_ind %>%
-  select(efficiency_crs, hpi)%>%
+  select(efficiency_crs, efficiency_vrs, hpi)%>%
   cor(use = "pairwise.complete.obs")
 ```
 
 ```{r}
 # Color-coded by cluster
-wellfare_ind %>%
-  ggplot(aes(efficiency_crs, hpi))+
+vrs_vs_hpi_cluster <- wellfare_ind %>%
+  ggplot(aes(efficiency_vrs, hpi))+
   geom_point(aes(
     color = cluster
   ))+
-  geom_smooth()
+  geom_smooth()+
+  theme(legend.position="bottom")
+vrs_vs_hpi_cluster
 ```
 
 ```{r}
 # Color-coded by continent
-wellfare_ind %>%
-  ggplot(aes(efficiency_crs, hpi))+
+vrs_vs_hpi_continent <- wellfare_ind %>%
+  ggplot(aes(efficiency_vrs, hpi))+
   geom_point(aes(
     color = continent
   ))+
-  geom_smooth()
+  geom_smooth()+
+  theme(legend.position="bottom")
+vrs_vs_hpi_continent
+```
+
+```{r}
+grid.arrange(vrs_vs_hpi_cluster, vrs_vs_hpi_continent)
 ```
 
 #### Average values

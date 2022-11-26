@@ -78,15 +78,15 @@ at first sight
 # 
 # data_vrs$target_input.foreign_investment <- data_vrs$target_input.foreign_investment * (-1) + 450
 
-# # crs
-# data_crs$foreign_investment <- data_crs$foreign_investment - 58.5
-# 
-# data_crs$target_input.foreign_investment <- data_crs$target_input.foreign_investment - 58.5
-# 
-# # vrs
-# data_vrs$foreign_investment <- data_vrs$foreign_investment - 58.5
-# 
-# data_vrs$target_input.foreign_investment <- data_vrs$target_input.foreign_investment - 58.5
+# crs
+data_crs$foreign_investment <- data_crs$foreign_investment - 58.5
+
+data_crs$target_input.foreign_investment <- data_crs$target_input.foreign_investment - 58.5
+
+# vrs
+data_vrs$foreign_investment <- data_vrs$foreign_investment - 58.5
+
+data_vrs$target_input.foreign_investment <- data_vrs$target_input.foreign_investment - 58.5
 ```
 
 ## CRS-VRS general data set
@@ -439,7 +439,7 @@ fviz_nbclust(data_scale_mean, kmeans, method = "wss")
 3 clusters makes the most sense
 
 ```{r}
-km.out_mean <- kmeans(data_scale_mean, centers = 4, nstart = 100)
+km.out_mean <- kmeans(data_scale_mean, centers = 4, nstart = 200)
 # print(km.out)
 
 km.clusters_mean <- km.out_mean$cluster
@@ -449,7 +449,7 @@ p
 ```
 
 ```{r}
-pca_analyse <- prcomp(data_scale_mean, rank =4)
+pca_analyse <- prcomp(data_scale_mean, rank = 4)
 pca_analyse$rotation[,1:4]
 #?prcomp
 
@@ -513,30 +513,30 @@ avg_wellfare_ind$continent <- countrycode(sourcevar = avg_wellfare_ind$country,
 
 ```{r}
 # general data sets
-write_csv(data_general, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/data_general.csv")
+write_csv(data_general, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files 113/data_general.csv")
 
-write_csv(wellfare_ind, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/wellfare_ind.csv")
+write_csv(wellfare_ind, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files 113/wellfare_ind.csv")
 
-write_csv(avg_wellfare_ind, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/avg_wellfare_ind.csv")
+write_csv(avg_wellfare_ind, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files 113/avg_wellfare_ind.csv")
 
 
 # means and variance
-write_csv(means_country, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/means_country.csv")
+write_csv(means_country, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files 113/means_country.csv")
 
-write_csv(means_year, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/means_year.csv")
+write_csv(means_year, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files 113/means_year.csv")
 
-write_csv(variance_country, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/variance_country.csv")
+write_csv(variance_country, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files 113/variance_country.csv")
 
-write_csv(variance_year, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/variance_year.csv")
+write_csv(variance_year, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files 113/variance_year.csv")
 
 
 # wide data sets
-write_csv(data_crs_wider_eff, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/data_crs_wider_eff.csv")
+write_csv(data_crs_wider_eff, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files 113/data_crs_wider_eff.csv")
 
-write_csv(data_crs_wider_rank, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/data_crs_wider_rank.csv")
+write_csv(data_crs_wider_rank, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files 113/data_crs_wider_rank.csv")
 
-write_csv(data_vrs_wider_eff, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/data_vrs_wider_eff.csv")
+write_csv(data_vrs_wider_eff, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files 113/data_vrs_wider_eff.csv")
 
-write_csv(data_vrs_wider_rank, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files/data_vrs_wider_rank.csv")
+write_csv(data_vrs_wider_rank, "D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/Working Files 113/data_vrs_wider_rank.csv")
 
 ```
