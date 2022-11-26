@@ -36,11 +36,11 @@ Selection_01 <- regions$country[regions$selection_01 == TRUE]
 
 ```{r}
 # Chose the attempt
-attempt = 113
+attempt = 112
 
 # Number of in- and outputs -> checl struture of selected data set!
 number_of_inputs <- 4
-number_of_outputs <- 5
+number_of_outputs <- 4
 
 # location of inputs and outputs
 input_cols <- c()
@@ -59,12 +59,18 @@ orient <- "io"
 # io: input oriented
 # oo: output oriented
 
-return_to_scale <- "vrs"
+return_to_scale <- "crs"
 # crs: constant return to scale
 # vrs: variable return to scale
 # nirs: non-increasing
 # ndrs: non-decreasing
 # grs: generalized
+
+excluded_cols <- ""
+
+name_additions <- ""
+
+scale_data <- FALSE
 ```
 
 ### Load data
@@ -98,6 +104,20 @@ if (!is.null(chosen_countries)) {
   data <- data %>%
     filter(country %in% chosen_countries)
 }
+
+if (scale_data == TRUE) {
+  data$CO2 <- data$CO2 / mean(data$CO2)
+  data$material_footprint <- data$material_footprint / mean(data$material_footprint)
+  data$foreign_investment <- data$foreign_investment / mean(data$foreign_investment)
+  data$government_debt <- data$government_debt / mean(data$government_debt)
+  data$life_expectancy <- data$life_expectancy / mean(data$life_expectancy)
+  data$income <- data$income / mean(data$income)
+  data$mean_years_in_school <- data$mean_years_in_school / mean(data$mean_years_in_school)
+  data$murder <- data$murder / mean(data$murder)
+  data$income_share_20 <- data$income_share_20 / mean(data$income_share_20)
+}
+
+data[excluded_cols] <- NULL
   
 ```
 
@@ -217,63 +237,67 @@ if (!is.null(chosen_countries)) {
     filename <- paste(filename, "_", "notAllCountries", sep = "")
   }
 }
+
+if (scale_data == TRUE) {
+  filename <- paste(filename, "_scaled", sep = "")
+}
 ```
 
 ```{r}
-write_csv(data_dea, paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/dea_results_", filename, ".csv", sep = ""))
+write_csv(data_dea, paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/dea_results_", filename, name_additions, ".csv", sep = ""))
 ```
 
 ## 1on1 DEA
 
 ```{r}
-for (i in 1:number_of_inputs) {
-  for (j in 1:number_of_outputs) {
-    
-    partial_data <- data[c(1,1+i,number_of_inputs+1+j)]
-    
-    model_data <- read_data(partial_data,
-                        ni=1,
-                        no=1,
-                        dmus = 1)
-
-    result <- model_basic(model_data, orientation = orient, rts=return_to_scale)
-
-
-# Efficiencies
-    eff <- as.data.frame(efficiencies(result))
-
-# add column for dmu names
-    eff$dmu <- rownames(eff)
-
-# delete rownames
-    rownames(eff) <- NULL
-
-# Rename efficiency column
-    colnames(eff)[1] <- "efficiencies"
-
-# get targets
-    # targets <- as.data.frame(targets(result))
-
-# add column for dmu names
-    # targets$dmu <- rownames(targets)
-
-# delte rownames
-    # rownames(targets) <- NULL
-
-    data_and_results <- list(
-      partial_data,
-      eff
-    )
-
-    data_dea <- data_and_results %>% reduce(full_join, by="dmu")
-
-    data_dea <- data_dea %>% relocate(efficiencies, .after = dmu)
-
-    data_dea <- separate(data_dea, dmu, c("country", "year"), "_", remove=FALSE)
-
-    write_csv(data_dea, paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/dea_results_", filename, "_", as.character(i), as.character(j), ".csv", sep = ""))
-
-  }
-
-}
+# for (i in 1:number_of_inputs) {
+#   for (j in 1:number_of_outputs) {
+#     
+#     partial_data <- data[c(1,1+i,number_of_inputs+1+j)]
+#     
+#     model_data <- read_data(partial_data,
+#                         ni=1,
+#                         no=1,
+#                         dmus = 1)
+# 
+#     result <- model_basic(model_data, orientation = orient, rts=return_to_scale)
+# 
+# 
+# # Efficiencies
+#     eff <- as.data.frame(efficiencies(result))
+# 
+# # add column for dmu names
+#     eff$dmu <- rownames(eff)
+# 
+# # delete rownames
+#     rownames(eff) <- NULL
+# 
+# # Rename efficiency column
+#     colnames(eff)[1] <- "efficiencies"
+# 
+# # get targets
+#     # targets <- as.data.frame(targets(result))
+# 
+# # add column for dmu names
+#     # targets$dmu <- rownames(targets)
+# 
+# # delte rownames
+#     # rownames(targets) <- NULL
+# 
+#     data_and_results <- list(
+#       partial_data,
+#       eff
+#     )
+# 
+#     data_dea <- data_and_results %>% reduce(full_join, by="dmu")
+# 
+#     data_dea <- data_dea %>% relocate(efficiencies, .after = dmu)
+# 
+#     data_dea <- separate(data_dea, dmu, c("country", "year"), "_", remove=FALSE)
+# 
+#     write_csv(data_dea, paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/dea_results_", filename, "_", as.character(i), as.character(j), ".csv", sep = ""))
+# 
+#   }
+# 
+# }
 ```
