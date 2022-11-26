@@ -181,7 +181,8 @@ final_13 <- merger(c(
 nrow(final_13)
 ```
 
-Unfortunately, not many dmus are left. -\> (852 with interpolation)
+Unfortunately, not many dmus are left. -\> (852 with interpolation, 591
+without Interpolation)
 
 ```{r}
 check0(final_13)
@@ -212,19 +213,18 @@ write_final(final_13)
 | CO2                | life_expectancy      |
 | material_footprint | income               |
 | foreign_investment | mean_years_in_school |
-| missing: debts     | murder               |
-|                    | income_share_20      |
+| government_debt    | murder               |
 
 ```{r}
 final_12 <- merger(c(
   "CO2",
   "material_footprint",
   "foreign_investment",
+  "government_debt",
   "life_expectancy",
   "income",
   "mean_years_in_school",
-  "murder",
-  "income_share_20"
+  "murder"
 ))
 
 nrow(final_12)
@@ -236,7 +236,7 @@ Unfortunately, not many dmus are left. -\> 637 (937 with interpolation)
 check0(final_12)
 ```
 
-36 values with 0
+49 values with 0
 
 ```{r}
 min(final_12$mean_years_in_school)
