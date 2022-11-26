@@ -44,7 +44,7 @@ source("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/code/functions.R")
 ## Load data
 
 ```{r}
-data <- read_final(13)
+data <- read_final(12)
 str(data)
 ```
 
@@ -117,8 +117,6 @@ each value along the middle between min and max
 data$foreign_investment <- (data$foreign_investment - (min(data$foreign_investment))+1)
 ```
 
-Now, Luxembourg 2007 and Malta 2007 switched places
-
 ### Government debts
 
 The less the better \<- good
@@ -172,6 +170,8 @@ It cannot be below 0. No adjustment needed
 ## Export adjusted data set
 
 ```{r}
-final_113 <- data
-write_final(final_113)
+final_112 <- data
+
+write_final(final_112)
+
 ```

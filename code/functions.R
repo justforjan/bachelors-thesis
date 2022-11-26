@@ -93,7 +93,7 @@ deepdive <- function(a, io) {
     geom_line()+
     geom_point()+
     facet_wrap(vars(indicator), scales = "free_y", ncol = 1, strip.position = "top")+
-    theme(strip.background = element_blank(), strip.placement = "outside")
+    theme(strip.background = element_blank(), strip.placement = "outside", legend.position="none")
 }
 
 

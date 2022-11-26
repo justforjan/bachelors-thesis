@@ -19,6 +19,8 @@ murder
 foreign_investment
 hdi
 government_debt
+hpi
+world_happiness_report
 
 **Gapminder**
 women_in_parliament
