@@ -318,7 +318,7 @@ pca$x
 data_general2 <- cbind(data_general, pca$x[,1:2])
 
 # CORRELATION
-cor(data_general[,9:ncol(data_general)], pca$x)
+as.data.frame(cor(data_general[,9:ncol(data_general)], pca$x))
 
 ```
 
@@ -351,15 +351,14 @@ fviz_nbclust(data_scale, kmeans, method = "wss")
 It is difficult to make out the ideal number of cluster but 6 seems to be one of the better options.
 
 ```{r}
-km.out <- kmeans(data_scale, centers = 5, nstart = 100)
+km.out <- kmeans(data_scale, centers = 5, nstart = 200)
 # print(km.out)
-```
 
-```{r}
 km.clusters <- km.out$cluster
 rownames(data_scale) <- data.lables
 fviz_cluster(list(data=data_scale, cluster=km.clusters))
 ```
+
 
 ```{r}
 data_general$cluster <- km.clusters
@@ -439,7 +438,7 @@ fviz_nbclust(data_scale_mean, kmeans, method = "wss")
 3 clusters makes the most sense
 
 ```{r}
-km.out_mean <- kmeans(data_scale_mean, centers = 4, nstart = 200)
+km.out_mean <- kmeans(data_scale_mean, centers = 3, nstart = 200)
 # print(km.out)
 
 km.clusters_mean <- km.out_mean$cluster
@@ -461,13 +460,13 @@ pca_analyse$rotation[,1:4]
 ### Input factors
 
 ```{r}
-cor(data_general$income, data_general$CO2) # / 0.62
+cor(data_general$income, data_general$CO2) # / 0.66
 ```
 
 -\> strong correlations
 
 ```{r}
-cor(data_general$income, data_general$foreign_investment) # / 0.40
+cor(data_general$income, data_general$foreign_investment) # / 0.06
 ```
 
 ```{r}
@@ -475,7 +474,7 @@ cor(data_general$income, data_general$mean_years_in_school) # / 0.41
 ```
 
 ```{r}
-cor(data_general$income, data_general$material_footprint) # / 0.84
+cor(data_general$income, data_general$material_footprint) # / 0.86
 ```
 
 -\> strong correlation
@@ -483,8 +482,8 @@ cor(data_general$income, data_general$material_footprint) # / 0.84
 ### Other well-begin factors
 
 ```{r}
-cor(wellfare_ind$income, wellfare_ind$hdi, use = "pairwise.complete.obs") # / 0.97
-cor(wellfare_ind$income, wellfare_ind$hpi, use = "pairwise.complete.obs") # / -0.08
+cor(wellfare_ind$income, wellfare_ind$hdi, use = "pairwise.complete.obs") # / 0.76
+cor(wellfare_ind$income, wellfare_ind$hpi, use = "pairwise.complete.obs") # / -0.10
 
 ```
 
