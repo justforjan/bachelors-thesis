@@ -174,6 +174,32 @@ colnames(wellfare_ind)[ncol(wellfare_ind)] <- "hpi"
 
 # Exploratory Analyses
 
+## What's in the data set
+
+```{r}
+nrow(data_general)
+table(data_general$continent)
+unique(data_general$country)
+length(unique(data_general$country))
+
+countries <- as.data.frame(table(data_general$country))
+
+countries$continent <- countrycode(sourcevar = countries$Var1,
+                                          origin = "country.name",
+                                          destination = "continent")
+
+subset(countries, Freq >= 5)
+nrow(subset(countries, Freq >= 5))
+subset(countries, Freq >= 10)
+nrow(subset(countries, Freq >= 10))
+
+table(countries$continent)
+table(subset(countries, Freq >= 5)$continent)
+table(subset(countries, Freq >= 10)$continent)
+
+```
+
+
 ## Means and variance
 
 ### Means per country
@@ -300,40 +326,6 @@ data_vrs_wider_eff <- data_vrs_wider_eff %>% mutate(rank = min_rank(desc(average
 data_vrs_wider_eff <- data_vrs_wider_eff %>% relocate(rank)
 ```
 
-## PCA
-
-```{r}
-# PCA -------
-pca <- prcomp(data_general[,9:ncol(data_general)], scale = TRUE)
-pca
-summary(pca)
-# -> die ersten 6 PCs stellen 90 Prozent dar
-plot(pca, tpye = "l")
-biplot(pca, scale = 0)
-
-# EXTRACT PC SCORES ------
-str(pca)
-pca$x
-
-data_general2 <- cbind(data_general, pca$x[,1:2])
-
-# CORRELATION
-as.data.frame(cor(data_general[,9:ncol(data_general)], pca$x))
-
-```
-
-> In PC1 most influencial factors (all positive)
->
-> 1.  income
-> 2.  material footprint
-> 3.  life expectancy
-> 4.  CO2
-> 5.  mean years in school
-> 6.  murder
->
-> In PC2:
->
-> 1.  government debt (+)
 
 ## Clustering
 
@@ -362,7 +354,7 @@ fviz_cluster(list(data=data_scale, cluster=km.clusters))
 
 ```{r}
 data_general$cluster <- km.clusters
-relocate(data_general, cluster, .after = continent)
+data_general <- relocate(data_general, cluster, .after = continent)
 ```
 
 What countries are in the cluster?
@@ -395,6 +387,8 @@ cluster_5 <- cluster_country %>%
 cluster_6 <- cluster_country %>%
   filter(cluster == 6) %>%
   select(unique_countries)
+
+table(data_general$cluster)
 ```
 
 ```{r}
@@ -448,12 +442,50 @@ p
 ```
 
 ```{r}
-pca_analyse <- prcomp(data_scale_mean, rank = 4)
-pca_analyse$rotation[,1:4]
+pca_analyse <- prcomp(data_scale_mean, rank = 6)
+pca_analyse$rotation[,1:6]
 #?prcomp
 
 
 ```
+
+## PCA
+
+```{r}
+# PCA -------
+pca <- prcomp(data_general[,10:ncol(data_general)], scale = TRUE)
+pca
+summary(pca)
+# -> die ersten 6 PCs stellen 90 Prozent dar
+plot(pca, tpye = "l")
+biplot(pca, scale = 0)
+
+# EXTRACT PC SCORES ------
+str(pca)
+pca$x
+
+data_general2 <- cbind(data_general, pca$x[,1:2])
+
+# CORRELATION
+as.data.frame(cor(data_general[,10:ncol(data_general)], pca$x))
+pca$rotation
+
+```
+
+> In PC1 most influencial factors (all positive)
+>
+> 1.  income
+> 2.  material footprint
+> 3.  life expectancy
+> 4.  CO2
+> 5.  mean years in school
+> 6.  murder
+>
+> In PC2:
+>
+> 1.  government debt (+)
+
+
 
 ## Correlation between GDP and other factors
 
