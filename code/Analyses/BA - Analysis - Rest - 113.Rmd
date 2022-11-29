@@ -148,9 +148,9 @@ sum(data_general$efficiency_vrs == 1) # = 193 / 151
 
 ## Most efficient, Least efficient, big changes
 
-### CRS
+### On average
 
-On average
+CRS
 
 ```{r}
 means_country$country[means_country$efficiency_crs == 1]
@@ -158,13 +158,28 @@ means_country$country[means_country$efficiency_crs == 1]
 means_country$country[means_country$efficiency_crs == min(means_country$efficiency_crs)]
 
 head(means_country[order(-means_country$efficiency_crs),],10)
+tail(means_country[order(-means_country$efficiency_crs),],10)
 ```
 
-Individual DMUs
+VRS
+
+```{r}
+means_country$country[means_country$efficiency_vrs == 1]
+
+means_country$country[means_country$efficiency_vrs == min(means_country$efficiency_crs)]
+
+head(means_country[order(-means_country$efficiency_vrs),],10)
+tail(means_country[order(-means_country$efficiency_vrs),],10)
+```
+
+### Individual DMUs
+
+CRS
 
 ```{r}
 crs_100 <- unique(data_general$country[data_general$efficiency_crs == 1])
 crs_100
+write_csv(as.data.frame(crs_100), "crs_100.csv")
 ```
 
 ```{r}
@@ -177,19 +192,7 @@ unique(head(data_general[order(data_general$rank_crs),],70)$country)
 unique(tail(data_general[order(data_general$rank_crs),],20)$country)
 ```
 
-### VRS
-
-On average:
-
-```{r}
-means_country$country[means_country$efficiency_vrs == 1]
-
-means_country$country[means_country$efficiency_vrs == min(means_country$efficiency_crs)]
-
-head(means_country[order(-means_country$efficiency_vrs),],20)
-```
-
-Individual DMUs
+VRS
 
 ```{r}
 vrs_100 <- unique(data_general$country[data_general$efficiency_vrs == 1])
@@ -207,6 +210,7 @@ unique(tail(data_general[order(data_general$rank_vrs),],20)$country)
 ```{r}
 crs_vrs_10_diff <- setdiff(vrs_100, crs_100)
 crs_vrs_10_diff
+write_csv(as.data.frame(crs_vrs_10_diff), "crs_vrs_100_diff.csv")
 ```
 
 > CRS efficient countries often developing countries, VRS developed...why?
@@ -498,8 +502,6 @@ vrs_vs_hdi_cluster
 ```
 
 The clusters seem to very well represent the different development classes based on the HDI
-
-![](images/paste-2B2B1FE9.png)
 
 ```{r}
 wellfare_ind %>%
