@@ -10,6 +10,8 @@ name_without_schooling_crs <- "dea_results_113_io_crs_without_schooling.csv"
 name_scaled_vrs <- "dea_results_113_io_vrs_scaled.csv"
 name_scaled_crs <- "dea_results_113_io_crs_scaled.csv"
 
+name_vrs_CO2_10000 <- "dea_results_113_test_io_crs.csv"
+
 # import data
 original_vrs <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/", name_original_vrs, sep = ""), show_col_types = FALSE)
 original_crs <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/", name_original_crs, sep = ""), show_col_types = FALSE)
@@ -22,8 +24,11 @@ without_schooling_crs <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelo
 scaled_vrs <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/", name_scaled_vrs, sep = ""), show_col_types = FALSE)
 scaled_crs <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/", name_scaled_crs, sep = ""), show_col_types = FALSE)
 
+vrs_CO2_10000 <- read_csv(paste("D:/Daten/Bildung/HS Mannheim/BA/bachelors-thesis/processed_data/", name_vrs_CO2_10000, sep = ""), show_col_types = FALSE)
+
+
 # correlations
-## without on output
+## without one output
 cor(original_vrs$efficiencies, without_life_expect_vrs$efficiencies) # 0.92
 cor(original_vrs$efficiencies, without_schooling_vrs$efficiencies) # 0.98
 
@@ -36,6 +41,8 @@ cor(original_crs$efficiencies, scaled_crs$efficiencies) # 1.0
 
 # -> same efficiencies?
 identical(original_crs$efficiencies, scaled_crs$efficiencies) # TRUE
+
+cor(original_vrs$efficiencies, vrs_CO2_10000$efficiencies)
 
 
 # fully efficient countries
